@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Website du lịch - Khám phá những điểm đến tuyệt vời">
     <title>Du Lịch Việt Nam - Trang Chủ</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -18,19 +18,27 @@
                 <div class="nav-wrapper">
                     <div class="logo">
                         <a href="index.html">
-                            <span class="logo-icon">🌴</span>
-                            <span class="logo-text">Du Lịch Việt</span>
+                            <img src="img/logo.png" alt="logo">
                         </a>
                     </div>
                     
                     <!-- Desktop Menu -->
                     <ul class="nav-menu">
-                        <li><a href="#home" class="nav-link active">Home</a></li>
-                        <li><a href="#tours" class="nav-link">Tour</a></li>
+                        <li><a href="#home" class="nav-link active">Trang chủ</a></li>
                         <li><a href="#about" class="nav-link">Giới thiệu</a></li>
+                        <li><a href="#tours" class="nav-link">Tour</a></li>
                         <li><a href="#destinations" class="nav-link">Điểm đến</a></li>
+                        <li><a href="#services" class="nav-link">Dịch vụ</a></li>
+                        <li><a href="#deals" class="nav-link">Ưu đãi</a></li>
+                        <li><a href="#blog" class="nav-link">Blog</a></li>
                         <li><a href="#contact" class="nav-link">Liên hệ</a></li>
                     </ul>
+                    
+                    <!-- Auth Buttons -->
+                    <div class="auth-buttons">
+                        <a href="#login" class="auth-btn auth-login">Đăng nhập</a>
+                        <a href="#register" class="auth-btn auth-register">Đăng ký</a>
+                    </div>
                     
                     <!-- Hamburger Menu Button -->
                     <button class="hamburger" aria-label="Toggle menu">
@@ -45,12 +53,19 @@
         <!-- Mobile Menu -->
         <div class="mobile-menu">
             <ul class="mobile-nav-menu">
-                <li><a href="#home" class="mobile-nav-link">Home</a></li>
-                <li><a href="#tours" class="mobile-nav-link">Tour</a></li>
+                <li><a href="#home" class="mobile-nav-link">Trang chủ</a></li>
                 <li><a href="#about" class="mobile-nav-link">Giới thiệu</a></li>
+                <li><a href="#tours" class="mobile-nav-link">Tour</a></li>
                 <li><a href="#destinations" class="mobile-nav-link">Điểm đến</a></li>
+                <li><a href="#services" class="mobile-nav-link">Dịch vụ</a></li>
+                <li><a href="#deals" class="mobile-nav-link">Ưu đãi</a></li>
+                <li><a href="#blog" class="mobile-nav-link">Blog</a></li>
                 <li><a href="#contact" class="mobile-nav-link">Liên hệ</a></li>
             </ul>
+            <div class="mobile-auth-buttons">
+                <a href="#login" class="mobile-auth-btn mobile-auth-login">Đăng nhập</a>
+                <a href="#register" class="mobile-auth-btn mobile-auth-register">Đăng ký</a>
+            </div>
         </div>
     </header>
 
@@ -548,7 +563,7 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>
 
