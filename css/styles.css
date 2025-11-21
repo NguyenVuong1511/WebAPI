@@ -758,8 +758,8 @@ section {
 
 .about-card {
     position: absolute;
-    bottom: -20px;
-    right: -20px;
+    bottom: -60px;
+    right: -60px;
     background-color: var(--bg-white);
     padding: var(--spacing-lg);
     border-radius: var(--border-radius-lg);
