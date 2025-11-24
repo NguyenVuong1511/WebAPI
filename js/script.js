@@ -637,5 +637,457 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch: fetchDestinations,
         getData: () => destinationsData
     };
+
+    // ============================================
+    // Testimonials API Integration
+    // ============================================
+    
+    // DOM Elements
+    const testimonialsContainer = document.getElementById('testimonials-container');
+    const testimonialsLoading = document.getElementById('testimonials-loading');
+    const testimonialsError = document.getElementById('testimonials-error');
+    const testimonialsEmpty = document.getElementById('testimonials-empty');
+    const testimonialsPagination = document.getElementById('testimonials-pagination');
+    const retryTestimonialsBtn = document.getElementById('retry-testimonials');
+    const testimonialsPrevBtn = document.getElementById('testimonials-prev');
+    const testimonialsNextBtn = document.getElementById('testimonials-next');
+    const testimonialsPages = document.getElementById('testimonials-pages');
+
+    // State Management
+    let testimonialsData = [];
+    let currentPage = 1;
+    let totalPages = 1;
+    const itemsPerPage = 3;
+
+    /**
+     * Hiển thị loading state
+     */
+    function showTestimonialsLoading() {
+        if (testimonialsLoading) testimonialsLoading.style.display = 'block';
+        if (testimonialsContainer) testimonialsContainer.style.display = 'none';
+        if (testimonialsError) testimonialsError.style.display = 'none';
+        if (testimonialsEmpty) testimonialsEmpty.style.display = 'none';
+        if (testimonialsPagination) testimonialsPagination.style.display = 'none';
+    }
+
+    /**
+     * Hiển thị error state
+     */
+    function showTestimonialsError() {
+        if (testimonialsLoading) testimonialsLoading.style.display = 'none';
+        if (testimonialsContainer) testimonialsContainer.style.display = 'none';
+        if (testimonialsError) testimonialsError.style.display = 'block';
+        if (testimonialsEmpty) testimonialsEmpty.style.display = 'none';
+        if (testimonialsPagination) testimonialsPagination.style.display = 'none';
+    }
+
+    /**
+     * Hiển thị empty state
+     */
+    function showTestimonialsEmpty() {
+        if (testimonialsLoading) testimonialsLoading.style.display = 'none';
+        if (testimonialsContainer) testimonialsContainer.style.display = 'none';
+        if (testimonialsError) testimonialsError.style.display = 'none';
+        if (testimonialsEmpty) testimonialsEmpty.style.display = 'block';
+        if (testimonialsPagination) testimonialsPagination.style.display = 'none';
+    }
+
+    /**
+     * Hiển thị testimonials
+     */
+    function showTestimonials() {
+        if (testimonialsLoading) testimonialsLoading.style.display = 'none';
+        if (testimonialsContainer) testimonialsContainer.style.display = 'grid';
+        if (testimonialsError) testimonialsError.style.display = 'none';
+        if (testimonialsEmpty) testimonialsEmpty.style.display = 'none';
+    }
+
+    /**
+     * Tạo HTML cho một testimonial card
+     * @param {Object} testimonial - Dữ liệu testimonial
+     * @returns {string} HTML string
+     */
+    function createTestimonialCard(testimonial) {
+        const {
+            id,
+            customerName,
+            customerAvatar = '',
+            customerInitials = '',
+            rating = 5,
+            comment = '',
+            tourName = '',
+            createdAt = '',
+            verified = false
+        } = testimonial;
+
+        // Tạo avatar initials từ tên nếu không có
+        const initials = customerInitials || (customerName ? customerName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'KH');
+        
+        // Tạo stars từ rating
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+        let starsHTML = '⭐'.repeat(fullStars);
+        if (hasHalfStar) starsHTML += '⭐';
+        // Đảm bảo luôn có 5 sao
+        while (starsHTML.length < 5) starsHTML += '☆';
+
+        // Format date
+        let dateText = '';
+        if (createdAt) {
+            try {
+                const date = new Date(createdAt);
+                dateText = date.toLocaleDateString('vi-VN', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+            } catch (e) {
+                dateText = createdAt;
+            }
+        }
+
+        return `
+            <div class="testimonial-card" data-id="${id || ''}">
+                <div class="testimonial-rating">
+                    <span>${starsHTML}</span>
+                    ${dateText ? `<span class="testimonial-date">${dateText}</span>` : ''}
+                </div>
+                <p class="testimonial-text">"${comment || 'Chưa có đánh giá'}"</p>
+                ${tourName ? `<p class="testimonial-tour">Tour: <strong>${tourName}</strong></p>` : ''}
+                <div class="testimonial-author">
+                    ${customerAvatar ? 
+                        `<img src="${customerAvatar}" alt="${customerName}" class="author-avatar-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : 
+                        ''
+                    }
+                    <div class="author-avatar" ${customerAvatar ? 'style="display: none;"' : ''}>${initials}</div>
+                    <div class="author-info">
+                        <h4 class="author-name">
+                            ${customerName || 'Khách hàng'}
+                            ${verified ? '<span class="verified-badge">✓</span>' : ''}
+                        </h4>
+                        <p class="author-role">Khách hàng</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render danh sách testimonials với phân trang
+     * @param {Array} testimonials - Mảng testimonials
+     * @param {number} page - Trang hiện tại
+     */
+    function renderTestimonials(testimonials, page = 1) {
+        if (!testimonialsContainer) return;
+
+        if (!testimonials || testimonials.length === 0) {
+            showTestimonialsEmpty();
+            return;
+        }
+
+        // Tính toán phân trang
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const currentTestimonials = testimonials.slice(startIndex, endIndex);
+        totalPages = Math.ceil(testimonials.length / itemsPerPage);
+        currentPage = page;
+
+        // Xóa nội dung cũ
+        testimonialsContainer.innerHTML = '';
+
+        // Render từng testimonial
+        currentTestimonials.forEach(testimonial => {
+            const cardHTML = createTestimonialCard(testimonial);
+            testimonialsContainer.insertAdjacentHTML('beforeend', cardHTML);
+        });
+
+        showTestimonials();
+        
+        // Render pagination
+        renderPagination();
+    }
+
+    /**
+     * Render pagination controls
+     */
+    function renderPagination() {
+        if (!testimonialsPagination || !testimonialsPages) return;
+
+        // Ẩn pagination nếu chỉ có 1 trang
+        if (totalPages <= 1) {
+            testimonialsPagination.style.display = 'none';
+            return;
+        }
+
+        testimonialsPagination.style.display = 'flex';
+        
+        // Update prev/next buttons
+        if (testimonialsPrevBtn) {
+            testimonialsPrevBtn.disabled = currentPage === 1;
+            testimonialsPrevBtn.classList.toggle('disabled', currentPage === 1);
+        }
+        
+        if (testimonialsNextBtn) {
+            testimonialsNextBtn.disabled = currentPage === totalPages;
+            testimonialsNextBtn.classList.toggle('disabled', currentPage === totalPages);
+        }
+
+        // Render page numbers
+        testimonialsPages.innerHTML = '';
+        
+        // Hiển thị tối đa 5 số trang
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, startPage + 4);
+        
+        if (endPage - startPage < 4) {
+            startPage = Math.max(1, endPage - 4);
+        }
+
+        // Button "First" nếu không bắt đầu từ 1
+        if (startPage > 1) {
+            const firstBtn = document.createElement('button');
+            firstBtn.className = 'pagination-page';
+            firstBtn.textContent = '1';
+            firstBtn.addEventListener('click', () => goToPage(1));
+            testimonialsPages.appendChild(firstBtn);
+            
+            if (startPage > 2) {
+                const dots = document.createElement('span');
+                dots.className = 'pagination-dots';
+                dots.textContent = '...';
+                testimonialsPages.appendChild(dots);
+            }
+        }
+
+        // Page numbers
+        for (let i = startPage; i <= endPage; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.className = 'pagination-page';
+            if (i === currentPage) {
+                pageBtn.classList.add('active');
+            }
+            pageBtn.textContent = i;
+            pageBtn.addEventListener('click', () => goToPage(i));
+            testimonialsPages.appendChild(pageBtn);
+        }
+
+        // Button "Last" nếu không kết thúc ở totalPages
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                const dots = document.createElement('span');
+                dots.className = 'pagination-dots';
+                dots.textContent = '...';
+                testimonialsPages.appendChild(dots);
+            }
+            
+            const lastBtn = document.createElement('button');
+            lastBtn.className = 'pagination-page';
+            lastBtn.textContent = totalPages;
+            lastBtn.addEventListener('click', () => goToPage(totalPages));
+            testimonialsPages.appendChild(lastBtn);
+        }
+    }
+
+    /**
+     * Điều hướng đến trang cụ thể
+     * @param {number} page - Số trang
+     */
+    function goToPage(page) {
+        if (page < 1 || page > totalPages || page === currentPage) return;
+        
+        renderTestimonials(testimonialsData, page);
+        
+        // Smooth scroll to testimonials section
+        const testimonialsSection = document.querySelector('.testimonials');
+        if (testimonialsSection) {
+            const headerOffset = 80;
+            const elementPosition = testimonialsSection.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+            
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
+    }
+
+    /**
+     * Fetch testimonials từ API
+     * @param {Object} options - Tùy chọn (limit, offset, sortBy)
+     * @returns {Promise<Array>}
+     */
+    async function fetchTestimonials(options = {}) {
+        const {
+            limit = 100, // Lấy nhiều để phân trang phía client
+            offset = 0,
+            sortBy = 'createdAt',
+            sortOrder = 'desc'
+        } = options;
+
+        try {
+            // Tạo URL với query parameters
+            const url = new URL(`${API_CONFIG.BASE_URL}/testimonials`);
+            url.searchParams.append('limit', limit);
+            url.searchParams.append('offset', offset);
+            url.searchParams.append('sortBy', sortBy);
+            url.searchParams.append('sortOrder', sortOrder);
+
+            const response = await fetch(url.toString(), {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                signal: AbortSignal.timeout(10000)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            // Xử lý các format response khác nhau
+            if (data.data && Array.isArray(data.data)) {
+                return data.data;
+            } else if (data.testimonials && Array.isArray(data.testimonials)) {
+                return data.testimonials;
+            } else if (data.reviews && Array.isArray(data.reviews)) {
+                return data.reviews;
+            } else if (Array.isArray(data)) {
+                return data;
+            } else {
+                throw new Error('Invalid response format');
+            }
+        } catch (error) {
+            console.error('Error fetching testimonials:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Load testimonials với error handling
+     */
+    async function loadTestimonials() {
+        try {
+            showTestimonialsLoading();
+
+            // Thử fetch từ API
+            const testimonials = await fetchTestimonials({
+                limit: 100,
+                sortBy: 'createdAt',
+                sortOrder: 'desc'
+            });
+
+            // Sắp xếp lại để đảm bảo mới nhất lên đầu
+            testimonialsData = testimonials.sort((a, b) => {
+                const dateA = new Date(a.createdAt || a.date || 0);
+                const dateB = new Date(b.createdAt || b.date || 0);
+                return dateB - dateA;
+            });
+
+            renderTestimonials(testimonialsData, 1);
+        } catch (error) {
+            console.error('Failed to load testimonials:', error);
+            
+            // Nếu API chưa sẵn sàng, sử dụng dữ liệu mẫu
+            if (error.name === 'AbortError' || error.message.includes('Failed to fetch')) {
+                console.warn('API không khả dụng, sử dụng dữ liệu mẫu');
+                const mockTestimonials = getMockTestimonials();
+                testimonialsData = mockTestimonials;
+                renderTestimonials(mockTestimonials, 1);
+            } else {
+                showTestimonialsError();
+            }
+        }
+    }
+
+    /**
+     * Dữ liệu mẫu - Sử dụng khi API chưa sẵn sàng
+     */
+    function getMockTestimonials() {
+        return [
+            {
+                id: 1,
+                customerName: 'Nguyễn Văn A',
+                rating: 5,
+                comment: 'Chuyến đi Hạ Long thật tuyệt vời! Hướng dẫn viên rất nhiệt tình, lịch trình hợp lý và dịch vụ chất lượng. Tôi sẽ quay lại đặt tour khác trong tương lai.',
+                tourName: 'Vịnh Hạ Long - Kỳ Quan Thiên Nhiên',
+                createdAt: new Date('2024-12-15').toISOString(),
+                verified: true
+            },
+            {
+                id: 2,
+                customerName: 'Trần Thị B',
+                rating: 5,
+                comment: 'Tour Sapa vượt quá mong đợi của tôi. Cảnh đẹp, văn hóa đa dạng và trải nghiệm độc đáo. Cảm ơn đội ngũ đã tạo nên một kỷ niệm đáng nhớ!',
+                tourName: 'Sapa - Núi Rừng Tây Bắc',
+                createdAt: new Date('2024-12-14').toISOString(),
+                verified: true
+            },
+            {
+                id: 3,
+                customerName: 'Lê Văn C',
+                rating: 5,
+                comment: 'Phú Quốc là điểm đến tuyệt vời! Bãi biển đẹp, hải sản tươi ngon và dịch vụ chuyên nghiệp. Đã giới thiệu cho nhiều bạn bè.',
+                tourName: 'Phú Quốc - Thiên Đường Biển Đảo',
+                createdAt: new Date('2024-12-13').toISOString(),
+                verified: false
+            },
+            {
+                id: 4,
+                customerName: 'Phạm Thị D',
+                rating: 4,
+                comment: 'Hội An rất đẹp và cổ kính. Thích nhất là đêm phố cổ với đèn lồng. Tour guide nhiệt tình, giải thích rất rõ về lịch sử.',
+                tourName: 'Hội An - Phố Cổ Di Sản',
+                createdAt: new Date('2024-12-12').toISOString(),
+                verified: true
+            },
+            {
+                id: 5,
+                customerName: 'Hoàng Văn E',
+                rating: 5,
+                comment: 'Đà Lạt mát mẻ, cảnh đẹp. Đặc biệt thích thác Datanla và cà phê ở đây. Sẽ quay lại vào mùa hoa dã quỳ.',
+                tourName: 'Đà Lạt - Thành Phố Ngàn Hoa',
+                createdAt: new Date('2024-12-11').toISOString(),
+                verified: false
+            },
+            {
+                id: 6,
+                customerName: 'Võ Thị F',
+                rating: 5,
+                comment: 'Nha Trang có biển xanh, cát trắng. Vinpearl rất thú vị. Hải sản ở đây tươi và ngon lắm. Đáng giá từng đồng!',
+                tourName: 'Nha Trang - Biển Xanh Cát Trắng',
+                createdAt: new Date('2024-12-10').toISOString(),
+                verified: true
+            }
+        ];
+    }
+
+    // Event Listeners
+    if (retryTestimonialsBtn) {
+        retryTestimonialsBtn.addEventListener('click', loadTestimonials);
+    }
+
+    if (testimonialsPrevBtn) {
+        testimonialsPrevBtn.addEventListener('click', () => goToPage(currentPage - 1));
+    }
+
+    if (testimonialsNextBtn) {
+        testimonialsNextBtn.addEventListener('click', () => goToPage(currentPage + 1));
+    }
+
+    // Initialize - Load testimonials khi trang load
+    if (testimonialsContainer) {
+        loadTestimonials();
+    }
+
+    // Export functions để có thể sử dụng từ nơi khác (nếu cần)
+    window.TestimonialsAPI = {
+        load: loadTestimonials,
+        render: renderTestimonials,
+        fetch: fetchTestimonials,
+        getData: () => testimonialsData,
+        goToPage: goToPage
+    };
 });
 

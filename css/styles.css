@@ -1224,6 +1224,157 @@ section {
     color: var(--text-secondary);
 }
 
+/* Testimonial Additional Info */
+.testimonial-date {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-left: var(--spacing-md);
+    font-weight: var(--font-weight-normal);
+}
+
+.testimonial-tour {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-md);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-color);
+}
+
+.testimonial-rating {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-lg);
+}
+
+.author-avatar-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border-color);
+}
+
+.verified-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    background-color: var(--primary-color);
+    color: var(--bg-white);
+    border-radius: 50%;
+    font-size: var(--font-size-xs);
+    margin-left: var(--spacing-xs);
+    font-weight: var(--font-weight-bold);
+}
+
+/* Testimonials Loading State */
+.testimonials-loading {
+    width: 100%;
+}
+
+/* Testimonials Error State */
+.testimonials-error {
+    text-align: center;
+    padding: var(--spacing-3xl) var(--spacing-lg);
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius-lg);
+    border: 2px dashed var(--border-color);
+}
+
+/* Testimonials Empty State */
+.testimonials-empty {
+    text-align: center;
+    padding: var(--spacing-3xl) var(--spacing-lg);
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius-lg);
+}
+
+/* Pagination Styles */
+.testimonials-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-2xl);
+    flex-wrap: wrap;
+}
+
+.pagination-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background-color: var(--bg-white);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.pagination-btn:hover:not(.disabled) {
+    background-color: var(--primary-color);
+    color: var(--bg-white);
+    border-color: var(--primary-color);
+}
+
+.pagination-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.pagination-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.pagination-pages {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    flex-wrap: wrap;
+}
+
+.pagination-page {
+    min-width: 40px;
+    height: 40px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background-color: var(--bg-white);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination-page:hover:not(.active) {
+    background-color: var(--bg-light);
+    border-color: var(--primary-color);
+}
+
+.pagination-page.active {
+    background-color: var(--primary-color);
+    color: var(--bg-white);
+    border-color: var(--primary-color);
+}
+
+.pagination-dots {
+    padding: 0 var(--spacing-xs);
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-bold);
+}
+
 /* ============================================
    Top Destinations Section
    ============================================ */
@@ -1954,6 +2105,22 @@ section {
 
     .testimonials-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Pagination responsive */
+    .testimonials-pagination {
+        gap: var(--spacing-sm);
+    }
+
+    .pagination-btn {
+        padding: var(--spacing-xs) var(--spacing-md);
+        font-size: var(--font-size-sm);
+    }
+
+    .pagination-page {
+        min-width: 36px;
+        height: 36px;
+        font-size: var(--font-size-sm);
     }
 
     .destinations-grid {

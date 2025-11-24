@@ -545,34 +545,60 @@
                 <h2 class="section-title">Đánh Giá Khách Hàng</h2>
                 <p class="section-subtitle">Những chia sẻ từ khách hàng đã trải nghiệm</p>
                 
-                <div class="testimonials-grid">
-                    <div class="testimonial-card">
-                        <div class="testimonial-rating">
-                            <span>⭐⭐⭐⭐⭐</span>
+                <!-- Loading State -->
+                <div id="testimonials-loading" class="testimonials-loading" style="display: none;">
+                    <div class="testimonials-grid">
+                        <div class="testimonial-card skeleton">
+                            <div class="skeleton-shimmer" style="height: 20px; width: 100px; margin-bottom: 1rem;"></div>
+                            <div class="skeleton-shimmer" style="height: 60px; width: 100%; margin-bottom: 1rem;"></div>
+                            <div class="skeleton-shimmer" style="height: 20px; width: 150px;"></div>
                         </div>
-                        <p class="testimonial-text">"Chuyến đi Hạ Long thật tuyệt vời! Hướng dẫn viên rất nhiệt tình, lịch trình hợp lý và dịch vụ chất lượng. Tôi sẽ quay lại đặt tour khác trong tương lai."</p>
-                        <div class="testimonial-author">
-                            <div class="author-avatar">N</div>
-                            <div class="author-info">
-                                <h4 class="author-name">Nguyễn Văn A</h4>
-                                <p class="author-role">Khách hàng</p>
-                            </div>
+                        <div class="testimonial-card skeleton">
+                            <div class="skeleton-shimmer" style="height: 20px; width: 100px; margin-bottom: 1rem;"></div>
+                            <div class="skeleton-shimmer" style="height: 60px; width: 100%; margin-bottom: 1rem;"></div>
+                            <div class="skeleton-shimmer" style="height: 20px; width: 150px;"></div>
+                        </div>
+                        <div class="testimonial-card skeleton">
+                            <div class="skeleton-shimmer" style="height: 20px; width: 100px; margin-bottom: 1rem;"></div>
+                            <div class="skeleton-shimmer" style="height: 60px; width: 100%; margin-bottom: 1rem;"></div>
+                            <div class="skeleton-shimmer" style="height: 20px; width: 150px;"></div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="testimonial-card">
-                        <div class="testimonial-rating">
-                            <span>⭐⭐⭐⭐⭐</span>
-                        </div>
-                        <p class="testimonial-text">"Tour Sapa vượt quá mong đợi của tôi. Cảnh đẹp, văn hóa đa dạng và trải nghiệm độc đáo. Cảm ơn đội ngũ đã tạo nên một kỷ niệm đáng nhớ!"</p>
-                        <div class="testimonial-author">
-                            <div class="author-avatar">T</div>
-                            <div class="author-info">
-                                <h4 class="author-name">Trần Thị B</h4>
-                                <p class="author-role">Khách hàng</p>
-                            </div>
-                        </div>
+                <!-- Error State -->
+                <div id="testimonials-error" class="testimonials-error" style="display: none;">
+                    <p class="error-message">Không thể tải đánh giá. Vui lòng thử lại sau.</p>
+                    <button id="retry-testimonials" class="retry-button">Thử lại</button>
+                </div>
+
+                <!-- Testimonials Container - Render từ JavaScript -->
+                <div id="testimonials-container" class="testimonials-grid">
+                    <!-- Testimonials sẽ được render động từ JavaScript -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="testimonials-empty" class="testimonials-empty" style="display: none;">
+                    <p class="empty-message">Hiện tại chưa có đánh giá nào.</p>
+                </div>
+
+                <!-- Pagination -->
+                <div id="testimonials-pagination" class="testimonials-pagination" style="display: none;">
+                    <button id="testimonials-prev" class="pagination-btn pagination-btn-prev" aria-label="Trang trước">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 18l-6-6 6-6"/>
+                        </svg>
+                        Trước
+                    </button>
+                    <div id="testimonials-pages" class="pagination-pages">
+                        <!-- Pagination numbers sẽ được render động -->
                     </div>
+                    <button id="testimonials-next" class="pagination-btn pagination-btn-next" aria-label="Trang sau">
+                        Sau
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </section>
