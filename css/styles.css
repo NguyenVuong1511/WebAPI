@@ -1295,6 +1295,120 @@ section {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+/* Destination Link */
+.destination-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Destination Additional Info (optional) */
+.destination-description,
+.destination-location,
+.destination-tour-count {
+    display: none; /* Ẩn mặc định, có thể hiển thị khi hover nếu cần */
+}
+
+.destination-rating {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    background: rgba(255, 255, 255, 0.9);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    z-index: 2;
+    backdrop-filter: blur(10px);
+}
+
+/* Loading Skeleton */
+.destinations-loading {
+    width: 100%;
+}
+
+.skeleton {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.skeleton-shimmer {
+    background: linear-gradient(
+        90deg,
+        var(--bg-gray) 0%,
+        var(--bg-light) 50%,
+        var(--bg-gray) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.skeleton-text {
+    background: var(--bg-gray);
+    border-radius: var(--border-radius);
+    height: 24px;
+    width: 60%;
+    margin: var(--spacing-md) auto;
+    animation: shimmer 1.5s infinite;
+}
+
+/* Error State */
+.destinations-error {
+    text-align: center;
+    padding: var(--spacing-3xl) var(--spacing-lg);
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius-lg);
+    border: 2px dashed var(--border-color);
+}
+
+.error-message {
+    font-size: var(--font-size-lg);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.retry-button {
+    background-color: var(--primary-color);
+    color: var(--bg-white);
+    border: none;
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: background-color var(--transition-base);
+}
+
+.retry-button:hover {
+    background-color: var(--primary-dark);
+}
+
+.retry-button:active {
+    transform: scale(0.98);
+}
+
+/* Empty State */
+.destinations-empty {
+    text-align: center;
+    padding: var(--spacing-3xl) var(--spacing-lg);
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius-lg);
+}
+
+.empty-message {
+    font-size: var(--font-size-lg);
+    color: var(--text-secondary);
+}
+
 /* ============================================
    Exclusive Services Section
    ============================================ */

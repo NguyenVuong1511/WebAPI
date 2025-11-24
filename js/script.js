@@ -317,5 +317,325 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(initCarousel, 100);
         }
     }
+
+    // ============================================
+    // Destinations API Integration
+    // ============================================
+    
+    // API Configuration
+    const API_CONFIG = {
+        // Thay đổi URL này thành API endpoint thực tế của bạn
+        BASE_URL: 'http://localhost:3000/api', // hoặc 'https://your-api-domain.com/api'
+        ENDPOINTS: {
+            DESTINATIONS: '/destinations'
+        }
+    };
+
+    // DOM Elements
+    const destinationsContainer = document.getElementById('destinations-container');
+    const destinationsLoading = document.getElementById('destinations-loading');
+    const destinationsError = document.getElementById('destinations-error');
+    const destinationsEmpty = document.getElementById('destinations-empty');
+    const retryButton = document.getElementById('retry-destinations');
+
+    // State Management
+    let destinationsData = [];
+
+    /**
+     * Hiển thị loading state
+     */
+    function showLoading() {
+        if (destinationsLoading) destinationsLoading.style.display = 'block';
+        if (destinationsContainer) destinationsContainer.style.display = 'none';
+        if (destinationsError) destinationsError.style.display = 'none';
+        if (destinationsEmpty) destinationsEmpty.style.display = 'none';
+    }
+
+    /**
+     * Hiển thị error state
+     */
+    function showError() {
+        if (destinationsLoading) destinationsLoading.style.display = 'none';
+        if (destinationsContainer) destinationsContainer.style.display = 'none';
+        if (destinationsError) destinationsError.style.display = 'block';
+        if (destinationsEmpty) destinationsEmpty.style.display = 'none';
+    }
+
+    /**
+     * Hiển thị empty state
+     */
+    function showEmpty() {
+        if (destinationsLoading) destinationsLoading.style.display = 'none';
+        if (destinationsContainer) destinationsContainer.style.display = 'none';
+        if (destinationsError) destinationsError.style.display = 'none';
+        if (destinationsEmpty) destinationsEmpty.style.display = 'block';
+    }
+
+    /**
+     * Hiển thị destinations
+     */
+    function showDestinations() {
+        if (destinationsLoading) destinationsLoading.style.display = 'none';
+        if (destinationsContainer) destinationsContainer.style.display = 'grid';
+        if (destinationsError) destinationsError.style.display = 'none';
+        if (destinationsEmpty) destinationsEmpty.style.display = 'none';
+    }
+
+    /**
+     * Tạo HTML cho một destination card
+     * @param {Object} destination - Dữ liệu destination
+     * @returns {string} HTML string
+     */
+    function createDestinationCard(destination) {
+        const {
+            id,
+            name,
+            image,
+            imageAlt = '',
+            slug = '',
+            description = '',
+            location = '',
+            rating = null,
+            tourCount = null
+        } = destination;
+
+        // Tạo URL chi tiết (nếu có slug)
+        const detailUrl = slug ? `/destinations/${slug}` : `#destinations?id=${id}`;
+
+        return `
+            <article class="destination-card" data-id="${id || ''}">
+                <a href="${detailUrl}" class="destination-link">
+                    <div class="destination-image">
+                        <img 
+                            src="${image || 'https://via.placeholder.com/800x600?text=No+Image'}" 
+                            alt="${imageAlt || name}" 
+                            loading="lazy"
+                            onerror="this.src='https://via.placeholder.com/800x600?text=Error+Loading+Image'"
+                        >
+                        <div class="destination-overlay"></div>
+                        ${rating ? `<div class="destination-rating">⭐ ${rating.toFixed(1)}</div>` : ''}
+                    </div>
+                    <h3 class="destination-name">${name || 'Không có tên'}</h3>
+                    ${description ? `<p class="destination-description">${description}</p>` : ''}
+                    ${location ? `<p class="destination-location">📍 ${location}</p>` : ''}
+                    ${tourCount !== null ? `<p class="destination-tour-count">${tourCount} tour</p>` : ''}
+                </a>
+            </article>
+        `;
+    }
+
+    /**
+     * Render danh sách destinations
+     * @param {Array} destinations - Mảng destinations
+     */
+    function renderDestinations(destinations) {
+        if (!destinationsContainer) return;
+
+        if (!destinations || destinations.length === 0) {
+            showEmpty();
+            return;
+        }
+
+        // Xóa nội dung cũ
+        destinationsContainer.innerHTML = '';
+
+        // Render từng destination
+        destinations.forEach(destination => {
+            const cardHTML = createDestinationCard(destination);
+            destinationsContainer.insertAdjacentHTML('beforeend', cardHTML);
+        });
+
+        // Thêm event listeners cho các cards
+        const destinationCards = destinationsContainer.querySelectorAll('.destination-card');
+        destinationCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Có thể thêm analytics tracking ở đây
+                console.log('Destination clicked:', this.dataset.id);
+            });
+        });
+
+        showDestinations();
+    }
+
+    /**
+     * Fetch destinations từ API
+     * @param {Object} options - Tùy chọn (limit, offset, etc.)
+     * @returns {Promise<Array>}
+     */
+    async function fetchDestinations(options = {}) {
+        const {
+            limit = 6,
+            offset = 0,
+            featured = true,
+            sortBy = 'popularity'
+        } = options;
+
+        try {
+            // Tạo URL với query parameters
+            const url = new URL(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DESTINATIONS}`);
+            url.searchParams.append('limit', limit);
+            url.searchParams.append('offset', offset);
+            if (featured) url.searchParams.append('featured', 'true');
+            if (sortBy) url.searchParams.append('sortBy', sortBy);
+
+            const response = await fetch(url.toString(), {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Thêm Authorization header nếu cần
+                    // 'Authorization': `Bearer ${token}`
+                },
+                // Timeout sau 10 giây
+                signal: AbortSignal.timeout(10000)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            // Xử lý các format response khác nhau
+            // Format 1: { data: [...], total: 10 }
+            // Format 2: { destinations: [...], count: 10 }
+            // Format 3: [...]
+            if (data.data && Array.isArray(data.data)) {
+                return data.data;
+            } else if (data.destinations && Array.isArray(data.destinations)) {
+                return data.destinations;
+            } else if (Array.isArray(data)) {
+                return data;
+            } else {
+                throw new Error('Invalid response format');
+            }
+        } catch (error) {
+            console.error('Error fetching destinations:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Load destinations với error handling
+     */
+    async function loadDestinations() {
+        try {
+            showLoading();
+
+            // Thử fetch từ API
+            const destinations = await fetchDestinations({
+                limit: 6,
+                featured: true,
+                sortBy: 'popularity'
+            });
+
+            destinationsData = destinations;
+            renderDestinations(destinations);
+        } catch (error) {
+            console.error('Failed to load destinations:', error);
+            
+            // Nếu API chưa sẵn sàng, sử dụng dữ liệu mẫu
+            if (error.name === 'AbortError' || error.message.includes('Failed to fetch')) {
+                console.warn('API không khả dụng, sử dụng dữ liệu mẫu');
+                const mockDestinations = getMockDestinations();
+                destinationsData = mockDestinations;
+                renderDestinations(mockDestinations);
+            } else {
+                showError();
+            }
+        }
+    }
+
+    /**
+     * Dữ liệu mẫu - Sử dụng khi API chưa sẵn sàng
+     * Format này phù hợp với cấu trúc dữ liệu từ Backend
+     */
+    function getMockDestinations() {
+        return [
+            {
+                id: 1,
+                name: 'Vịnh Hạ Long',
+                image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800',
+                imageAlt: 'Vịnh Hạ Long',
+                slug: 'vinh-ha-long',
+                description: 'Kỳ quan thiên nhiên thế giới',
+                location: 'Quảng Ninh',
+                rating: 4.8,
+                tourCount: 25
+            },
+            {
+                id: 2,
+                name: 'Sapa',
+                image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
+                imageAlt: 'Sapa',
+                slug: 'sapa',
+                description: 'Vẻ đẹp núi rừng Tây Bắc',
+                location: 'Lào Cai',
+                rating: 4.7,
+                tourCount: 18
+            },
+            {
+                id: 3,
+                name: 'Phú Quốc',
+                image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+                imageAlt: 'Phú Quốc',
+                slug: 'phu-quoc',
+                description: 'Thiên đường biển đảo',
+                location: 'Kiên Giang',
+                rating: 4.9,
+                tourCount: 30
+            },
+            {
+                id: 4,
+                name: 'Hội An',
+                image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
+                imageAlt: 'Hội An',
+                slug: 'hoi-an',
+                description: 'Phố cổ di sản văn hóa thế giới',
+                location: 'Quảng Nam',
+                rating: 4.6,
+                tourCount: 22
+            },
+            {
+                id: 5,
+                name: 'Đà Lạt',
+                image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800',
+                imageAlt: 'Đà Lạt',
+                slug: 'da-lat',
+                description: 'Thành phố ngàn hoa',
+                location: 'Lâm Đồng',
+                rating: 4.5,
+                tourCount: 20
+            },
+            {
+                id: 6,
+                name: 'Nha Trang',
+                image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+                imageAlt: 'Nha Trang',
+                slug: 'nha-trang',
+                description: 'Biển xanh cát trắng',
+                location: 'Khánh Hòa',
+                rating: 4.7,
+                tourCount: 28
+            }
+        ];
+    }
+
+    // Event Listeners
+    if (retryButton) {
+        retryButton.addEventListener('click', loadDestinations);
+    }
+
+    // Initialize - Load destinations khi trang load
+    if (destinationsContainer) {
+        loadDestinations();
+    }
+
+    // Export functions để có thể sử dụng từ nơi khác (nếu cần)
+    window.DestinationsAPI = {
+        load: loadDestinations,
+        render: renderDestinations,
+        fetch: fetchDestinations,
+        getData: () => destinationsData
+    };
 });
 

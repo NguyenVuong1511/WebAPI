@@ -439,54 +439,50 @@
                 <h2 class="section-title">Điểm Đến Phổ Biến</h2>
                 <p class="section-subtitle">Khám phá những địa danh nổi tiếng nhất Việt Nam</p>
                 
-                <div class="destinations-grid">
-                    <article class="destination-card">
-                        <div class="destination-image">
-                            <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800" alt="Hạ Long" loading="lazy">
-                            <div class="destination-overlay"></div>
+                <!-- Loading State -->
+                <div id="destinations-loading" class="destinations-loading" style="display: none;">
+                    <div class="destinations-grid">
+                        <div class="destination-card skeleton">
+                            <div class="destination-image skeleton-shimmer"></div>
+                            <div class="destination-name skeleton-text"></div>
                         </div>
-                        <h3 class="destination-name">Vịnh Hạ Long</h3>
-                    </article>
+                        <div class="destination-card skeleton">
+                            <div class="destination-image skeleton-shimmer"></div>
+                            <div class="destination-name skeleton-text"></div>
+                        </div>
+                        <div class="destination-card skeleton">
+                            <div class="destination-image skeleton-shimmer"></div>
+                            <div class="destination-name skeleton-text"></div>
+                        </div>
+                        <div class="destination-card skeleton">
+                            <div class="destination-image skeleton-shimmer"></div>
+                            <div class="destination-name skeleton-text"></div>
+                        </div>
+                        <div class="destination-card skeleton">
+                            <div class="destination-image skeleton-shimmer"></div>
+                            <div class="destination-name skeleton-text"></div>
+                        </div>
+                        <div class="destination-card skeleton">
+                            <div class="destination-image skeleton-shimmer"></div>
+                            <div class="destination-name skeleton-text"></div>
+                        </div>
+                    </div>
+                </div>
 
-                    <article class="destination-card">
-                        <div class="destination-image">
-                            <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800" alt="Sapa" loading="lazy">
-                            <div class="destination-overlay"></div>
-                        </div>
-                        <h3 class="destination-name">Sapa</h3>
-                    </article>
+                <!-- Error State -->
+                <div id="destinations-error" class="destinations-error" style="display: none;">
+                    <p class="error-message">Không thể tải danh sách điểm đến. Vui lòng thử lại sau.</p>
+                    <button id="retry-destinations" class="retry-button">Thử lại</button>
+                </div>
 
-                    <article class="destination-card">
-                        <div class="destination-image">
-                            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800" alt="Phú Quốc" loading="lazy">
-                            <div class="destination-overlay"></div>
-                        </div>
-                        <h3 class="destination-name">Phú Quốc</h3>
-                    </article>
+                <!-- Destinations Container - Render từ JavaScript -->
+                <div id="destinations-container" class="destinations-grid">
+                    <!-- Destinations sẽ được render động từ JavaScript -->
+                </div>
 
-                    <article class="destination-card">
-                        <div class="destination-image">
-                            <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800" alt="Hội An" loading="lazy">
-                            <div class="destination-overlay"></div>
-                        </div>
-                        <h3 class="destination-name">Hội An</h3>
-                    </article>
-
-                    <article class="destination-card">
-                        <div class="destination-image">
-                            <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800" alt="Đà Lạt" loading="lazy">
-                            <div class="destination-overlay"></div>
-                        </div>
-                        <h3 class="destination-name">Đà Lạt</h3>
-                    </article>
-
-                    <article class="destination-card">
-                        <div class="destination-image">
-                            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800" alt="Nha Trang" loading="lazy">
-                            <div class="destination-overlay"></div>
-                        </div>
-                        <h3 class="destination-name">Nha Trang</h3>
-                    </article>
+                <!-- Empty State -->
+                <div id="destinations-empty" class="destinations-empty" style="display: none;">
+                    <p class="empty-message">Hiện tại chưa có điểm đến nào.</p>
                 </div>
             </div>
         </section>
