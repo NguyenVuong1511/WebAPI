@@ -147,7 +147,86 @@
             </div>
         </section>
 
-        <!-- Section 2: Tour Nổi Bật -->
+        <!-- Section 2: Dịch vụ & Trải nghiệm Độc quyền -->
+        <section id="services" class="exclusive-services">
+            <div class="container">
+                <div class="services-wrapper">
+                    <div class="services-content">
+                        <h2 class="services-title">Dịch Vụ & Trải Nghiệm Độc Quyền</h2>
+                        <p class="services-description">
+                            Chúng tôi cung cấp các dịch vụ du lịch cao cấp và độc quyền, được thiết kế riêng để mang đến trải nghiệm hoàn hảo cho bạn. Từ tour thiết kế riêng theo yêu cầu, dịch vụ thuê xe cao cấp, đến đặt vé máy bay và khách sạn với giá ưu đãi.
+                        </p>
+                        <p class="services-description">
+                            Đội ngũ chuyên nghiệp của chúng tôi luôn sẵn sàng tư vấn và hỗ trợ bạn tạo nên hành trình du lịch đáng nhớ nhất.
+                        </p>
+                        <a href="#contact" class="services-cta">Tìm hiểu thêm về dịch vụ</a>
+                    </div>
+                    <div class="services-image">
+                        <div class="services-icon-wrapper">
+                            <div class="services-icon">✨</div>
+                            <div class="services-icon">🎯</div>
+                            <div class="services-icon">🌟</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Điểm đến Phổ biến -->
+        <section id="destinations" class="top-destinations">
+            <div class="container">
+                <h2 class="section-title">Điểm Đến Phổ Biến</h2>
+                <p class="section-subtitle">Khám phá những địa danh nổi tiếng nhất Việt Nam</p>
+                
+                <!-- Loading State -->
+                <div id="destinations-loading" class="destinations-loading" style="display: none;">
+                    <div class="destinations-grid">
+                        <div class="destination-card skeleton">
+                            <div class="destination-image skeleton-shimmer"></div>
+                            <div class="destination-name skeleton-text"></div>
+                        </div>
+                        <div class="destination-card skeleton">
+                            <div class="destination-image skeleton-shimmer"></div>
+                            <div class="destination-name skeleton-text"></div>
+                        </div>
+                        <div class="destination-card skeleton">
+                            <div class="destination-image skeleton-shimmer"></div>
+                            <div class="destination-name skeleton-text"></div>
+                        </div>
+                        <div class="destination-card skeleton">
+                            <div class="destination-image skeleton-shimmer"></div>
+                            <div class="destination-name skeleton-text"></div>
+                        </div>
+                        <div class="destination-card skeleton">
+                            <div class="destination-image skeleton-shimmer"></div>
+                            <div class="destination-name skeleton-text"></div>
+                        </div>
+                        <div class="destination-card skeleton">
+                            <div class="destination-image skeleton-shimmer"></div>
+                            <div class="destination-name skeleton-text"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div id="destinations-error" class="destinations-error" style="display: none;">
+                    <p class="error-message">Không thể tải danh sách điểm đến. Vui lòng thử lại sau.</p>
+                    <button id="retry-destinations" class="retry-button">Thử lại</button>
+                </div>
+
+                <!-- Destinations Container - Render từ JavaScript -->
+                <div id="destinations-container" class="destinations-grid">
+                    <!-- Destinations sẽ được render động từ JavaScript -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="destinations-empty" class="destinations-empty" style="display: none;">
+                    <p class="empty-message">Hiện tại chưa có điểm đến nào.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Tour Nổi Bật -->
         <section id="tours" class="featured-tours">
             <div class="container">
                 <h2 class="section-title">Tour Nổi Bật</h2>
@@ -433,61 +512,7 @@
             </div>
         </section>
 
-        <!-- Section 3: Điểm đến Phổ biến -->
-        <section id="destinations" class="top-destinations">
-            <div class="container">
-                <h2 class="section-title">Điểm Đến Phổ Biến</h2>
-                <p class="section-subtitle">Khám phá những địa danh nổi tiếng nhất Việt Nam</p>
-                
-                <!-- Loading State -->
-                <div id="destinations-loading" class="destinations-loading" style="display: none;">
-                    <div class="destinations-grid">
-                        <div class="destination-card skeleton">
-                            <div class="destination-image skeleton-shimmer"></div>
-                            <div class="destination-name skeleton-text"></div>
-                        </div>
-                        <div class="destination-card skeleton">
-                            <div class="destination-image skeleton-shimmer"></div>
-                            <div class="destination-name skeleton-text"></div>
-                        </div>
-                        <div class="destination-card skeleton">
-                            <div class="destination-image skeleton-shimmer"></div>
-                            <div class="destination-name skeleton-text"></div>
-                        </div>
-                        <div class="destination-card skeleton">
-                            <div class="destination-image skeleton-shimmer"></div>
-                            <div class="destination-name skeleton-text"></div>
-                        </div>
-                        <div class="destination-card skeleton">
-                            <div class="destination-image skeleton-shimmer"></div>
-                            <div class="destination-name skeleton-text"></div>
-                        </div>
-                        <div class="destination-card skeleton">
-                            <div class="destination-image skeleton-shimmer"></div>
-                            <div class="destination-name skeleton-text"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Error State -->
-                <div id="destinations-error" class="destinations-error" style="display: none;">
-                    <p class="error-message">Không thể tải danh sách điểm đến. Vui lòng thử lại sau.</p>
-                    <button id="retry-destinations" class="retry-button">Thử lại</button>
-                </div>
-
-                <!-- Destinations Container - Render từ JavaScript -->
-                <div id="destinations-container" class="destinations-grid">
-                    <!-- Destinations sẽ được render động từ JavaScript -->
-                </div>
-
-                <!-- Empty State -->
-                <div id="destinations-empty" class="destinations-empty" style="display: none;">
-                    <p class="empty-message">Hiện tại chưa có điểm đến nào.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 4: Tại sao chọn chúng tôi -->
+        <!-- Section 5: Tại sao chọn chúng tôi -->
         <section class="why-choose-us">
             <div class="container">
                 <h2 class="section-title">Tại Sao Chọn Chúng Tôi</h2>
@@ -515,7 +540,45 @@
             </div>
         </section>
 
-        <!-- Section 6: Ưu đãi Hiện tại / Tour Last Minute -->
+        <!-- Section 6: Đánh giá Khách hàng -->
+        <section class="testimonials">
+            <div class="container">
+                <h2 class="section-title">Đánh Giá Khách Hàng</h2>
+                <p class="section-subtitle">Những chia sẻ từ khách hàng đã trải nghiệm</p>
+                
+                <div class="testimonials-grid">
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">
+                            <span>⭐⭐⭐⭐⭐</span>
+                        </div>
+                        <p class="testimonial-text">"Chuyến đi Hạ Long thật tuyệt vời! Hướng dẫn viên rất nhiệt tình, lịch trình hợp lý và dịch vụ chất lượng. Tôi sẽ quay lại đặt tour khác trong tương lai."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">N</div>
+                            <div class="author-info">
+                                <h4 class="author-name">Nguyễn Văn A</h4>
+                                <p class="author-role">Khách hàng</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">
+                            <span>⭐⭐⭐⭐⭐</span>
+                        </div>
+                        <p class="testimonial-text">"Tour Sapa vượt quá mong đợi của tôi. Cảnh đẹp, văn hóa đa dạng và trải nghiệm độc đáo. Cảm ơn đội ngũ đã tạo nên một kỷ niệm đáng nhớ!"</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">T</div>
+                            <div class="author-info">
+                                <h4 class="author-name">Trần Thị B</h4>
+                                <p class="author-role">Khách hàng</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 7: Ưu đãi Đặc biệt -->
         <section id="deals" class="deals-offers">
             <div class="container">
                 <h2 class="section-title">Ưu Đãi Đặc Biệt</h2>
@@ -591,69 +654,6 @@
                         </div>
                         <a href="#tours" class="deal-button">Đặt Ngay</a>
                     </article>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 7: Đánh giá Khách hàng -->
-        <section class="testimonials">
-            <div class="container">
-                <h2 class="section-title">Đánh Giá Khách Hàng</h2>
-                <p class="section-subtitle">Những chia sẻ từ khách hàng đã trải nghiệm</p>
-                
-                <div class="testimonials-grid">
-                    <div class="testimonial-card">
-                        <div class="testimonial-rating">
-                            <span>⭐⭐⭐⭐⭐</span>
-                        </div>
-                        <p class="testimonial-text">"Chuyến đi Hạ Long thật tuyệt vời! Hướng dẫn viên rất nhiệt tình, lịch trình hợp lý và dịch vụ chất lượng. Tôi sẽ quay lại đặt tour khác trong tương lai."</p>
-                        <div class="testimonial-author">
-                            <div class="author-avatar">N</div>
-                            <div class="author-info">
-                                <h4 class="author-name">Nguyễn Văn A</h4>
-                                <p class="author-role">Khách hàng</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="testimonial-card">
-                        <div class="testimonial-rating">
-                            <span>⭐⭐⭐⭐⭐</span>
-                        </div>
-                        <p class="testimonial-text">"Tour Sapa vượt quá mong đợi của tôi. Cảnh đẹp, văn hóa đa dạng và trải nghiệm độc đáo. Cảm ơn đội ngũ đã tạo nên một kỷ niệm đáng nhớ!"</p>
-                        <div class="testimonial-author">
-                            <div class="author-avatar">T</div>
-                            <div class="author-info">
-                                <h4 class="author-name">Trần Thị B</h4>
-                                <p class="author-role">Khách hàng</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 5: Dịch vụ & Trải nghiệm Độc quyền -->
-        <section id="services" class="exclusive-services">
-            <div class="container">
-                <div class="services-wrapper">
-                    <div class="services-content">
-                        <h2 class="services-title">Dịch Vụ & Trải Nghiệm Độc Quyền</h2>
-                        <p class="services-description">
-                            Chúng tôi cung cấp các dịch vụ du lịch cao cấp và độc quyền, được thiết kế riêng để mang đến trải nghiệm hoàn hảo cho bạn. Từ tour thiết kế riêng theo yêu cầu, dịch vụ thuê xe cao cấp, đến đặt vé máy bay và khách sạn với giá ưu đãi.
-                        </p>
-                        <p class="services-description">
-                            Đội ngũ chuyên nghiệp của chúng tôi luôn sẵn sàng tư vấn và hỗ trợ bạn tạo nên hành trình du lịch đáng nhớ nhất.
-                        </p>
-                        <a href="#contact" class="services-cta">Tìm hiểu thêm về dịch vụ</a>
-                    </div>
-                    <div class="services-image">
-                        <div class="services-icon-wrapper">
-                            <div class="services-icon">✨</div>
-                            <div class="services-icon">🎯</div>
-                            <div class="services-icon">🌟</div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>
