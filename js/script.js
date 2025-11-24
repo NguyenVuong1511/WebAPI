@@ -658,6 +658,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentPage = 1;
     let totalPages = 1;
     const itemsPerPage = 3;
+    const maxItemsToShow = 4; // Chỉ hiển thị tối đa 4 đánh giá trên 1 hàng
 
     /**
      * Hiển thị loading state
@@ -773,9 +774,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * Render danh sách testimonials với phân trang
+     * Render danh sách testimonials - chỉ hiển thị tối đa 4 items trên 1 hàng
      * @param {Array} testimonials - Mảng testimonials
-     * @param {number} page - Trang hiện tại
+     * @param {number} page - Trang hiện tại (không dùng nữa, nhưng giữ để tương thích)
      */
     function renderTestimonials(testimonials, page = 1) {
         if (!testimonialsContainer) return;
@@ -785,26 +786,24 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Tính toán phân trang
-        const startIndex = (page - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const currentTestimonials = testimonials.slice(startIndex, endIndex);
-        totalPages = Math.ceil(testimonials.length / itemsPerPage);
-        currentPage = page;
+        // Chỉ lấy tối đa 4 items đầu tiên (mới nhất)
+        const itemsToShow = testimonials.slice(0, maxItemsToShow);
 
         // Xóa nội dung cũ
         testimonialsContainer.innerHTML = '';
 
         // Render từng testimonial
-        currentTestimonials.forEach(testimonial => {
+        itemsToShow.forEach(testimonial => {
             const cardHTML = createTestimonialCard(testimonial);
             testimonialsContainer.insertAdjacentHTML('beforeend', cardHTML);
         });
 
         showTestimonials();
         
-        // Render pagination
-        renderPagination();
+        // Luôn ẩn pagination vì chỉ hiển thị 1 hàng
+        if (testimonialsPagination) {
+            testimonialsPagination.style.display = 'none';
+        }
     }
 
     /**
@@ -979,13 +978,15 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             // Sắp xếp lại để đảm bảo mới nhất lên đầu
-            testimonialsData = testimonials.sort((a, b) => {
+            const sortedTestimonials = testimonials.sort((a, b) => {
                 const dateA = new Date(a.createdAt || a.date || 0);
                 const dateB = new Date(b.createdAt || b.date || 0);
                 return dateB - dateA;
             });
-
-            renderTestimonials(testimonialsData, 1);
+            
+            testimonialsData = sortedTestimonials;
+            // Chỉ lấy 4 items đầu tiên (mới nhất) để hiển thị trên 1 hàng
+            renderTestimonials(sortedTestimonials.slice(0, maxItemsToShow), 1);
         } catch (error) {
             console.error('Failed to load testimonials:', error);
             
@@ -994,7 +995,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.warn('API không khả dụng, sử dụng dữ liệu mẫu');
                 const mockTestimonials = getMockTestimonials();
                 testimonialsData = mockTestimonials;
-                renderTestimonials(mockTestimonials, 1);
+                // Chỉ lấy 4 items đầu tiên (mới nhất) để hiển thị trên 1 hàng
+                renderTestimonials(mockTestimonials.slice(0, maxItemsToShow), 1);
             } else {
                 showTestimonialsError();
             }

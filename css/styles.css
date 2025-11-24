@@ -1165,15 +1165,19 @@ section {
 .testimonials-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--spacing-xl);
+    gap: var(--spacing-lg);
+    max-width: 100%;
+    margin: 0 auto;
 }
 
 .testimonial-card {
     background-color: var(--bg-white);
-    padding: var(--spacing-xl);
+    padding: var(--spacing-md) var(--spacing-lg);
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-md);
     transition: transform var(--transition-base), box-shadow var(--transition-base);
+    max-width: 100%;
+    width: 100%;
 }
 
 .testimonial-card:hover {
@@ -1189,9 +1193,9 @@ section {
 .testimonial-text {
     color: var(--text-secondary);
     font-style: italic;
-    line-height: 1.8;
-    margin-bottom: var(--spacing-lg);
-    font-size: var(--font-size-lg);
+    line-height: 1.7;
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-base);
 }
 
 .testimonial-author {
@@ -2103,8 +2107,15 @@ section {
         grid-template-columns: repeat(3, 1fr);
     }
 
+    /* Testimonials hiển thị 2-3 cột trên tablet */
     .testimonials-grid {
         grid-template-columns: repeat(2, 1fr);
+        max-width: 100%;
+        gap: var(--spacing-md);
+    }
+    
+    .testimonial-card {
+        padding: var(--spacing-sm) var(--spacing-md);
     }
 
     /* Pagination responsive */
@@ -2247,6 +2258,18 @@ section {
         height: 350px;
     }
 
+    /* Testimonials hiển thị 3 cột trên desktop */
+    .testimonials-grid {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 100%;
+        gap: var(--spacing-lg);
+    }
+
+    .testimonial-card {
+        max-width: 100%;
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+
     .footer-content {
         grid-template-columns: repeat(4, 1fr);
     }
@@ -2266,6 +2289,16 @@ section {
 @media (min-width: 1280px) {
     .container {
         max-width: 1280px;
+    }
+
+    /* Testimonials hiển thị 4 cột trên large desktop */
+    .testimonials-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--spacing-lg);
+    }
+    
+    .testimonial-card {
+        padding: var(--spacing-md) var(--spacing-lg);
     }
 }
 
