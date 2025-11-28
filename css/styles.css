@@ -214,25 +214,8 @@ button {
     text-decoration: none;
 }
 
-.nav-link.active {
-    color: var(--primary-color);
-    font-weight: var(--font-weight-semibold);
-}
-
 .nav-link:hover {
     color: var(--primary-color);
-}
-
-.nav-link.active::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60%;
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    border-radius: 2px;
 }
 
 /* Auth Buttons */
@@ -295,18 +278,6 @@ button {
     border-radius: 2px;
 }
 
-.hamburger.active .hamburger-line:nth-child(1) {
-    transform: rotate(45deg) translate(6px, 6px);
-}
-
-.hamburger.active .hamburger-line:nth-child(2) {
-    opacity: 0;
-}
-
-.hamburger.active .hamburger-line:nth-child(3) {
-    transform: rotate(-45deg) translate(6px, -6px);
-}
-
 /* Mobile Menu */
 .mobile-menu {
     position: fixed;
@@ -318,10 +289,6 @@ button {
     max-height: 0;
     overflow: hidden;
     transition: max-height var(--transition-base);
-}
-
-.mobile-menu.active {
-    max-height: 500px;
 }
 
 .mobile-nav-menu {
