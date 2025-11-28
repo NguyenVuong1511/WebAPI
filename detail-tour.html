@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Chi tiết tour du lịch - Khám phá hành trình tuyệt vời">
+    <title>Chi Tiết Tour - Du Lịch Việt Nam</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles-detail-tour.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-wrapper">
+                    <div class="logo">
+                        <a href="index.html">
+                            <img src="img/Logo.png" alt="logo">
+                        </a>
+                    </div>
+                    
+                    <!-- Desktop Menu -->
+                    <ul class="nav-menu">
+                        <li><a href="index.html#home" class="nav-link">Trang chủ</a></li>
+                        <li><a href="index.html#about" class="nav-link">Giới thiệu</a></li>
+                        <li><a href="index.html#tours" class="nav-link active">Tour</a></li>
+                        <li><a href="index.html#destinations" class="nav-link">Điểm đến</a></li>
+                        <li><a href="index.html#deals" class="nav-link">Ưu đãi</a></li>
+                        <li><a href="index.html#services" class="nav-link">Dịch vụ</a></li>
+                        <li><a href="index.html#blog" class="nav-link">Blog</a></li>
+                    </ul>
+                    
+                    <!-- Auth Buttons -->
+                    <div class="auth-buttons">
+                        <a href="#login" class="auth-btn auth-login">Đăng nhập</a>
+                        <a href="#register" class="auth-btn auth-register">Đăng ký</a>
+                    </div>
+                    
+                    <!-- Hamburger Menu Button -->
+                    <button class="hamburger" aria-label="Toggle menu">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Mobile Menu -->
+        <div class="mobile-menu">
+            <ul class="mobile-nav-menu">
+                <li><a href="index.html#home" class="mobile-nav-link">Trang chủ</a></li>
+                <li><a href="index.html#about" class="mobile-nav-link">Giới thiệu</a></li>
+                <li><a href="index.html#services" class="mobile-nav-link">Dịch vụ</a></li>
+                <li><a href="index.html#destinations" class="mobile-nav-link">Điểm đến</a></li>
+                <li><a href="index.html#tours" class="mobile-nav-link active">Tour</a></li>
+                <li><a href="index.html#deals" class="mobile-nav-link">Ưu đãi</a></li>
+                <li><a href="index.html#blog" class="mobile-nav-link">Blog</a></li>
+            </ul>
+            <div class="mobile-auth-buttons">
+                <a href="#login" class="mobile-auth-btn mobile-auth-login">Đăng nhập</a>
+                <a href="#register" class="mobile-auth-btn mobile-auth-register">Đăng ký</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="container">
+            <div class="breadcrumb-content">
+                <a href="index.html">Trang chủ</a>
+                <span class="breadcrumb-separator">/</span>
+                <a href="index.html#tours">Tour</a>
+                <span class="breadcrumb-separator">/</span>
+                <span>Chi tiết tour</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Hero -->
+    <section class="detail-hero">
+        <div class="detail-hero-content">
+            <h1 class="detail-hero-title">Vịnh Hạ Long - Kỳ Quan Thiên Nhiên</h1>
+            <p class="detail-hero-subtitle">Khám phá vẻ đẹp hùng vĩ của vịnh Hạ Long với hàng nghìn đảo đá vôi độc đáo</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main>
+        <section class="tour-detail-section">
+            <div class="container">
+                <div class="tour-detail-wrapper">
+                    <!-- Tour Header -->
+                    <div class="tour-detail-header">
+                        <div class="tour-detail-badges">
+                            <span class="tour-detail-badge badge-popular">Phổ biến</span>
+                            <span class="tour-detail-badge badge-new">Tour mới</span>
+                        </div>
+                        <h2 class="tour-detail-title">Vịnh Hạ Long - Kỳ Quan Thiên Nhiên Thế Giới</h2>
+                        <div class="tour-detail-meta">
+                            <div class="tour-meta-item">
+                                <span class="tour-meta-icon">📅</span>
+                                <div class="tour-meta-text">
+                                    <span class="tour-meta-label">Khởi hành</span>
+                                    <span class="tour-meta-value">15/01/2025</span>
+                                </div>
+                            </div>
+                            <div class="tour-meta-item">
+                                <span class="tour-meta-icon">⏱️</span>
+                                <div class="tour-meta-text">
+                                    <span class="tour-meta-label">Thời gian</span>
+                                    <span class="tour-meta-value">3 ngày 2 đêm</span>
+                                </div>
+                            </div>
+                            <div class="tour-meta-item">
+                                <span class="tour-meta-icon">👥</span>
+                                <div class="tour-meta-text">
+                                    <span class="tour-meta-label">Số người</span>
+                                    <span class="tour-meta-value">2 - 20 người</span>
+                                </div>
+                            </div>
+                            <div class="tour-meta-item">
+                                <span class="tour-meta-icon">⭐</span>
+                                <div class="tour-meta-text">
+                                    <span class="tour-meta-label">Đánh giá</span>
+                                    <span class="tour-meta-value">4.8/5 (256 đánh giá)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tour Content -->
+                    <div class="tour-detail-content">
+                        <!-- Left Column -->
+                        <div class="tour-detail-left">
+                            <!-- Gallery -->
+                            <div class="tour-gallery">
+                                <div class="tour-gallery-main">
+                                    <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200" alt="Vịnh Hạ Long" id="main-gallery-image">
+                                </div>
+                                <div class="tour-gallery-thumbs">
+                                    <div class="tour-gallery-thumb active" onclick="changeGalleryImage('https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200')">
+                                        <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=300" alt="Hạ Long 1">
+                                    </div>
+                                    <div class="tour-gallery-thumb" onclick="changeGalleryImage('https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1200')">
+                                        <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=300" alt="Hạ Long 2">
+                                    </div>
+                                    <div class="tour-gallery-thumb" onclick="changeGalleryImage('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200')">
+                                        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300" alt="Hạ Long 3">
+                                    </div>
+                                    <div class="tour-gallery-thumb" onclick="changeGalleryImage('https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200')">
+                                        <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=300" alt="Hạ Long 4">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tour Description -->
+                            <div class="tour-info-section">
+                                <h3 class="tour-info-title">Mô tả tour</h3>
+                                <div class="tour-info-content">
+                                    <p>
+                                        Vịnh Hạ Long là một trong những kỳ quan thiên nhiên đẹp nhất thế giới, được UNESCO công nhận là Di sản Thế giới. Với hơn 1.600 hòn đảo đá vôi và đá vôi vôi hùng vĩ, vịnh Hạ Long tạo nên một cảnh quan tuyệt đẹp và độc đáo.
+                                    </p>
+                                    <p>
+                                        Trong chuyến du lịch 3 ngày 2 đêm này, bạn sẽ có cơ hội khám phá những hang động kỳ bí, tham quan các làng chài truyền thống, thưởng thức hải sản tươi ngon và trải nghiệm các hoạt động thú vị như chèo thuyền kayak, tắm biển, và ngắm hoàng hôn trên vịnh.
+                                    </p>
+                                    <p>
+                                        Tour được thiết kế với lịch trình hợp lý, đảm bảo bạn có đủ thời gian để thư giãn và tận hưởng vẻ đẹp của vịnh Hạ Long. Đội ngũ hướng dẫn viên chuyên nghiệp sẽ đồng hành cùng bạn trong suốt hành trình.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Tour Itinerary -->
+                            <div class="tour-info-section">
+                                <h3 class="tour-info-title">Lịch trình tour</h3>
+                                <div class="tour-itinerary">
+                                    <div class="itinerary-day">
+                                        <div class="itinerary-day-header">
+                                            <div class="itinerary-day-number">1</div>
+                                            <h4 class="itinerary-day-title">Ngày 1: Hà Nội - Hạ Long</h4>
+                                        </div>
+                                        <div class="itinerary-day-content">
+                                            <p>07:00 - Xe đón khách tại điểm hẹn ở Hà Nội, khởi hành đi Hạ Long (khoảng 3.5 giờ).</p>
+                                            <p>11:30 - Đến cảng tàu, làm thủ tục lên tàu du lịch. Nhận phòng và nghỉ ngơi.</p>
+                                            <p>12:30 - Thưởng thức bữa trưa trên tàu với các món hải sản tươi ngon.</p>
+                                            <p>14:30 - Tham quan hang Sửng Sốt - một trong những hang động đẹp nhất vịnh Hạ Long.</p>
+                                            <p>16:00 - Chèo thuyền kayak khám phá vịnh, tắm biển tại bãi tắm Ti Tốp.</p>
+                                            <p>18:00 - Quay về tàu, thưởng thức hoàng hôn trên vịnh.</p>
+                                            <p>19:00 - Bữa tối trên tàu với các món đặc sản địa phương.</p>
+                                            <p>20:30 - Tham gia các hoạt động giải trí: câu mực, karaoke, hoặc thư giãn trên boong tàu.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="itinerary-day">
+                                        <div class="itinerary-day-header">
+                                            <div class="itinerary-day-number">2</div>
+                                            <h4 class="itinerary-day-title">Ngày 2: Khám phá vịnh Hạ Long</h4>
+                                        </div>
+                                        <div class="itinerary-day-content">
+                                            <p>06:30 - Tham gia lớp học Thái Cực Quyền trên boong tàu (tùy chọn).</p>
+                                            <p>07:00 - Bữa sáng nhẹ với bánh mì, trứng, cà phê.</p>
+                                            <p>08:00 - Tham quan hang Luồn - hang động nổi tiếng với hệ thống thạch nhũ độc đáo.</p>
+                                            <p>10:00 - Tham quan làng chài Cửa Vạn, tìm hiểu cuộc sống của ngư dân địa phương.</p>
+                                            <p>12:00 - Bữa trưa trên tàu.</p>
+                                            <p>14:00 - Tham quan hang Đầu Gỗ - hang động lớn và đẹp nhất vịnh Hạ Long.</p>
+                                            <p>16:00 - Thư giãn, tắm nắng trên boong tàu hoặc tham gia các hoạt động tự do.</p>
+                                            <p>19:00 - Bữa tối đặc biệt với buffet hải sản.</p>
+                                            <p>21:00 - Tham gia các hoạt động giải trí ban đêm.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="itinerary-day">
+                                        <div class="itinerary-day-header">
+                                            <div class="itinerary-day-number">3</div>
+                                            <h4 class="itinerary-day-title">Ngày 3: Hạ Long - Hà Nội</h4>
+                                        </div>
+                                        <div class="itinerary-day-content">
+                                            <p>06:30 - Tham gia lớp học Thái Cực Quyền hoặc yoga trên boong tàu.</p>
+                                            <p>07:00 - Bữa sáng buffet.</p>
+                                            <p>08:00 - Tham quan hang Trinh Nữ - hang động với truyền thuyết tình yêu lãng mạn.</p>
+                                            <p>09:30 - Trả phòng, làm thủ tục trả tàu.</p>
+                                            <p>10:30 - Thưởng thức bữa trưa trên tàu trước khi về bờ.</p>
+                                            <p>11:30 - Về đến cảng, lên xe về Hà Nội.</p>
+                                            <p>15:30 - Về đến Hà Nội, kết thúc chuyến du lịch.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tour Includes -->
+                            <div class="tour-info-section">
+                                <h3 class="tour-info-title">Dịch vụ bao gồm</h3>
+                                <div class="tour-info-list">
+                                    <div class="tour-info-item">
+                                        <span class="tour-info-item-icon">✅</span>
+                                        <div class="tour-info-item-content">
+                                            <div class="tour-info-item-title">Vận chuyển</div>
+                                            <div class="tour-info-item-text">Xe đưa đón Hà Nội - Hạ Long - Hà Nội, tàu du lịch trên vịnh</div>
+                                        </div>
+                                    </div>
+                                    <div class="tour-info-item">
+                                        <span class="tour-info-item-icon">🏨</span>
+                                        <div class="tour-info-item-content">
+                                            <div class="tour-info-item-title">Lưu trú</div>
+                                            <div class="tour-info-item-text">2 đêm trên tàu du lịch 3-4 sao, phòng đôi có điều hòa, TV, phòng tắm riêng</div>
+                                        </div>
+                                    </div>
+                                    <div class="tour-info-item">
+                                        <span class="tour-info-item-icon">🍽️</span>
+                                        <div class="tour-info-item-content">
+                                            <div class="tour-info-item-title">Ăn uống</div>
+                                            <div class="tour-info-item-text">2 bữa sáng, 3 bữa trưa, 2 bữa tối với các món hải sản tươi ngon</div>
+                                        </div>
+                                    </div>
+                                    <div class="tour-info-item">
+                                        <span class="tour-info-item-icon">🎫</span>
+                                        <div class="tour-info-item-content">
+                                            <div class="tour-info-item-title">Vé tham quan</div>
+                                            <div class="tour-info-item-text">Vé vào cửa các hang động, làng chài, và các điểm tham quan</div>
+                                        </div>
+                                    </div>
+                                    <div class="tour-info-item">
+                                        <span class="tour-info-item-icon">👨‍🏫</span>
+                                        <div class="tour-info-item-content">
+                                            <div class="tour-info-item-title">Hướng dẫn viên</div>
+                                            <div class="tour-info-item-text">Hướng dẫn viên tiếng Việt chuyên nghiệp, nhiệt tình</div>
+                                        </div>
+                                    </div>
+                                    <div class="tour-info-item">
+                                        <span class="tour-info-item-icon">🛶</span>
+                                        <div class="tour-info-item-content">
+                                            <div class="tour-info-item-title">Hoạt động</div>
+                                            <div class="tour-info-item-text">Chèo thuyền kayak, tắm biển, câu mực, và các hoạt động giải trí khác</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tour Excludes -->
+                            <div class="tour-info-section">
+                                <h3 class="tour-info-title">Dịch vụ không bao gồm</h3>
+                                <div class="tour-info-list">
+                                    <div class="tour-info-item">
+                                        <span class="tour-info-item-icon">❌</span>
+                                        <div class="tour-info-item-content">
+                                            <div class="tour-info-item-text">Đồ uống có cồn, nước ngọt, và các chi phí cá nhân khác</div>
+                                        </div>
+                                    </div>
+                                    <div class="tour-info-item">
+                                        <span class="tour-info-item-icon">❌</span>
+                                        <div class="tour-info-item-content">
+                                            <div class="tour-info-item-text">Bảo hiểm du lịch (khuyến nghị mua riêng)</div>
+                                        </div>
+                                    </div>
+                                    <div class="tour-info-item">
+                                        <span class="tour-info-item-icon">❌</span>
+                                        <div class="tour-info-item-content">
+                                            <div class="tour-info-item-text">Chi phí phát sinh do thời tiết hoặc các yếu tố khách quan</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column - Booking Card -->
+                        <div class="tour-detail-right">
+                            <div class="tour-booking-card">
+                                <div class="tour-price-section">
+                                    <div class="tour-price-label">Giá tour</div>
+                                    <div class="tour-price-amount">2.500.000₫</div>
+                                    <div class="tour-price-note">/ người (áp dụng cho đoàn 2 người trở lên)</div>
+                                </div>
+
+                                <form class="tour-booking-form">
+                                    <div class="form-group">
+                                        <label class="form-label">Ngày khởi hành</label>
+                                        <input type="date" class="form-input" value="2025-01-15" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Số người</label>
+                                        <select class="form-select" required>
+                                            <option value="1">1 người</option>
+                                            <option value="2" selected>2 người</option>
+                                            <option value="3">3 người</option>
+                                            <option value="4">4 người</option>
+                                            <option value="5">5 người</option>
+                                            <option value="6+">6+ người</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Loại phòng</label>
+                                        <select class="form-select" required>
+                                            <option value="standard" selected>Phòng tiêu chuẩn</option>
+                                            <option value="deluxe">Phòng deluxe</option>
+                                            <option value="suite">Phòng suite</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="booking-button">Đặt tour ngay</button>
+                                </form>
+
+                                <div class="tour-includes">
+                                    <div class="includes-title">Bao gồm trong giá:</div>
+                                    <div class="includes-list">
+                                        <div class="includes-item">
+                                            <span class="includes-item-icon">✓</span>
+                                            <span>Vận chuyển Hà Nội - Hạ Long</span>
+                                        </div>
+                                        <div class="includes-item">
+                                            <span class="includes-item-icon">✓</span>
+                                            <span>Lưu trú 2 đêm trên tàu</span>
+                                        </div>
+                                        <div class="includes-item">
+                                            <span class="includes-item-icon">✓</span>
+                                            <span>Ăn uống đầy đủ</span>
+                                        </div>
+                                        <div class="includes-item">
+                                            <span class="includes-item-icon">✓</span>
+                                            <span>Vé tham quan</span>
+                                        </div>
+                                        <div class="includes-item">
+                                            <span class="includes-item-icon">✓</span>
+                                            <span>Hướng dẫn viên</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <!-- Column 1: Liên kết nhanh -->
+                <div class="footer-column">
+                    <h3 class="footer-title">Liên Kết Nhanh</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html#home">Trang Chủ</a></li>
+                        <li><a href="index.html#tours">Tour Du Lịch</a></li>
+                        <li><a href="index.html#about">Giới Thiệu</a></li>
+                        <li><a href="index.html#contact">Liên Hệ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 2: Thông tin liên hệ -->
+                <div class="footer-column">
+                    <h3 class="footer-title">Thông Tin Liên Hệ</h3>
+                    <ul class="footer-contact">
+                        <li>📍 123 Đường ABC, Quận XYZ, TP.HCM</li>
+                        <li>📞 0123 456 789</li>
+                        <li>✉️ info@dulichviet.com</li>
+                        <li>🕒 8:00 - 20:00 (T2 - CN)</li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Mạng xã hội -->
+                <div class="footer-column">
+                    <h3 class="footer-title">Theo Dõi Chúng Tôi</h3>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Facebook">📘 Facebook</a>
+                        <a href="#" class="social-link" aria-label="Instagram">📷 Instagram</a>
+                        <a href="#" class="social-link" aria-label="YouTube">📺 YouTube</a>
+                        <a href="#" class="social-link" aria-label="TikTok">🎵 TikTok</a>
+                    </div>
+                </div>
+
+                <!-- Column 4: Newsletter -->
+                <div class="footer-column">
+                    <h3 class="footer-title">Đăng Ký Nhận Tin</h3>
+                    <p class="footer-description">Nhận thông tin về các tour mới và ưu đãi đặc biệt</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Email của bạn" class="newsletter-input" required>
+                        <button type="submit" class="newsletter-button">Đăng Ký</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <p class="copyright">&copy; 2024 Du Lịch Việt Nam. Tất cả quyền được bảo lưu.</p>
+                <div class="footer-legal">
+                    <a href="#">Chính Sách Bảo Mật</a>
+                    <a href="#">Điều Khoản Sử Dụng</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Gallery image change function
+        function changeGalleryImage(imageUrl) {
+            document.getElementById('main-gallery-image').src = imageUrl;
+            
+            // Update active thumbnail
+            const thumbs = document.querySelectorAll('.tour-gallery-thumb');
+            thumbs.forEach(thumb => thumb.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu toggle
+        const hamburger = document.querySelector('.hamburger');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        
+        if (hamburger) {
+            hamburger.addEventListener('click', function() {
+                hamburger.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+        }
+
+        // Close mobile menu when clicking on a link
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                hamburger.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
+
