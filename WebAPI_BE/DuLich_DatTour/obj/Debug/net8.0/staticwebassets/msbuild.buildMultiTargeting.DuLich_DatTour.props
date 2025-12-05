@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\DuLich_DatTour.props" />
+</Project>

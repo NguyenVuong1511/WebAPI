@@ -7,20 +7,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Header scroll effect
     function handleScroll() {
-<<<<<<< HEAD
-        if (!header) return;
-        if (window.scrollY > 50) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
-=======
         if (header) {
             if (window.scrollY > 50) {
                 header.classList.add('scrolled');
             } else {
                 header.classList.remove('scrolled');
             }
->>>>>>> Vuong
         }
     }
 
@@ -48,24 +40,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Close mobile menu when clicking on a link
     mobileNavLinks.forEach(link => {
         link.addEventListener('click', function() {
-<<<<<<< HEAD
-            if (hamburger) hamburger.classList.remove('active');
-            if (mobileMenu) mobileMenu.classList.remove('active');
-=======
             if (mobileMenu) mobileMenu.style.maxHeight = '0px';
->>>>>>> Vuong
         });
     });
 
     // Close mobile menu when clicking outside
     document.addEventListener('click', function(event) {
-<<<<<<< HEAD
-        if (!mobileMenu) return;
-        const isClickInsideNav = event.target.closest('.navbar') || event.target.closest('.mobile-menu');
-        if (!isClickInsideNav && mobileMenu.classList.contains('active')) {
-            if (hamburger) hamburger.classList.remove('active');
-            mobileMenu.classList.remove('active');
-=======
         if (!mobileMenu || !hamburger) return;
         
         const isClickInsideNav = event.target.closest('.navbar') || event.target.closest('.mobile-menu');
@@ -76,7 +56,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (computedStyle.maxHeight !== '0px' && computedStyle.maxHeight !== '') {
                 mobileMenu.style.maxHeight = '0px';
             }
->>>>>>> Vuong
         }
     });
 
