@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Đăng ký tài khoản để quản lý tour, đặt dịch vụ và nhận ưu đãi từ Travel Viet">
+    <title>Đăng ký - Travel Viet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body class="auth-body">
+    <header class="auth-header">
+        <a href="index.html" class="auth-logo">
+            <img src="img/Logo.png" alt="Travel Viet Logo">
+            <div>
+                <span class="brand-name">Travel Viet</span>
+                <span class="brand-tagline">Chạm tới mọi hành trình</span>
+            </div>
+        </a>
+        <a href="index.html" class="auth-link">← Quay về trang chủ</a>
+    </header>
+
+    <main class="auth-main">
+        <section class="auth-card">
+            <div class="auth-showcase">
+                <div class="showcase-badge">Thành viên Travel Viet</div>
+                <h1>Bắt đầu hành trình của bạn</h1>
+                <p>Tạo tài khoản để quản lý các chuyến đi, nhận ưu đãi độc quyền và trải nghiệm dịch vụ tốt nhất.</p>
+                <ul class="auth-benefits">
+                    <li>✔ Đặt tour nhanh chóng và dễ dàng</li>
+                    <li>✔ Lưu tour yêu thích và nhận thông báo giảm giá</li>
+                    <li>✔ Quản lý booking và thanh toán trực tuyến</li>
+                    <li>✔ Tư vấn viên hỗ trợ 24/7</li>
+                </ul>
+            </div>
+
+            <div class="auth-form-wrapper">
+                <div class="auth-form-header">
+                    <h2>Tạo tài khoản mới 🎉</h2>
+                    <p>Điền thông tin để bắt đầu hành trình cùng Travel Viet.</p>
+                </div>
+                <form id="register-form" class="auth-form" novalidate>
+                    <!-- Thông tin đăng nhập -->
+                    <div class="form-section">
+                        <h3 class="form-section-title">Thông tin đăng nhập</h3>
+                        
+                        <div class="form-group">
+                            <label for="email">Email <span class="required">*</span></label>
+                            <div class="input-field">
+                                <input type="email" id="email" name="email" placeholder="ban@domain.com" required>
+                                <span class="input-icon">✉️</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Mật khẩu <span class="required">*</span></label>
+                            <div class="input-field password-field">
+                                <input type="password" id="password" name="password" placeholder="••••••••" required minlength="6">
+                                <button type="button" class="toggle-password" aria-label="Hiện mật khẩu" id="toggle-password">👁️</button>
+                            </div>
+                            <small class="form-hint">Mật khẩu tối thiểu 6 ký tự</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirm-password">Xác nhận mật khẩu <span class="required">*</span></label>
+                            <div class="input-field password-field">
+                                <input type="password" id="confirm-password" name="confirmPassword" placeholder="••••••••" required minlength="6">
+                                <button type="button" class="toggle-password" aria-label="Hiện mật khẩu" id="toggle-confirm-password">👁️</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Thông tin cá nhân -->
+                    <div class="form-section">
+                        <h3 class="form-section-title">Thông tin cá nhân</h3>
+                        
+                        <div class="form-group">
+                            <label for="hoTen">Họ và tên <span class="required">*</span></label>
+                            <div class="input-field">
+                                <input type="text" id="hoTen" name="hoTen" placeholder="Nguyễn Văn A" required>
+                                <span class="input-icon">👤</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="soDienThoai">Số điện thoại</label>
+                                <div class="input-field">
+                                    <input type="tel" id="soDienThoai" name="soDienThoai" placeholder="0123 456 789">
+                                    <span class="input-icon">📞</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="gioiTinh">Giới tính</label>
+                                <select class="form-select" id="gioiTinh" name="gioiTinh">
+                                    <option value="">Chọn giới tính</option>
+                                    <option value="Nam">Nam</option>
+                                    <option value="Nữ">Nữ</option>
+                                    <option value="Khác">Khác</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="ngaySinh">Ngày sinh</label>
+                            <input type="date" id="ngaySinh" name="ngaySinh" class="form-input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="diaChi">Địa chỉ</label>
+                            <textarea id="diaChi" name="diaChi" class="form-textarea" rows="3" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cmndHoChieu">CMND/Hộ chiếu</label>
+                            <div class="input-field">
+                                <input type="text" id="cmndHoChieu" name="cmndHoChieu" placeholder="Số CMND hoặc hộ chiếu">
+                                <span class="input-icon">🆔</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-meta">
+                        <label class="remember-me">
+                            <input type="checkbox" name="agreeTerms" required>
+                            <span>Tôi đồng ý với <a href="#" class="link">Điều khoản sử dụng</a> và <a href="#" class="link">Chính sách bảo mật</a> <span class="required">*</span></span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="auth-submit">Đăng ký</button>
+                    <div id="register-feedback" class="form-feedback" aria-live="polite"></div>
+                    
+                    <div class="divider">
+                        <span>Hoặc</span>
+                    </div>
+                    <div class="social-login">
+                        <button type="button" class="social-btn google-btn">
+                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google">
+                            Google
+                        </button>
+                        <button type="button" class="social-btn facebook-btn">
+                            <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" alt="Facebook">
+                            Facebook
+                        </button>
+                    </div>
+                </form>
+                <p class="auth-footer">
+                    Đã có tài khoản?
+                    <a href="login.html" class="auth-link-cta">Đăng nhập ngay</a>
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/register.js"></script>
+</body>
+</html>

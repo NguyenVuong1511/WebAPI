@@ -1535,7 +1535,7 @@ section {
    Exclusive Services Section
    ============================================ */
 .exclusive-services {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 50%, var(--secondary-color) 100%);
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 50%, #34d399 100%);
     color: var(--bg-white);
     position: relative;
     overflow: hidden;
@@ -1548,8 +1548,8 @@ section {
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.2) 0%, transparent 50%);
+    background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(52, 211, 153, 0.15) 0%, transparent 50%);
     pointer-events: none;
 }
 
@@ -1588,12 +1588,12 @@ section {
     display: inline-block;
     margin-top: var(--spacing-lg);
     padding: var(--spacing-md) var(--spacing-xl);
-    background: linear-gradient(135deg, var(--accent-color) 0%, #f97316 100%);
+    background: linear-gradient(135deg, var(--secondary-color) 0%, #059669 100%);
     color: var(--bg-white);
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
     border-radius: var(--border-radius-lg);
-    box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4);
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
     transition: all var(--transition-base);
     position: relative;
     overflow: hidden;
@@ -1606,7 +1606,7 @@ section {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
     transition: left 0.5s;
 }
 
@@ -1615,9 +1615,9 @@ section {
 }
 
 .services-cta:hover {
-    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
     transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(245, 158, 11, 0.5);
+    box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
 }
 
 .services-image {

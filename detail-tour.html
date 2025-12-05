@@ -315,30 +315,30 @@
                                     <div class="tour-price-note">/ người (áp dụng cho đoàn 2 người trở lên)</div>
                                 </div>
 
-                                <form class="tour-booking-form">
+                                <form class="tour-booking-form" id="booking-form">
                                     <div class="form-group">
-                                        <label class="form-label">Ngày khởi hành</label>
-                                        <input type="date" class="form-input" value="2025-01-15" required>
+                                        <label class="form-label">Ngày khởi hành <span class="required">*</span></label>
+                                        <input type="date" class="form-input" id="ngay-khoi-hanh" name="ngayKhoiHanh" required min="">
                                     </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Số người</label>
-                                        <select class="form-select" required>
-                                            <option value="1">1 người</option>
-                                            <option value="2" selected>2 người</option>
-                                            <option value="3">3 người</option>
-                                            <option value="4">4 người</option>
-                                            <option value="5">5 người</option>
-                                            <option value="6+">6+ người</option>
-                                        </select>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Số người lớn <span class="required">*</span></label>
+                                            <input type="number" class="form-input" id="so-nguoi-lon" name="soNguoiLon" min="1" max="20" value="2" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Số trẻ em</label>
+                                            <input type="number" class="form-input" id="so-tre-em" name="soTreEm" min="0" max="10" value="0">
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Loại phòng</label>
-                                        <select class="form-select" required>
-                                            <option value="standard" selected>Phòng tiêu chuẩn</option>
-                                            <option value="deluxe">Phòng deluxe</option>
-                                            <option value="suite">Phòng suite</option>
-                                        </select>
+                                    
+                                    <!-- Thông tin khách hàng -->
+                                    <div class="booking-guests-section" id="guests-section">
+                                        <div class="section-title">Thông tin khách hàng</div>
+                                        <div id="guests-list">
+                                            <!-- Sẽ được thêm động bằng JavaScript -->
+                                        </div>
                                     </div>
+                                    
                                     <button type="submit" class="booking-button">Đặt tour ngay</button>
                                 </form>
 
@@ -474,6 +474,132 @@
                 hamburger.classList.remove('active');
                 mobileMenu.classList.remove('active');
             });
+        });
+
+        // Booking Form Management
+        document.addEventListener('DOMContentLoaded', function() {
+            const soNguoiLonInput = document.getElementById('so-nguoi-lon');
+            const soTreEmInput = document.getElementById('so-tre-em');
+            const guestsList = document.getElementById('guests-list');
+            const bookingForm = document.getElementById('booking-form');
+            const ngayKhoiHanhInput = document.getElementById('ngay-khoi-hanh');
+
+            // Set minimum date to today
+            if (ngayKhoiHanhInput) {
+                const today = new Date().toISOString().split('T')[0];
+                ngayKhoiHanhInput.setAttribute('min', today);
+            }
+
+            // Create guest form fields
+            function createGuestFields(index, isAdult = true) {
+                const guestType = isAdult ? 'Người lớn' : 'Trẻ em';
+                return `
+                    <div class="guest-info-card" data-index="${index}" data-type="${isAdult ? 'adult' : 'child'}">
+                        <div class="guest-card-header">
+                            <h4>Thông tin ${guestType} ${index + 1}</h4>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Họ và tên <span class="required">*</span></label>
+                                <input type="text" class="form-input" name="guests[${index}][hoTen]" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Giới tính</label>
+                                <select class="form-select" name="guests[${index}][gioiTinh]">
+                                    <option value="">Chọn giới tính</option>
+                                    <option value="Nam">Nam</option>
+                                    <option value="Nữ">Nữ</option>
+                                    <option value="Khác">Khác</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Ngày sinh</label>
+                                <input type="date" class="form-input" name="guests[${index}][ngaySinh]">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">CMND/Hộ chiếu</label>
+                                <input type="text" class="form-input" name="guests[${index}][cmndHoChieu]" placeholder="Số CMND hoặc hộ chiếu">
+                            </div>
+                        </div>
+                        <input type="hidden" name="guests[${index}][loaiKhach]" value="${isAdult ? 'Người lớn' : 'Trẻ em'}">
+                    </div>
+                `;
+            }
+
+            // Update guests list
+            function updateGuestsList() {
+                const soNguoiLon = parseInt(soNguoiLonInput.value) || 0;
+                const soTreEm = parseInt(soTreEmInput.value) || 0;
+                const total = soNguoiLon + soTreEm;
+
+                if (total === 0) {
+                    guestsList.innerHTML = '<p class="form-hint">Vui lòng chọn số lượng khách</p>';
+                    return;
+                }
+
+                guestsList.innerHTML = '';
+
+                // Add adult guests
+                for (let i = 0; i < soNguoiLon; i++) {
+                    guestsList.insertAdjacentHTML('beforeend', createGuestFields(i, true));
+                }
+
+                // Add child guests
+                for (let i = 0; i < soTreEm; i++) {
+                    guestsList.insertAdjacentHTML('beforeend', createGuestFields(soNguoiLon + i, false));
+                }
+            }
+
+            // Event listeners
+            if (soNguoiLonInput && soTreEmInput) {
+                soNguoiLonInput.addEventListener('change', updateGuestsList);
+                soTreEmInput.addEventListener('change', updateGuestsList);
+                // Initialize
+                updateGuestsList();
+            }
+
+            // Form submission
+            if (bookingForm) {
+                bookingForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Validate form
+                    if (!bookingForm.checkValidity()) {
+                        bookingForm.reportValidity();
+                        return;
+                    }
+
+                    // Collect form data
+                    const formData = new FormData(bookingForm);
+                    const bookingData = {
+                        ngayKhoiHanh: formData.get('ngayKhoiHanh'),
+                        soNguoiLon: parseInt(formData.get('soNguoiLon')),
+                        soTreEm: parseInt(formData.get('soTreEm')),
+                        guests: []
+                    };
+
+                    // Collect guest data
+                    const guestCards = guestsList.querySelectorAll('.guest-info-card');
+                    guestCards.forEach((card, index) => {
+                        const guestData = {
+                            hoTen: formData.get(`guests[${index}][hoTen]`),
+                            gioiTinh: formData.get(`guests[${index}][gioiTinh]`),
+                            ngaySinh: formData.get(`guests[${index}][ngaySinh]`),
+                            cmndHoChieu: formData.get(`guests[${index}][cmndHoChieu]`),
+                            loaiKhach: formData.get(`guests[${index}][loaiKhach]`)
+                        };
+                        bookingData.guests.push(guestData);
+                    });
+
+                    console.log('Booking Data:', bookingData);
+                    
+                    // TODO: Gửi dữ liệu đến API
+                    alert('Đang xử lý đặt tour...\n\nDữ liệu sẽ được gửi đến server để xử lý.');
+                    // window.location.href = 'checkout.html?booking=' + encodeURIComponent(JSON.stringify(bookingData));
+                });
+            }
         });
     </script>
 </body>
