@@ -8,19 +8,19 @@ namespace DAL.Interfaces
         // Tạo mới người dùng
         bool Create(NguoiDung newNguoiDung, out string msg);
 
-        // Lấy người dùng theo ID
-        //NguoiDung GetById(string nguoiDungId);
+        //Lấy người dùng theo ID
+        NguoiDung GetById(string nguoiDungId);
 
-        //// Lấy tất cả người dùng
-        //List<NguoiDung> GetAll();
+        // Lấy tất cả người dùng
+        List<NguoiDung> GetAll();
 
-        //// Cập nhật thông tin người dùng
-        //bool Update(NguoiDung nguoiDung, out string msg);
+        // Cập nhật thông tin người dùng
+        bool Update(NguoiDung nguoiDung, out string msg);
 
-        //// Xóa người dùng theo ID
-        //bool Delete(string nguoiDungId, out string msg);
+        // Xóa người dùng theo ID
+        bool Delete(string nguoiDungId, out string msg);
 
-        //// Tìm kiếm người dùng theo email
-        //NguoiDung GetByEmail(string email);
+        // Tìm kiếm người dùng theo email
+        NguoiDung GetByEmail(string email);
     }
 }

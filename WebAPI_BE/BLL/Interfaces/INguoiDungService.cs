@@ -10,5 +10,6 @@ namespace BLL.Interfaces
     public interface INguoiDungService
     {
         public bool Create(NguoiDung nguoiDung, out string msg);
+
     }
 }
