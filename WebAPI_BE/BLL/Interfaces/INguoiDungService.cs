@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace BLL.Interfaces
 {
-    public interface INguoiDung
+    public interface INguoiDungService
     {
-        public bool Create(NguoiDung newNguoiDung);
+        public bool Create(NguoiDung nguoiDung, out string msg);
     }
 }

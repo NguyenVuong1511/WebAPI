@@ -9,44 +9,30 @@ namespace DAL.Helper
 {
     public class DatabaseHelper : IDatabaseHelper
     {
-        public string StrConnection { get; set; }
-        public SqlConnection sqlConnection { get; set; }
-        public SqlTransaction sqlTransaction { get; set; }
+        private string _connectionString;
+        private SqlConnection _sqlConnection;
+        private SqlTransaction _sqlTransaction;
 
         public DatabaseHelper(IConfiguration configuration)
         {
-            StrConnection = configuration["ConnectionStrings:DefaultConnection"];
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
         public void SetConnectionString(string connectionString)
         {
-            StrConnection = connectionString;
+            _connectionString = connectionString;
         }
 
-        // ================================
-        // 1. OPEN / CLOSE CONNECTION
-        // ================================
-        public string OpenConnection()
-        {
-            try
-            {
-                sqlConnection = new SqlConnection(StrConnection);
-                sqlConnection.Open();
-                return string.Empty;
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-        }
-
+        // =========================
+        // Transaction
+        // =========================
         public string OpenConnectionAndBeginTransaction()
         {
             try
             {
-                sqlConnection = new SqlConnection(StrConnection);
-                sqlConnection.Open();
-                sqlTransaction = sqlConnection.BeginTransaction();
+                _sqlConnection = new SqlConnection(_connectionString);
+                _sqlConnection.Open();
+                _sqlTransaction = _sqlConnection.BeginTransaction();
                 return string.Empty;
             }
             catch (Exception ex)
@@ -55,35 +41,28 @@ namespace DAL.Helper
             }
         }
 
-        public string CloseConnection()
+        public string CloseConnectionAndEndTransaction(bool rollback)
         {
             try
             {
-                if (sqlConnection != null && sqlConnection.State != ConnectionState.Closed)
-                    sqlConnection.Close();
-
-                return string.Empty;
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-        }
-
-        public string CloseConnectionAndEndTransaction(bool isRollback)
-        {
-            try
-            {
-                if (sqlTransaction != null)
+                if (_sqlTransaction != null)
                 {
-                    if (isRollback)
-                        sqlTransaction.Rollback();
+                    if (rollback)
+                        _sqlTransaction.Rollback();
                     else
-                        sqlTransaction.Commit();
+                        _sqlTransaction.Commit();
+
+                    _sqlTransaction.Dispose();
                 }
 
-                if (sqlConnection != null && sqlConnection.State != ConnectionState.Closed)
-                    sqlConnection.Close();
+                if (_sqlConnection != null)
+                {
+                    _sqlConnection.Close();
+                    _sqlConnection.Dispose();
+                }
+
+                _sqlTransaction = null;
+                _sqlConnection = null;
 
                 return string.Empty;
             }
@@ -93,19 +72,17 @@ namespace DAL.Helper
             }
         }
 
-        // ================================
-        // 2. SQL QUERY THƯỜNG
-        // ================================
+        // =========================
+        // SQL thường
+        // =========================
         public string ExecuteNoneQuery(string sql)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(StrConnection))
-                {
-                    conn.Open();
-                    SqlCommand cmd = new SqlCommand(sql, conn);
-                    cmd.ExecuteNonQuery();
-                }
+                using var conn = new SqlConnection(_connectionString);
+                conn.Open();
+                using var cmd = new SqlCommand(sql, conn);
+                cmd.ExecuteNonQuery();
                 return string.Empty;
             }
             catch (Exception ex)
@@ -117,16 +94,13 @@ namespace DAL.Helper
         public DataTable ExecuteQueryToDataTable(string sql, out string msgError)
         {
             msgError = string.Empty;
-            DataTable dt = new DataTable();
+            var dt = new DataTable();
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(StrConnection))
-                {
-                    conn.Open();
-                    SqlDataAdapter da = new SqlDataAdapter(sql, conn);
-                    da.Fill(dt);
-                }
+                using var conn = new SqlConnection(_connectionString);
+                using var da = new SqlDataAdapter(sql, conn);
+                da.Fill(dt);
             }
             catch (Exception ex)
             {
@@ -142,12 +116,10 @@ namespace DAL.Helper
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(StrConnection))
-                {
-                    conn.Open();
-                    SqlCommand cmd = new SqlCommand(sql, conn);
-                    return cmd.ExecuteScalar();
-                }
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand(sql, conn);
+                conn.Open();
+                return cmd.ExecuteScalar();
             }
             catch (Exception ex)
             {
@@ -156,22 +128,23 @@ namespace DAL.Helper
             }
         }
 
-        // ================================
-        // 3. STORE PROCEDURE
-        // ================================
-        private SqlCommand PrepareCommand(SqlConnection conn, string proc, object[] paramObjects)
+        // =========================
+        // Stored Procedure thường
+        // =========================
+        private SqlCommand PrepareCommand(SqlConnection conn, string procName, object[] paramObjects)
         {
-            SqlCommand cmd = new SqlCommand(proc, conn);
-            cmd.CommandType = CommandType.StoredProcedure;
+            var cmd = new SqlCommand(procName, conn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
 
-            if (paramObjects != null && paramObjects.Length > 0)
+            if (paramObjects != null)
             {
                 for (int i = 0; i < paramObjects.Length; i += 2)
                 {
                     string paramName = paramObjects[i].ToString();
-                    object paramValue = paramObjects[i + 1];
-
-                    cmd.Parameters.AddWithValue(paramName, paramValue ?? DBNull.Value);
+                    object paramValue = paramObjects[i + 1] ?? DBNull.Value;
+                    cmd.Parameters.AddWithValue(paramName, paramValue);
                 }
             }
 
@@ -182,38 +155,33 @@ namespace DAL.Helper
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(StrConnection))
-                {
-                    conn.Open();
-                    SqlCommand cmd = PrepareCommand(conn, procName, paramObjects);
-                    cmd.ExecuteNonQuery();
-                }
+                using var conn = new SqlConnection(_connectionString);
+                conn.Open();
+                using var cmd = PrepareCommand(conn, procName, paramObjects);
+                cmd.ExecuteNonQuery();
                 return string.Empty;
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                return $"SP {procName} lỗi: {ex.Message}";
             }
         }
 
         public DataTable ExecuteSProcedureReturnDataTable(out string msgError, string procName, params object[] paramObjects)
         {
             msgError = string.Empty;
-            DataTable dt = new DataTable();
+            var dt = new DataTable();
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(StrConnection))
-                {
-                    conn.Open();
-                    SqlCommand cmd = PrepareCommand(conn, procName, paramObjects);
-                    SqlDataAdapter da = new SqlDataAdapter(cmd);
-                    da.Fill(dt);
-                }
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = PrepareCommand(conn, procName, paramObjects);
+                using var da = new SqlDataAdapter(cmd);
+                da.Fill(dt);
             }
             catch (Exception ex)
             {
-                msgError = ex.Message;
+                msgError = $"SP {procName} lỗi: {ex.Message}";
             }
 
             return dt;
@@ -225,38 +193,37 @@ namespace DAL.Helper
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(StrConnection))
-                {
-                    conn.Open();
-                    SqlCommand cmd = PrepareCommand(conn, procName, paramObjects);
-                    return cmd.ExecuteScalar();
-                }
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = PrepareCommand(conn, procName, paramObjects);
+                conn.Open();
+                return cmd.ExecuteScalar();
             }
             catch (Exception ex)
             {
-                msgError = ex.Message;
+                msgError = $"SP {procName} lỗi: {ex.Message}";
                 return null;
             }
         }
 
-        // ================================
-        // 4. TRANSACTION MULTI STORE
-        // ================================
+        // =========================
+        // Multi SP Transaction
+        // =========================
         public List<string> ExecuteSProcedureWithTransaction(List<StoreParameterInfo> storeInfos)
         {
-            List<string> errors = new List<string>();
+            var errors = new List<string>();
 
             try
             {
                 OpenConnectionAndBeginTransaction();
 
-                foreach (var item in storeInfos)
+                foreach (var info in storeInfos)
                 {
-                    SqlCommand cmd = new SqlCommand(item.StoreProcedureName, sqlConnection, sqlTransaction);
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    foreach (var p in item.StoreProcedureParams)
-                        cmd.Parameters.Add(p);
+                    using var cmd = new SqlCommand(info.StoreProcedureName, _sqlConnection, _sqlTransaction)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    if (info.StoreProcedureParams != null)
+                        cmd.Parameters.AddRange(info.StoreProcedureParams.ToArray());
 
                     cmd.ExecuteNonQuery();
                 }
@@ -272,22 +239,23 @@ namespace DAL.Helper
             return errors;
         }
 
-        public List<object> ExecuteScalarSProcedureWithTransaction(out List<string> msgErrors, List<StoreParameterInfo> storeInfos)
+        public List<object> ExecuteScalarSProcedureWithTransaction(out List<string> errors, List<StoreParameterInfo> storeInfos)
         {
-            List<object> results = new List<object>();
-            msgErrors = new List<string>();
+            var results = new List<object>();
+            errors = new List<string>();
 
             try
             {
                 OpenConnectionAndBeginTransaction();
 
-                foreach (var item in storeInfos)
+                foreach (var info in storeInfos)
                 {
-                    SqlCommand cmd = new SqlCommand(item.StoreProcedureName, sqlConnection, sqlTransaction);
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    foreach (var p in item.StoreProcedureParams)
-                        cmd.Parameters.Add(p);
+                    using var cmd = new SqlCommand(info.StoreProcedureName, _sqlConnection, _sqlTransaction)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    if (info.StoreProcedureParams != null)
+                        cmd.Parameters.AddRange(info.StoreProcedureParams.ToArray());
 
                     results.Add(cmd.ExecuteScalar());
                 }
@@ -296,7 +264,7 @@ namespace DAL.Helper
             }
             catch (Exception ex)
             {
-                msgErrors.Add(ex.Message);
+                errors.Add(ex.Message);
                 CloseConnectionAndEndTransaction(true);
             }
 
