@@ -15,6 +15,25 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    // Đóng modal khi click bên ngoài
+    const modals = document.querySelectorAll('.modal-overlay');
+    modals.forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    });
+    
+    // Đóng modal bằng phím ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            modals.forEach(modal => {
+                modal.classList.remove('active');
+            });
+        }
+    });
 });
 
 function loadUserInfo() {
@@ -143,7 +162,7 @@ function renderUsersTable(users) {
     tbody.innerHTML = '';
 
     if (users.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: var(--spacing-xl);">Không tìm thấy người dùng nào</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: var(--spacing-xl);">Không tìm thấy khách hàng nào</td></tr>';
         return;
     }
 
@@ -219,44 +238,71 @@ function deleteUser(userId) {
 }
 
 function viewCustomerDetail(userId) {
-    const user = allUsers.find(u => u.nguoiDungId === userId);
-    if (!user || !user.khachHang) return;
+    try {
+        const user = allUsers.find(u => u.nguoiDungId === userId);
+        if (!user) {
+            console.error('Không tìm thấy người dùng với ID:', userId);
+            alert('Không tìm thấy thông tin người dùng');
+            return;
+        }
+        
+        if (!user.khachHang) {
+            alert('Người dùng này chưa có thông tin khách hàng');
+            return;
+        }
 
-    const content = `
-        <div class="user-info-section">
-            <div class="user-info-item">
-                <span class="user-info-label">Họ tên:</span>
-                <span class="user-info-value">${user.hoTen}</span>
+        const content = `
+            <div class="user-info-section">
+                <div class="user-info-item">
+                    <span class="user-info-label">Họ tên:</span>
+                    <span class="user-info-value">${user.hoTen}</span>
+                </div>
+                <div class="user-info-item">
+                    <span class="user-info-label">Email:</span>
+                    <span class="user-info-value">${user.email}</span>
+                </div>
+                <div class="user-info-item">
+                    <span class="user-info-label">Số điện thoại:</span>
+                    <span class="user-info-value">${user.soDienThoai || '-'}</span>
+                </div>
+                <div class="user-info-item">
+                    <span class="user-info-label">Địa chỉ:</span>
+                    <span class="user-info-value">${user.khachHang.diaChi || '-'}</span>
+                </div>
+                <div class="user-info-item">
+                    <span class="user-info-label">Giới tính:</span>
+                    <span class="user-info-value">${user.khachHang.gioiTinh || '-'}</span>
+                </div>
+                <div class="user-info-item">
+                    <span class="user-info-label">Ngày sinh:</span>
+                    <span class="user-info-value">${user.khachHang.ngaySinh ? formatDate(user.khachHang.ngaySinh) : '-'}</span>
+                </div>
+                <div class="user-info-item">
+                    <span class="user-info-label">CMND/Hộ chiếu:</span>
+                    <span class="user-info-value">${user.khachHang.cmnd_HoChieu || '-'}</span>
+                </div>
             </div>
-            <div class="user-info-item">
-                <span class="user-info-label">Email:</span>
-                <span class="user-info-value">${user.email}</span>
-            </div>
-            <div class="user-info-item">
-                <span class="user-info-label">Số điện thoại:</span>
-                <span class="user-info-value">${user.soDienThoai || '-'}</span>
-            </div>
-            <div class="user-info-item">
-                <span class="user-info-label">Địa chỉ:</span>
-                <span class="user-info-value">${user.khachHang.diaChi || '-'}</span>
-            </div>
-            <div class="user-info-item">
-                <span class="user-info-label">Giới tính:</span>
-                <span class="user-info-value">${user.khachHang.gioiTinh || '-'}</span>
-            </div>
-            <div class="user-info-item">
-                <span class="user-info-label">Ngày sinh:</span>
-                <span class="user-info-value">${user.khachHang.ngaySinh ? formatDate(user.khachHang.ngaySinh) : '-'}</span>
-            </div>
-            <div class="user-info-item">
-                <span class="user-info-label">CMND/Hộ chiếu:</span>
-                <span class="user-info-value">${user.khachHang.cmnd_HoChieu || '-'}</span>
-            </div>
-        </div>
-    `;
+        `;
 
-    document.getElementById('customer-detail-content').innerHTML = content;
-    document.getElementById('customer-detail-modal').classList.add('active');
+        const modal = document.getElementById('customer-detail-modal');
+        const contentDiv = document.getElementById('customer-detail-content');
+        
+        if (!modal) {
+            console.error('Không tìm thấy modal customer-detail-modal');
+            return;
+        }
+        
+        if (!contentDiv) {
+            console.error('Không tìm thấy customer-detail-content');
+            return;
+        }
+        
+        contentDiv.innerHTML = content;
+        modal.classList.add('active');
+    } catch (error) {
+        console.error('Lỗi khi mở modal chi tiết khách hàng:', error);
+        alert('Có lỗi xảy ra khi mở thông tin khách hàng');
+    }
 }
 
 function closeUserModal() {
@@ -287,7 +333,7 @@ function updatePaginationInfo(total) {
     const startIndex = (currentPage - 1) * pageSize + 1;
     const endIndex = Math.min(currentPage * pageSize, total);
     document.getElementById('pagination-info').textContent = 
-        `Hiển thị ${startIndex}-${endIndex} của ${total} người dùng`;
+        `Hiển thị ${startIndex}-${endIndex} của ${total} khách hàng`;
 }
 
 function formatDate(dateString) {
