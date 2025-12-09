@@ -49,6 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     name: 'Trần Thị B',
                     redirect: 'admin-dashboard.html'
                 },
+                'nhanvien@dulich.com': {
+                    password: 'nhanvien123',
+                    role: 'Nhân viên',
+                    name: 'Nguyễn Thị F',
+                    redirect: 'staff-dashboard.html'
+                },
                 'khachhang1@email.com': {
                     password: 'kh123456',
                     role: 'Khách Hàng',
