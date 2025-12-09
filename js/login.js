@@ -35,13 +35,72 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            showFeedback('Đăng nhập thành công! Đang chuyển hướng...', 'success');
+            // Demo accounts - Dựa trên database schema
+            const demoAccounts = {
+                'admin@dulich.com': {
+                    password: 'admin123',
+                    role: 'Quản Trị Viên',
+                    name: 'Nguyễn Văn A',
+                    redirect: 'admin-dashboard.html'
+                },
+                'manager@dulich.com': {
+                    password: 'manager123',
+                    role: 'Quản Lý',
+                    name: 'Trần Thị B',
+                    redirect: 'admin-dashboard.html'
+                },
+                'khachhang1@email.com': {
+                    password: 'kh123456',
+                    role: 'Khách Hàng',
+                    name: 'Lê Văn C',
+                    redirect: 'index.html'
+                },
+                'khachhang2@email.com': {
+                    password: 'kh123456',
+                    role: 'Khách Hàng',
+                    name: 'Phạm Thị D',
+                    redirect: 'index.html'
+                },
+                'khachhang3@email.com': {
+                    password: 'kh123456',
+                    role: 'Khách Hàng',
+                    name: 'Hoàng Minh E',
+                    redirect: 'index.html'
+                }
+            };
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+
+            // Kiểm tra tài khoản demo
+            const account = demoAccounts[email];
+            
+            if (!account) {
+                showFeedback('Email không tồn tại trong hệ thống.', 'error');
+                emailInput.focus();
+                return;
+            }
+
+            if (account.password !== password) {
+                showFeedback('Mật khẩu không chính xác.', 'error');
+                passwordInput.focus();
+                return;
+            }
+
+            // Lưu thông tin đăng nhập vào sessionStorage (tạm thời)
+            sessionStorage.setItem('user', JSON.stringify({
+                email: email,
+                name: account.name,
+                role: account.role
+            }));
+
+            showFeedback(`Đăng nhập thành công! Chào mừng ${account.name}`, 'success');
             form.classList.add('is-loading');
 
-            // Giả lập gọi API
+            // Redirect sau 1.5 giây
             setTimeout(() => {
                 form.classList.remove('is-loading');
-                window.location.href = 'index.html';
+                window.location.href = account.redirect;
             }, 1500);
         });
     }
