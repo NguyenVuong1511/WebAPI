@@ -1,0 +1,248 @@
+/* Admin Reports Page Styles */
+
+/* Period Filter Section */
+.period-filter-section {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.custom-date-range {
+    display: none;
+    gap: var(--spacing-md);
+    align-items: center;
+}
+
+.custom-date-range.active {
+    display: flex;
+}
+
+.date-range-separator {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.date-input {
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    transition: all var(--transition-fast);
+}
+
+.date-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.filter-select {
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    background: white;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Chart Container */
+.chart-container {
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-light);
+    border-radius: var(--border-radius);
+    margin-top: var(--spacing-md);
+}
+
+.chart-placeholder {
+    color: var(--text-secondary);
+    text-align: center;
+    font-size: var(--font-size-base);
+}
+
+/* Top Tours Table */
+.top-tours-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.top-tours-table th,
+.top-tours-table td {
+    padding: var(--spacing-md);
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.top-tours-table th {
+    background-color: var(--bg-light);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.top-tours-table td {
+    color: var(--text-secondary);
+}
+
+/* Progress Bar */
+.progress-bar-container {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.progress-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--bg-light);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: var(--primary-color);
+    transition: width 0.3s ease;
+    border-radius: 4px;
+}
+
+.progress-percentage {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    min-width: 50px;
+    text-align: right;
+    font-weight: var(--font-weight-medium);
+}
+
+/* Analysis Charts */
+.analysis-charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.analysis-chart {
+    display: flex;
+    flex-direction: column;
+}
+
+.analysis-chart-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+.analysis-chart-container {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-light);
+    border-radius: var(--border-radius);
+}
+
+.analysis-chart-placeholder {
+    color: var(--text-secondary);
+    text-align: center;
+    font-size: var(--font-size-sm);
+}
+
+/* Refund Statistics */
+.refund-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.refund-stat-card {
+    text-align: center;
+    padding: var(--spacing-lg);
+    background: var(--bg-light);
+    border-radius: var(--border-radius);
+    transition: all var(--transition-fast);
+}
+
+.refund-stat-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.refund-stat-value {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-xs);
+}
+
+.refund-stat-value.primary {
+    color: var(--primary-color);
+}
+
+.refund-stat-value.success {
+    color: var(--secondary-color);
+}
+
+.refund-stat-value.danger {
+    color: #ef4444;
+}
+
+.refund-stat-label {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+/* Table Container */
+.table-container {
+    overflow-x: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .period-filter-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-select {
+        width: 100%;
+    }
+
+    .custom-date-range {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .date-input {
+        width: 100%;
+    }
+
+    .date-range-separator {
+        display: none;
+    }
+
+    .analysis-charts {
+        grid-template-columns: 1fr;
+    }
+
+    .refund-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-container {
+        height: 200px;
+    }
+
+    .analysis-chart-container {
+        height: 150px;
+    }
+}
+
