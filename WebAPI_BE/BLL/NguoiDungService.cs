@@ -96,5 +96,9 @@ namespace BLL
         {
             return _repo.GetById(nguoiDungId);
         }
+        public List<NguoiDung> GetAll()
+        {
+            return _repo.GetAll();
+        }
     }
 }

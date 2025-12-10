@@ -51,5 +51,22 @@ namespace API_NguoiDung.Controllers
             return BadRequest(new { message = "Không tìm thấy người dùng với ID này" });
             // Hoặc dùng: return NotFound(); sẽ chuẩn hơn cho trường hợp không tìm thấy.
         }
+        [HttpGet("get-all")]
+        public IActionResult GetAll()
+        {
+            // Gọi tầng xử lý nghiệp vụ
+            List<NguoiDung> user = _bus.GetAll();
+
+            // 3. Kiểm tra null
+            if (user != null)
+            {
+                // 4. Bọc kết quả trong Ok() để trả về HTTP 200 chuẩn
+                return Ok(user);
+            }
+
+            // 5. Gán nội dung thông báo rõ ràng
+            return BadRequest(new { message = "Không tìm thấy người dùng nào" });
+            // Hoặc dùng: return NotFound(); sẽ chuẩn hơn cho trường hợp không tìm thấy.
+        }
     }
 }
