@@ -3,6 +3,14 @@ let allBookings = [];
 let currentBookingId = null;
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Kiểm tra đăng nhập
+    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+    if (!user.email || user.role !== 'Khách Hàng') {
+        alert('Vui lòng đăng nhập để truy cập trang này!');
+        window.location.href = 'login.html';
+        return;
+    }
+    
     loadUserInfo();
     loadBookings();
     
