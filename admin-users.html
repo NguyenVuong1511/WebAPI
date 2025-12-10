@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quản lý người dùng - Admin Dashboard">
+    <title>Quản lý Người dùng - Admin</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <link rel="stylesheet" href="css/admin-users.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <img src="img/Logo.png" alt="Logo">
+                <div class="admin-logo-text">
+                    <h2>Travel Viet</h2>
+                    <p>Quản lý hệ thống</p>
+                </div>
+            </div>
+            <nav>
+                <ul class="admin-menu">
+                    <li class="admin-menu-item">
+                        <a href="admin-dashboard.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📊</span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-tours.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">✈️</span>
+                            <span>Quản lý Tour</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-bookings.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📋</span>
+                            <span>Quản lý Booking</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-users.html" class="admin-menu-link active">
+                            <span class="admin-menu-icon">👥</span>
+                            <span>Khách hàng</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-reports.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📈</span>
+                            <span>Báo cáo</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-feedback.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">⭐</span>
+                            <span>Đánh giá</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="index.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">🏠</span>
+                            <span>Về trang chủ</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1>Quản lý Khách hàng</h1>
+                <div class="admin-user">
+                    <div class="admin-user-avatar" id="user-avatar">NV</div>
+                    <div>
+                        <div class="admin-user-name" id="user-name">Nguyễn Văn A</div>
+                        <div class="admin-user-role" id="user-role">Quản Trị Viên</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <div class="filter-section">
+                    <input type="text" id="search-input" class="filter-input" placeholder="Tìm kiếm theo tên, email, số điện thoại...">
+                    <select id="role-filter" class="filter-select">
+                        <option value="">Tất cả vai trò</option>
+                        <option value="Quản Trị Viên">Quản Trị Viên</option>
+                        <option value="Quản Lý">Quản Lý</option>
+                        <option value="Nhân viên">Nhân viên</option>
+                        <option value="Khách Hàng">Khách Hàng</option>
+                    </select>
+                    <select id="status-filter" class="filter-select">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="true">Hoạt động</option>
+                        <option value="false">Không hoạt động</option>
+                    </select>
+                    <button class="cta-button cta-primary" onclick="loadUsers()">🔍 Tìm kiếm</button>
+                    <button class="cta-button cta-secondary" onclick="showAddUserModal()">➕ Thêm người dùng</button>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <h2 class="section-title">Danh sách Khách hàng</h2>
+                <div class="table-container">
+                    <table class="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>Họ tên</th>
+                                <th>Email</th>
+                                <th>Số điện thoại</th>
+                                <th>Vai trò</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body"></tbody>
+                    </table>
+                </div>
+                <div class="pagination-section">
+                    <div class="pagination-info" id="pagination-info">Hiển thị 1-10 của 50 khách hàng</div>
+                    <div class="pagination-buttons">
+                        <button class="cta-button cta-secondary" onclick="previousPage()">← Trước</button>
+                        <button class="cta-button cta-secondary" onclick="nextPage()">Sau →</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="user-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modal-title">Thêm người dùng mới</h2>
+            <form id="user-form" class="modal-form" onsubmit="saveUser(event)">
+                <input type="hidden" id="user-id">
+                <div class="form-group">
+                    <label class="form-label required" for="user-ho-ten">Họ tên</label>
+                    <input type="text" id="user-ho-ten" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required" for="user-email">Email</label>
+                    <input type="email" id="user-email" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="user-phone">Số điện thoại</label>
+                    <input type="tel" id="user-phone" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label required" for="user-role">Vai trò</label>
+                    <select id="user-role" class="form-select" required>
+                        <option value="Khách Hàng">Khách Hàng</option>
+                        <option value="Nhân viên">Nhân viên</option>
+                        <option value="Quản Lý">Quản Lý</option>
+                        <option value="Quản Trị Viên">Quản Trị Viên</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required" for="user-status">Trạng thái</label>
+                    <select id="user-status" class="form-select" required>
+                        <option value="true">Hoạt động</option>
+                        <option value="false">Không hoạt động</option>
+                    </select>
+                </div>
+                <div class="form-group" id="password-section">
+                    <label class="form-label required" for="user-password">Mật khẩu</label>
+                    <input type="password" id="user-password" class="form-input" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="cta-button cta-secondary" onclick="closeUserModal()">Hủy</button>
+                    <button type="submit" class="cta-button cta-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="customer-detail-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">Thông tin Khách hàng</h2>
+            <div id="customer-detail-content" class="customer-detail-content"></div>
+            <div class="modal-actions">
+                <button class="cta-button cta-secondary" onclick="closeCustomerDetailModal()">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin-users.js"></script>
+</body>
+</html>

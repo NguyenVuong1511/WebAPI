@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard Khách hàng - Quản lý Du lịch">
+    <title>Dashboard Khách hàng - Travel Viet</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <link rel="stylesheet" href="css/customer-dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <img src="img/Logo.png" alt="Logo">
+                <div class="admin-logo-text">
+                    <h2>Travel Viet</h2>
+                    <p>Khách hàng</p>
+                </div>
+            </div>
+            <nav>
+                <ul class="admin-menu">
+                    <li class="admin-menu-item">
+                        <a href="customer-dashboard.html" class="admin-menu-link active">
+                            <span class="admin-menu-icon">📊</span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="customer-bookings.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📋</span>
+                            <span>Đặt tour của tôi</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="customer-invoices.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">🧾</span>
+                            <span>Hóa đơn</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="customer-reviews.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">⭐</span>
+                            <span>Đánh giá của tôi</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="index.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">🏠</span>
+                            <span>Về trang chủ</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1>Dashboard Khách hàng</h1>
+                <div class="admin-user">
+                    <div class="admin-user-avatar" id="user-avatar">KH</div>
+                    <div>
+                        <div class="admin-user-name" id="user-name">Khách hàng</div>
+                        <div class="admin-user-role" id="user-role">Khách Hàng</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-header">
+                        <span class="stat-title">Tổng đặt tour</span>
+                        <span class="stat-icon">📋</span>
+                    </div>
+                    <div class="stat-value" id="total-bookings">0</div>
+                    <div class="stat-change">Tất cả booking</div>
+                </div>
+
+                <div class="stat-card success">
+                    <div class="stat-header">
+                        <span class="stat-title">Đã xác nhận</span>
+                        <span class="stat-icon">✅</span>
+                    </div>
+                    <div class="stat-value" id="confirmed-bookings">0</div>
+                    <div class="stat-change">Tour đã xác nhận</div>
+                </div>
+
+                <div class="stat-card warning">
+                    <div class="stat-header">
+                        <span class="stat-title">Chờ thanh toán</span>
+                        <span class="stat-icon">⏳</span>
+                    </div>
+                    <div class="stat-value" id="pending-payment">0</div>
+                    <div class="stat-change negative">Cần thanh toán</div>
+                </div>
+
+                <div class="stat-card info">
+                    <div class="stat-header">
+                        <span class="stat-title">Đã thanh toán</span>
+                        <span class="stat-icon">💰</span>
+                    </div>
+                    <div class="stat-value" id="paid-amount">0₫</div>
+                    <div class="stat-change">Tổng đã thanh toán</div>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <h2 class="section-title">Tour sắp tới</h2>
+                <div class="table-container">
+                    <table class="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>Tên Tour</th>
+                                <th>Ngày khởi hành</th>
+                                <th>Số người</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="upcoming-tours-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <h2 class="section-title">Booking gần đây</h2>
+                <div class="table-container">
+                    <table class="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>Mã Booking</th>
+                                <th>Tên Tour</th>
+                                <th>Ngày đặt</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-bookings-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/customer-dashboard.js"></script>
+</body>
+</html>
+

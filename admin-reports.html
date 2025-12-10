@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Báo cáo & Thống kê - Admin Dashboard">
+    <title>Báo cáo & Thống kê - Admin</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <link rel="stylesheet" href="css/admin-reports.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <img src="img/Logo.png" alt="Logo">
+                <div class="admin-logo-text">
+                    <h2>Travel Viet</h2>
+                    <p>Quản lý hệ thống</p>
+                </div>
+            </div>
+            <nav>
+                <ul class="admin-menu">
+                    <li class="admin-menu-item">
+                        <a href="admin-dashboard.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📊</span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-tours.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">✈️</span>
+                            <span>Quản lý Tour</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-bookings.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📋</span>
+                            <span>Quản lý Booking</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-users.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">👥</span>
+                            <span>Khách hàng</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-reports.html" class="admin-menu-link active">
+                            <span class="admin-menu-icon">📈</span>
+                            <span>Báo cáo</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-feedback.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">⭐</span>
+                            <span>Đánh giá</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="index.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">🏠</span>
+                            <span>Về trang chủ</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1>Báo cáo & Thống kê</h1>
+                <div class="admin-user">
+                    <div class="admin-user-avatar" id="user-avatar">NV</div>
+                    <div>
+                        <div class="admin-user-name" id="user-name">Nguyễn Văn A</div>
+                        <div class="admin-user-role" id="user-role">Quản Trị Viên</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <div class="period-filter-section">
+                    <select id="period-filter" class="filter-select">
+                        <option value="month">Tháng này</option>
+                        <option value="quarter">Quý này</option>
+                        <option value="year">Năm này</option>
+                        <option value="custom">Tùy chọn</option>
+                    </select>
+                    <div id="custom-date-range" class="custom-date-range">
+                        <input type="date" id="date-from" class="date-input">
+                        <span class="date-range-separator">đến</span>
+                        <input type="date" id="date-to" class="date-input">
+                    </div>
+                    <button class="cta-button cta-primary" onclick="loadReports()">🔍 Xem báo cáo</button>
+                    <button class="cta-button cta-secondary" onclick="exportReport()">📥 Xuất Excel</button>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-header">
+                        <span class="stat-title">Doanh thu tổng</span>
+                        <span class="stat-icon">💰</span>
+                    </div>
+                    <div class="stat-value" id="total-revenue">0₫</div>
+                    <div class="stat-change" id="revenue-change">So với kỳ trước</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-header">
+                        <span class="stat-title">Số lượng Booking</span>
+                        <span class="stat-icon">📋</span>
+                    </div>
+                    <div class="stat-value" id="total-bookings">0</div>
+                    <div class="stat-change" id="bookings-change">So với kỳ trước</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-header">
+                        <span class="stat-title">Số khách hàng</span>
+                        <span class="stat-icon">👥</span>
+                    </div>
+                    <div class="stat-value" id="total-customers">0</div>
+                    <div class="stat-change" id="customers-change">So với kỳ trước</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-header">
+                        <span class="stat-title">Booking hủy</span>
+                        <span class="stat-icon">❌</span>
+                    </div>
+                    <div class="stat-value" id="cancelled-bookings">0</div>
+                    <div class="stat-change negative" id="cancelled-change">Tỷ lệ hủy</div>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <h2 class="section-title">Biểu đồ Doanh thu</h2>
+                <div id="revenue-chart" class="chart-container">
+                    <p class="chart-placeholder">Biểu đồ sẽ được hiển thị ở đây (cần tích hợp thư viện chart)</p>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <h2 class="section-title">Tour bán chạy</h2>
+                <div class="table-container">
+                    <table class="top-tours-table">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên Tour</th>
+                                <th>Số lượng Booking</th>
+                                <th>Doanh thu</th>
+                                <th>Tỷ lệ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top-tours-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <h2 class="section-title">Phân tích Booking</h2>
+                <div class="analysis-charts">
+                    <div class="analysis-chart">
+                        <h3 class="analysis-chart-title">Theo trạng thái</h3>
+                        <div id="booking-status-chart" class="analysis-chart-container">
+                            <p class="analysis-chart-placeholder">Biểu đồ trạng thái</p>
+                        </div>
+                    </div>
+                    <div class="analysis-chart">
+                        <h3 class="analysis-chart-title">Theo thời gian</h3>
+                        <div id="booking-timeline-chart" class="analysis-chart-container">
+                            <p class="analysis-chart-placeholder">Biểu đồ thời gian</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <h2 class="section-title">Thống kê Hoàn trả</h2>
+                <div class="refund-stats">
+                    <div class="refund-stat-card">
+                        <div class="refund-stat-value primary" id="total-refunds">0</div>
+                        <div class="refund-stat-label">Tổng yêu cầu</div>
+                    </div>
+                    <div class="refund-stat-card">
+                        <div class="refund-stat-value success" id="refund-amount">0₫</div>
+                        <div class="refund-stat-label">Tổng tiền hoàn</div>
+                    </div>
+                    <div class="refund-stat-card">
+                        <div class="refund-stat-value danger" id="pending-refunds">0</div>
+                        <div class="refund-stat-label">Đang xử lý</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/admin-reports.js"></script>
+</body>
+</html>
+

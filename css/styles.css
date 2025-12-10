@@ -1535,8 +1535,22 @@ section {
    Exclusive Services Section
    ============================================ */
 .exclusive-services {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 50%, #34d399 100%);
     color: var(--bg-white);
+    position: relative;
+    overflow: hidden;
+}
+
+.exclusive-services::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(52, 211, 153, 0.15) 0%, transparent 50%);
+    pointer-events: none;
 }
 
 .services-wrapper {
@@ -1544,11 +1558,15 @@ section {
     flex-direction: column;
     gap: var(--spacing-2xl);
     align-items: center;
+    position: relative;
+    z-index: 1;
 }
 
 .services-content {
     text-align: center;
     max-width: 100%;
+    position: relative;
+    z-index: 1;
 }
 
 .services-title {
@@ -1570,19 +1588,36 @@ section {
     display: inline-block;
     margin-top: var(--spacing-lg);
     padding: var(--spacing-md) var(--spacing-xl);
-    background-color: var(--secondary-color);
+    background: linear-gradient(135deg, var(--secondary-color) 0%, #059669 100%);
     color: var(--bg-white);
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-lg);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
     transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.services-cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+    transition: left 0.5s;
+}
+
+.services-cta:hover::before {
+    left: 100%;
 }
 
 .services-cta:hover {
-    background-color: #10b981;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-xl);
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
 }
 
 .services-image {
@@ -1590,6 +1625,8 @@ section {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+    z-index: 1;
 }
 
 .services-icon-wrapper {
@@ -1606,14 +1643,19 @@ section {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.4);
     border-radius: 50%;
-    backdrop-filter: blur(10px);
-    transition: transform var(--transition-base);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    transition: all var(--transition-base);
 }
 
 .services-icon:hover {
-    transform: scale(1.1) rotate(5deg);
+    transform: scale(1.15) rotate(5deg);
+    background: rgba(255, 255, 255, 0.35);
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
 }
 
 /* ============================================

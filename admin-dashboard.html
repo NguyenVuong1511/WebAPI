@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard quản lý du lịch và đặt tour">
+    <title>Dashboard - Quản Lý Du Lịch</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <img src="img/Logo.png" alt="Logo">
+                <div class="admin-logo-text">
+                    <h2>Travel Viet</h2>
+                    <p>Quản lý hệ thống</p>
+                </div>
+            </div>
+            
+            <nav>
+                <ul class="admin-menu">
+                    <li class="admin-menu-item">
+                        <a href="admin-dashboard.html" class="admin-menu-link active">
+                            <span class="admin-menu-icon">📊</span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-tours.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">✈️</span>
+                            <span>Quản lý Tour</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-bookings.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📋</span>
+                            <span>Quản lý Booking</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-users.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">👥</span>
+                            <span>Khách hàng</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-reports.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📈</span>
+                            <span>Báo cáo</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-feedback.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">⭐</span>
+                            <span>Đánh giá</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="index.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">🏠</span>
+                            <span>Về trang chủ</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1>Dashboard</h1>
+                <div class="admin-user">
+                    <div class="admin-user-avatar">NV</div>
+                    <div>
+                        <div style="font-weight: 600;">Nguyễn Văn A</div>
+                        <div style="font-size: 0.875rem; color: var(--text-secondary);">Quản Trị Viên</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-header">
+                        <span class="stat-title">Tổng số Tour</span>
+                        <span class="stat-icon">✈️</span>
+                    </div>
+                    <div class="stat-value" id="total-tours">5</div>
+                    <div class="stat-change">+2 tour mới tháng này</div>
+                </div>
+
+                <div class="stat-card success">
+                    <div class="stat-header">
+                        <span class="stat-title">Tổng Booking</span>
+                        <span class="stat-icon">📋</span>
+                    </div>
+                    <div class="stat-value" id="total-bookings">5</div>
+                    <div class="stat-change">+3 booking hôm nay</div>
+                </div>
+
+                <div class="stat-card warning">
+                    <div class="stat-header">
+                        <span class="stat-title">Doanh thu tháng</span>
+                        <span class="stat-icon">💰</span>
+                    </div>
+                    <div class="stat-value" id="monthly-revenue">324.000.000₫</div>
+                    <div class="stat-change">+15% so với tháng trước</div>
+                </div>
+
+                <div class="stat-card danger">
+                    <div class="stat-header">
+                        <span class="stat-title">Booking chờ xử lý</span>
+                        <span class="stat-icon">⏳</span>
+                    </div>
+                    <div class="stat-value" id="pending-bookings">1</div>
+                    <div class="stat-change negative">Cần xử lý ngay</div>
+                </div>
+            </div>
+
+            <!-- Recent Bookings -->
+            <div class="dashboard-section">
+                <h2 class="section-title">Booking gần đây</h2>
+                <div class="recent-bookings">
+                    <table class="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>Mã Booking</th>
+                                <th>Tour</th>
+                                <th>Khách hàng</th>
+                                <th>Ngày khởi hành</th>
+                                <th>Số người</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-bookings-list">
+                            <!-- Sẽ được load từ API -->
+                            <tr>
+                                <td>31FEDE4C</td>
+                                <td>Tour Miền Bắc</td>
+                                <td>Lê Văn C</td>
+                                <td>15/01/2025</td>
+                                <td>2 người lớn</td>
+                                <td>17.000.000₫</td>
+                                <td><span class="status-badge status-confirmed">Đã xác nhận</span></td>
+                            </tr>
+                            <tr>
+                                <td>3B77F08D</td>
+                                <td>Tour Di sản Miền Trung</td>
+                                <td>Hoàng Minh E</td>
+                                <td>20/02/2025</td>
+                                <td>1 người lớn, 1 trẻ em</td>
+                                <td>6.000.000₫</td>
+                                <td><span class="status-badge status-paid">Đã thanh toán</span></td>
+                            </tr>
+                            <tr>
+                                <td>586CCD5A</td>
+                                <td>Tour Đà Lạt</td>
+                                <td>Phạm Thị D</td>
+                                <td>10/03/2025</td>
+                                <td>3 người lớn</td>
+                                <td>9.600.000₫</td>
+                                <td><span class="status-badge status-pending">Chờ thanh toán</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="dashboard-section">
+                <h2 class="section-title">Thao tác nhanh</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-md);">
+                    <a href="admin-tours.html?action=create" class="cta-button cta-primary" style="text-align: center; padding: var(--spacing-lg);">
+                        ➕ Tạo Tour mới
+                    </a>
+                    <a href="admin-bookings.html" class="cta-button cta-secondary" style="text-align: center; padding: var(--spacing-lg);">
+                        📋 Xem Booking
+                    </a>
+                    <a href="admin-reports.html" class="cta-button cta-secondary" style="text-align: center; padding: var(--spacing-lg);">
+                        📈 Xem Báo cáo
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/admin-dashboard.js"></script>
+</body>
+</html>

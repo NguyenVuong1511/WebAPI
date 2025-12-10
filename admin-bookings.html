@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quản lý Booking - Admin Dashboard">
+    <title>Quản lý Booking - Admin</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <link rel="stylesheet" href="css/admin-bookings.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <img src="img/Logo.png" alt="Logo">
+                <div class="admin-logo-text">
+                    <h2>Travel Viet</h2>
+                    <p>Quản lý hệ thống</p>
+                </div>
+            </div>
+            <nav>
+                <ul class="admin-menu">
+                    <li class="admin-menu-item">
+                        <a href="admin-dashboard.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📊</span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-tours.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">✈️</span>
+                            <span>Quản lý Tour</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-bookings.html" class="admin-menu-link active">
+                            <span class="admin-menu-icon">📋</span>
+                            <span>Quản lý Booking</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-users.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">👥</span>
+                            <span>Khách hàng</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-reports.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📈</span>
+                            <span>Báo cáo</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-feedback.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">⭐</span>
+                            <span>Đánh giá</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="index.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">🏠</span>
+                            <span>Về trang chủ</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1>Quản lý Booking & Hóa đơn</h1>
+                <div class="admin-user">
+                    <div class="admin-user-avatar" id="user-avatar">NV</div>
+                    <div>
+                        <div class="admin-user-name" id="user-name">Nguyễn Văn A</div>
+                        <div class="admin-user-role" id="user-role">Quản Trị Viên</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <div class="filter-section">
+                    <input type="text" id="search-input" class="filter-input" placeholder="Tìm kiếm theo mã booking, tên khách hàng...">
+                    <select id="status-filter" class="filter-select">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="Chờ xác nhận">Chờ xác nhận</option>
+                        <option value="Đã xác nhận">Đã xác nhận</option>
+                        <option value="Chờ thanh toán">Chờ thanh toán</option>
+                        <option value="Đã thanh toán">Đã thanh toán</option>
+                        <option value="Đã hủy">Đã hủy</option>
+                    </select>
+                    <input type="date" id="date-from" class="date-input" placeholder="Từ ngày">
+                    <input type="date" id="date-to" class="date-input" placeholder="Đến ngày">
+                    <button class="cta-button cta-primary" onclick="loadBookings()">🔍 Tìm kiếm</button>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <h2 class="section-title">Danh sách Booking</h2>
+                <div class="table-container">
+                    <table class="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>Mã Booking</th>
+                                <th>Tour</th>
+                                <th>Khách hàng</th>
+                                <th>Ngày khởi hành</th>
+                                <th>Số người</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookings-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="booking-detail-modal" class="modal-overlay">
+        <div class="modal-content modal-content-large">
+            <h2 class="modal-title">Chi tiết Booking</h2>
+            <div class="booking-tabs">
+                <button class="booking-tab active" onclick="showBookingTab('thong-tin')">Thông tin</button>
+                <button class="booking-tab" onclick="showBookingTab('hoa-don')">Hóa đơn</button>
+                <button class="booking-tab" onclick="showBookingTab('thanh-toan')">Thanh toán</button>
+                <button class="booking-tab" onclick="showBookingTab('hoan-tra')">Hoàn trả</button>
+            </div>
+            <div id="booking-detail-content" class="booking-tab-content active">
+                <!-- Nội dung sẽ được load ở đây -->
+            </div>
+            <div class="modal-actions">
+                <button class="cta-button cta-secondary" onclick="closeBookingDetailModal()">Đóng</button>
+                <button class="cta-button cta-primary" id="confirm-booking-btn" onclick="confirmBooking()" style="display: none;">✓ Xác nhận Booking</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="refund-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">Xử lý Yêu cầu Hoàn trả</h2>
+            <form id="refund-form" class="modal-form" onsubmit="processRefund(event)">
+                <input type="hidden" id="refund-booking-id">
+                <div class="form-group">
+                    <label class="form-label" for="refund-lydo">Lý do hoàn trả</label>
+                    <textarea id="refund-lydo" class="form-textarea" rows="3" readonly></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required" for="refund-sotien">Số tiền hoàn trả (VNĐ)</label>
+                    <input type="number" id="refund-sotien" class="form-input refund-amount-input" required min="0" step="1000">
+                </div>
+                <div class="form-group">
+                    <label class="form-label required" for="refund-trangthai">Trạng thái xử lý</label>
+                    <select id="refund-trangthai" class="form-select" required>
+                        <option value="Đang xử lý">Đang xử lý</option>
+                        <option value="Đã hoàn thành">Đã hoàn thành</option>
+                        <option value="Từ chối">Từ chối</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="cta-button cta-secondary" onclick="closeRefundModal()">Hủy</button>
+                    <button type="submit" class="cta-button cta-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/admin-bookings.js"></script>
+</body>
+</html>
+
