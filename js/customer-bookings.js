@@ -41,6 +41,16 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+    
+    // Đóng modal hủy tour khi click bên ngoài
+    const cancelModal = document.getElementById('cancel-booking-modal');
+    if (cancelModal) {
+        cancelModal.addEventListener('click', function(e) {
+            if (e.target === cancelModal) {
+                closeCancelBookingModal();
+            }
+        });
+    }
 });
 
 function loadUserInfo() {
@@ -192,7 +202,8 @@ function getStatusClass(status) {
         'Chờ thanh toán': 'status-pending',
         'Đã thanh toán': 'status-paid',
         'Đã hủy': 'status-cancelled',
-        'Chờ xác nhận': 'status-pending'
+        'Chờ xác nhận': 'status-pending',
+        'Chờ hủy': 'status-pending'
     };
     return statusMap[status] || 'status-pending';
 }
@@ -446,6 +457,12 @@ function calculateRefundPercentage(daysUntilDeparture) {
     } else {
         return 0; // Không hoàn tiền nếu hủy dưới 7 ngày
     }
+}
+
+// Hiển thị modal hủy tour từ bảng
+function showCancelBookingModalFromTable(bookingId) {
+    currentBookingId = bookingId;
+    showCancelBookingModal();
 }
 
 // Hiển thị modal hủy tour
