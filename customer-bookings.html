@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Đặt tour của tôi - Khách hàng">
+    <title>Đặt tour của tôi - Travel Viet</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <link rel="stylesheet" href="css/customer-bookings.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <img src="img/Logo.png" alt="Logo">
+                <div class="admin-logo-text">
+                    <h2>Travel Viet</h2>
+                    <p>Khách hàng</p>
+                </div>
+            </div>
+            <nav>
+                <ul class="admin-menu">
+                    <li class="admin-menu-item">
+                        <a href="customer-dashboard.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📊</span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="customer-bookings.html" class="admin-menu-link active">
+                            <span class="admin-menu-icon">📋</span>
+                            <span>Đặt tour của tôi</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="customer-invoices.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">🧾</span>
+                            <span>Hóa đơn</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="customer-reviews.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">⭐</span>
+                            <span>Đánh giá của tôi</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="index.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">🏠</span>
+                            <span>Về trang chủ</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1>Đặt tour của tôi</h1>
+                <div class="admin-user">
+                    <div class="admin-user-avatar" id="user-avatar">KH</div>
+                    <div>
+                        <div class="admin-user-name" id="user-name">Khách hàng</div>
+                        <div class="admin-user-role" id="user-role">Khách Hàng</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <div class="filter-section">
+                    <input type="text" id="search-input" class="filter-input" placeholder="Tìm kiếm theo tên tour...">
+                    <select id="status-filter" class="filter-select">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="Chờ xác nhận">Chờ xác nhận</option>
+                        <option value="Đã xác nhận">Đã xác nhận</option>
+                        <option value="Chờ thanh toán">Chờ thanh toán</option>
+                        <option value="Đã thanh toán">Đã thanh toán</option>
+                        <option value="Đã hủy">Đã hủy</option>
+                    </select>
+                    <button class="cta-button cta-primary" onclick="loadBookings()">🔍 Tìm kiếm</button>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <h2 class="section-title">Danh sách Booking</h2>
+                <div class="table-container">
+                    <table class="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>Mã Booking</th>
+                                <th>Tên Tour</th>
+                                <th>Ngày khởi hành</th>
+                                <th>Số người</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookings-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="booking-detail-modal" class="modal-overlay">
+        <div class="modal-content modal-content-large">
+            <h2 class="modal-title" id="booking-detail-title">Chi tiết Booking</h2>
+            <div class="tab-container">
+                <button class="tab-button active" onclick="showTab('thong-tin')">Thông tin</button>
+                <button class="tab-button" onclick="showTab('hoa-don')">Hóa đơn</button>
+                <button class="tab-button" onclick="showTab('thanh-toan')">Thanh toán</button>
+            </div>
+            <div id="booking-detail-content" class="tab-content active">
+                <!-- Nội dung tab sẽ được load ở đây -->
+            </div>
+            <div class="modal-actions">
+                <button class="cta-button cta-secondary" onclick="closeBookingDetailModal()">Đóng</button>
+                <button id="payment-btn" class="cta-button cta-primary" onclick="makePayment()" style="display: none;">💳 Thanh toán</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/customer-bookings.js"></script>
+</body>
+</html>
+
