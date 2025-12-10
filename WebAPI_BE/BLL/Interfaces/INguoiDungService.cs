@@ -11,5 +11,7 @@ namespace BLL.Interfaces
     {
         public bool Create(NguoiDung nguoiDung, out string msg);
 
+        public NguoiDung GetById(string nguoiDungId);
+
     }
 }
