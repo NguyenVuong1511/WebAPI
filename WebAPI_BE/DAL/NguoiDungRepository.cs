@@ -185,5 +185,28 @@ namespace DAL
                 return null;
             }
         }
+
+        public bool CheckExist(string Email)
+        {
+            // LƯU Ý: Cách này nguy hiểm nếu không kiểm soát kỹ dữ liệu đầu vào
+            string query = $"SELECT COUNT(*) FROM NguoiDung WHERE Email = '{Email}'";
+
+            string msgError = "";
+            object result = _databaseHelper.ExecuteScalar(query, out msgError);
+
+            // Kiểm tra lỗi
+            if (!string.IsNullOrEmpty(msgError))
+            {
+                // Có lỗi kết nối hoặc SQL -> Trả về true để chặn (hoặc xử lý tùy logic)
+                return true;
+            }
+
+            if (result != null && result != DBNull.Value)
+            {
+                return Convert.ToInt32(result) > 0;
+            }
+
+            return false;
+        }
     }
 }

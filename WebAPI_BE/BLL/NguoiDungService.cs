@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace BLL
@@ -22,24 +23,71 @@ namespace BLL
         {
             msg = string.Empty;
 
+            // 1. Kiểm tra đối tượng đầu vào (Null Check)
+            if (nguoiDung == null)
+            {
+                msg = "Dữ liệu người dùng không hợp lệ (null).";
+                return false;
+            }
+
+            // 2. Validate dữ liệu bắt buộc (Data Validation)
+            if (string.IsNullOrWhiteSpace(nguoiDung.HoTen))
+            {
+                msg = "Vui lòng nhập họ tên.";
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(nguoiDung.Email))
+            {
+                msg = "Vui lòng nhập Email.";
+                return false;
+            }
+
+            // Kiểm tra định dạng email
+            if (!Regex.IsMatch(nguoiDung.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                msg = "Email không hợp lệ.";
+                return false;
+            }
+
+            // Kiểm tra số điện thoại (ví dụ: chỉ 10-11 chữ số)
+            if (!string.IsNullOrWhiteSpace(nguoiDung.SDT) &&
+                !Regex.IsMatch(nguoiDung.SDT, @"^\d{10,11}$"))
+            {
+                msg = "Số điện thoại không hợp lệ.";
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(nguoiDung.MatKhauHash))
+            {
+                msg = "Vui lòng nhập mật khẩu.";
+                return false;
+            }
+
             try
             {
-                // Hash mật khẩu trước khi lưu
+                if (_repo.CheckExist(nguoiDung.Email))
+                {
+                    msg = "Email đã tồn tại trong hệ thống.";
+                    return false;
+                }
+
                 //nguoiDung.MatKhauHash = BCrypt.Net.BCrypt.HashPassword(nguoiDung.MatKhauHash);
 
-                // Tạo ID mới nếu chưa có
                 if (string.IsNullOrEmpty(nguoiDung.NguoiDungId))
+                {
                     nguoiDung.NguoiDungId = Guid.NewGuid().ToString();
+                }
 
-                // Tự set ngày tạo và cập nhật
                 nguoiDung.NgayTao = DateTime.Now;
                 nguoiDung.NgayCapNhat = DateTime.Now;
+                nguoiDung.TrangThai = true;
 
                 return _repo.Create(nguoiDung, out msg);
             }
             catch (Exception ex)
             {
-                msg = ex.Message;
+                msg = "Đã xảy ra lỗi trong quá trình xử lý: " + ex.Message;
                 return false;
             }
         }
