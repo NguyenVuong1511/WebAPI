@@ -242,10 +242,19 @@ function viewBookingDetail(bookingId) {
         
         // Show/hide confirm button based on status
         const confirmBtn = document.getElementById('confirm-booking-btn');
+        const exportVoucherBtn = document.getElementById('export-voucher-btn');
+        
         if (booking.trangThai === 'Chờ xác nhận') {
             confirmBtn.style.display = 'block';
+            exportVoucherBtn.style.display = 'none';
         } else {
             confirmBtn.style.display = 'none';
+            // Chỉ hiển thị nút xuất voucher khi booking đã được xác nhận hoặc đã thanh toán
+            if (booking.trangThai === 'Đã xác nhận' || booking.trangThai === 'Đã thanh toán' || booking.trangThai === 'Chờ thanh toán') {
+                exportVoucherBtn.style.display = 'block';
+            } else {
+                exportVoucherBtn.style.display = 'none';
+            }
         }
     } catch (error) {
         console.error('Error viewing booking detail:', error);
@@ -404,5 +413,154 @@ function formatDate(dateString) {
     if (!dateString) return '-';
     const date = new Date(dateString);
     return date.toLocaleDateString('vi-VN');
+}
+
+// Xuất voucher PDF
+function exportVoucherPDF() {
+    if (!currentBookingId) {
+        alert('Không tìm thấy booking');
+        return;
+    }
+
+    const booking = allBookings.find(b => b.bookingId === currentBookingId);
+    if (!booking) {
+        alert('Không tìm thấy thông tin booking');
+        return;
+    }
+
+    try {
+        // Kiểm tra jsPDF đã load chưa
+        if (typeof window.jspdf === 'undefined') {
+            alert('Thư viện PDF chưa được tải. Vui lòng thử lại sau.');
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        // Màu sắc
+        const primaryColor = [37, 99, 235]; // Blue
+        const textColor = [31, 41, 55]; // Dark gray
+        const lightGray = [243, 244, 246];
+
+        // Header với logo và tiêu đề
+        doc.setFillColor(...primaryColor);
+        doc.rect(0, 0, 210, 50, 'F');
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(24);
+        doc.setFont('helvetica', 'bold');
+        doc.text('TRAVEL VIET', 105, 20, { align: 'center' });
+        
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'normal');
+        doc.text('VOUCHER ĐẶT TOUR', 105, 30, { align: 'center' });
+        doc.text('TOUR BOOKING VOUCHER', 105, 38, { align: 'center' });
+
+        // Nội dung voucher
+        let yPos = 60;
+        doc.setTextColor(...textColor);
+
+        // Mã booking
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Mã Booking:', 20, yPos);
+        doc.setFontSize(18);
+        doc.text(booking.bookingId.substring(0, 8).toUpperCase(), 70, yPos);
+        
+        yPos += 15;
+
+        // Thông tin khách hàng
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text('THÔNG TIN KHÁCH HÀNG', 20, yPos);
+        yPos += 8;
+        
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Tên khách hàng: ${booking.customerName}`, 20, yPos);
+        yPos += 7;
+
+        // Thông tin tour
+        doc.setFont('helvetica', 'bold');
+        doc.text('THÔNG TIN TOUR', 20, yPos);
+        yPos += 8;
+        
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(11);
+        const tourNameLines = doc.splitTextToSize(`Tour: ${booking.tourName}`, 170);
+        doc.text(tourNameLines, 20, yPos);
+        yPos += tourNameLines.length * 6;
+        
+        yPos += 5;
+        doc.text(`Ngày khởi hành: ${formatDate(booking.ngayKhoiHanh)}`, 20, yPos);
+        yPos += 7;
+        
+        const soNguoi = `${booking.soNguoiLon} người lớn${booking.soTreEm > 0 ? `, ${booking.soTreEm} trẻ em` : ''}`;
+        doc.text(`Số người: ${soNguoi}`, 20, yPos);
+        yPos += 7;
+
+        // Tổng tiền
+        doc.setFont('helvetica', 'bold');
+        doc.text('TỔNG TIỀN:', 20, yPos);
+        doc.setFontSize(16);
+        doc.text(formatCurrency(booking.tongTien), 70, yPos);
+        yPos += 10;
+
+        // Trạng thái
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Trạng thái: ${booking.trangThai}`, 20, yPos);
+        yPos += 10;
+
+        // Đường kẻ ngang
+        doc.setDrawColor(...lightGray);
+        doc.line(20, yPos, 190, yPos);
+        yPos += 10;
+
+        // Điều kiện sử dụng
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text('ĐIỀU KIỆN SỬ DỤNG:', 20, yPos);
+        yPos += 7;
+        
+        doc.setFont('helvetica', 'normal');
+        const conditions = [
+            'Voucher này chỉ có giá trị cho booking đã được xác nhận.',
+            'Vui lòng mang voucher này khi đến điểm tập trung.',
+            'Voucher không được hoàn tiền hoặc chuyển nhượng.',
+            'Vui lòng liên hệ hotline: 1900 1234 nếu có thắc mắc.'
+        ];
+        
+        conditions.forEach(condition => {
+            doc.text(`• ${condition}`, 20, yPos);
+            yPos += 6;
+        });
+
+        yPos += 5;
+        doc.line(20, yPos, 190, yPos);
+        yPos += 10;
+
+        // Footer
+        doc.setFontSize(9);
+        doc.setTextColor(128, 128, 128);
+        doc.text('Cảm ơn bạn đã sử dụng dịch vụ của Travel Viet!', 105, yPos, { align: 'center' });
+        yPos += 5;
+        doc.text('Email: info@travelviet.com | Hotline: 1900 1234', 105, yPos, { align: 'center' });
+        yPos += 5;
+        doc.text(`Ngày xuất: ${new Date().toLocaleDateString('vi-VN')}`, 105, yPos, { align: 'center' });
+
+        // Lưu file
+        const fileName = `Voucher_${booking.bookingId.substring(0, 8)}_${new Date().getTime()}.pdf`;
+        doc.save(fileName);
+        
+        alert('Xuất voucher PDF thành công!');
+    } catch (error) {
+        console.error('Error exporting voucher PDF:', error);
+        alert('Lỗi khi xuất voucher PDF. Vui lòng thử lại sau.');
+    }
 }
 
