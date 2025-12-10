@@ -1,0 +1,19 @@
+## Build folders
+[Bb]in/
+[Oo]bj/
+
+## Visual Studio
+.vs/
+*.user
+*.suo
+*.userprefs
+
+## Visual Studio Code
+.vscode/
+
+## System files
+.DS_Store
+Thumbs.db
+
+## Logs
+*.log
