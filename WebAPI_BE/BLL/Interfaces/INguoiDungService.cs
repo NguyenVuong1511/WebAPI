@@ -10,9 +10,8 @@ namespace BLL.Interfaces
     public interface INguoiDungService
     {
         public bool Create(NguoiDung nguoiDung, out string msg);
-
         public NguoiDung GetById(string nguoiDungId);
-
         public List<NguoiDung> GetAll();
+        public bool Update(NguoiDung nguoiDung, out string msg);
     }
 }
