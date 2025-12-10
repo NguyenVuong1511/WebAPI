@@ -91,5 +91,14 @@ namespace BLL
                 return false;
             }
         }
+
+        public NguoiDung GetById(string nguoiDungId)
+        {
+            return _repo.GetById(nguoiDungId);
+        }
+        public List<NguoiDung> GetAll()
+        {
+            return _repo.GetAll();
+        }
     }
 }

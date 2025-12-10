@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Đăng nhập để quản lý tour, đặt dịch vụ và nhận ưu đãi từ Travel Viet">
-    <title>Đăng nhập - Travel Viet</title>
+    <meta name="description" content="Đăng ký tài khoản để quản lý tour, đặt dịch vụ và nhận ưu đãi từ Travel Viet">
+    <title>Đăng ký - Travel Viet</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -26,37 +26,52 @@
     <main class="auth-main">
         <section class="auth-card">
             <div class="auth-showcase">
-                <div class="showcase-badge">Thành viên Travel Viet</div>
-                <h1>Đăng nhập để tiếp tục khám phá</h1>
-                <p>Tạo và quản lý các chuyến đi yêu thích, nhận ưu đãi độc quyền và đồng bộ lịch trình trên mọi thiết bị.</p>
+                <div class="showcase-badge">Thành viên mới</div>
+                <h1>Bắt đầu hành trình khám phá</h1>
+                <p>Tham gia cùng hơn 10.000 khách hàng đã tin tưởng và trải nghiệm những chuyến đi tuyệt vời với Travel Viet.</p>
                 <ul class="auth-benefits">
-                    <li>✔ Theo dõi tình trạng đặt tour theo thời gian thực</li>
-                    <li>✔ Lưu tour yêu thích và nhận thông báo giảm giá</li>
-                    <li>✔ Tư vấn viên hỗ trợ 24/7 trong suốt hành trình</li>
+                    <li>✔ Nhận ưu đãi đặc biệt cho thành viên mới</li>
+                    <li>✔ Lưu và quản lý tour yêu thích dễ dàng</li>
+                    <li>✔ Nhận thông báo về tour mới và khuyến mãi</li>
+                    <li>✔ Hỗ trợ 24/7 từ đội ngũ chuyên nghiệp</li>
                 </ul>
                 <div class="auth-stats">
                     <div>
                         <strong>10.000+</strong>
-                        <span>Khách hàng tin tưởng</span>
+                        <span>Thành viên đã tham gia</span>
                     </div>
                     <div>
-                        <strong>4.9/5</strong>
-                        <span>Điểm hài lòng trung bình</span>
+                        <strong>500+</strong>
+                        <span>Tour du lịch đa dạng</span>
                     </div>
                 </div>
             </div>
 
             <div class="auth-form-wrapper">
                 <div class="auth-form-header">
-                    <h2>Chào mừng trở lại 👋</h2>
-                    <p>Nhập thông tin để tiếp tục hành trình cùng Travel Viet.</p>
+                    <h2>Tạo tài khoản mới 🎉</h2>
+                    <p>Điền thông tin để bắt đầu hành trình khám phá cùng chúng tôi.</p>
                 </div>
-                <form id="login-form" class="auth-form" novalidate>
+                <form id="register-form" class="auth-form" novalidate>
+                    <div class="form-group">
+                        <label for="fullname">Họ và tên</label>
+                        <div class="input-field">
+                            <input type="text" id="fullname" name="fullname" placeholder="Nguyễn Văn A" required minlength="2">
+                            <span class="input-icon">👤</span>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label for="email">Email</label>
                         <div class="input-field">
                             <input type="email" id="email" name="email" placeholder="ban@domain.com" required>
                             <span class="input-icon">✉️</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Số điện thoại</label>
+                        <div class="input-field">
+                            <input type="tel" id="phone" name="phone" placeholder="0123456789" required pattern="[0-9]{10,11}">
+                            <span class="input-icon">📱</span>
                         </div>
                     </div>
                     <div class="form-group">
@@ -66,15 +81,21 @@
                             <button type="button" class="toggle-password" aria-label="Hiện mật khẩu" id="toggle-password">👁️</button>
                         </div>
                     </div>
-                    <div class="form-meta">
-                        <label class="remember-me">
-                            <input type="checkbox" name="remember" checked>
-                            <span>Ghi nhớ đăng nhập</span>
-                        </label>
-                        <a href="#" class="forgot-password">Quên mật khẩu?</a>
+                    <div class="form-group">
+                        <label for="confirm-password">Xác nhận mật khẩu</label>
+                        <div class="input-field password-field">
+                            <input type="password" id="confirm-password" name="confirm-password" placeholder="••••••••" required minlength="6">
+                            <button type="button" class="toggle-password" aria-label="Hiện mật khẩu" id="toggle-confirm-password">👁️</button>
+                        </div>
                     </div>
-                    <button type="submit" class="auth-submit">Đăng nhập</button>
-                    <div id="login-feedback" class="form-feedback" aria-live="polite"></div>
+                    <div class="form-group">
+                        <label class="remember-me">
+                            <input type="checkbox" name="terms" required>
+                            <span>Tôi đồng ý với <a href="#" class="terms-link">Điều khoản sử dụng</a> và <a href="#" class="terms-link">Chính sách bảo mật</a></span>
+                        </label>
+                    </div>
+                    <button type="submit" class="auth-submit">Đăng ký</button>
+                    <div id="register-feedback" class="form-feedback" aria-live="polite"></div>
                     <div class="divider">
                         <span>Hoặc</span>
                     </div>
@@ -90,13 +111,14 @@
                     </div>
                 </form>
                 <p class="auth-footer">
-                    Chưa có tài khoản?
-                    <a href="register.html" class="auth-link-cta">Đăng ký ngay</a>
+                    Đã có tài khoản?
+                    <a href="login.html" class="auth-link-cta">Đăng nhập ngay</a>
                 </p>
             </div>
         </section>
     </main>
 
-    <script src="js/login.js"></script>
+    <script src="js/register.js"></script>
 </body>
 </html>
+

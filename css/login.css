@@ -313,6 +313,16 @@
     font-weight: var(--font-weight-semibold);
 }
 
+.terms-link {
+    color: var(--primary-color);
+    text-decoration: underline;
+    transition: color var(--transition-fast);
+}
+
+.terms-link:hover {
+    color: var(--primary-dark);
+}
+
 @media (max-width: 768px) {
     .auth-header {
         flex-direction: column;
