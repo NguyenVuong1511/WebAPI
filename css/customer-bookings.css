@@ -391,3 +391,124 @@
     }
 }
 
+/* Cancel Booking Modal Styles */
+.cancel-policy-info {
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.cancel-policy-title {
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-base);
+}
+
+.cancel-policy-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--spacing-sm) 0;
+}
+
+.cancel-policy-list li {
+    padding: var(--spacing-xs) 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+}
+
+.cancel-policy-list li::before {
+    content: '•';
+    color: var(--primary-color);
+    font-weight: bold;
+    margin-right: var(--spacing-xs);
+}
+
+.cancel-policy-warning {
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    margin-top: var(--spacing-md);
+    color: #92400e;
+    font-size: var(--font-size-sm);
+}
+
+.cancel-policy-refund {
+    background: #d1fae5;
+    border: 1px solid #10b981;
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    margin-top: var(--spacing-md);
+    color: #065f46;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+}
+
+.cancel-booking-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.form-label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+}
+
+.form-textarea {
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    font-family: var(--font-family);
+    resize: vertical;
+    min-height: 100px;
+    transition: all var(--transition-fast);
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.form-checkbox-label input[type="checkbox"] {
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.required {
+    color: #ef4444;
+}
+
+.cta-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.cta-danger:hover {
+    background: #dc2626;
+}
+
