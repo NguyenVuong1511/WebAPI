@@ -122,13 +122,6 @@ namespace DAL
                     "@VaiTro", nguoiDung.VaiTro ?? "Khách Hàng",
                     "@TrangThai", nguoiDung.TrangThai,
                     "@NgayCapNhat", DateTime.Now);
-
-                if (msg.Contains("EMAIL_EXISTS"))
-                {
-                    msg = "Email đã tồn tại";
-                    return false;
-                }
-
                 return string.IsNullOrEmpty(msg) || msg.Contains("OK");
             }
             catch (Exception ex)
@@ -205,8 +198,37 @@ namespace DAL
             {
                 return Convert.ToInt32(result) > 0;
             }
+            return false;
+        }
+        public bool CheckEmailExist(string email, string nguoiDungIdToExclude)
+        {
+            // Escape ký tự ' để tránh lỗi SQL
+            string safeEmail = email.Replace("'", "''");
+            string safeId = string.IsNullOrEmpty(nguoiDungIdToExclude) ? null : nguoiDungIdToExclude.Replace("'", "''");
+
+            string query = "SELECT COUNT(*) FROM NguoiDung WHERE Email = '" + safeEmail + "'";
+
+            if (!string.IsNullOrEmpty(safeId))
+            {
+                query += " AND NguoiDungId <> '" + safeId + "'";
+            }
+
+            string msgError = "";
+            object result = _databaseHelper.ExecuteScalar(query, out msgError);
+
+            if (!string.IsNullOrEmpty(msgError))
+            {
+                // Có lỗi kết nối hoặc SQL -> trả về true để chặn (hoặc xử lý theo logic)
+                return true;
+            }
+
+            if (result != null && result != DBNull.Value)
+            {
+                return Convert.ToInt32(result) > 0;
+            }
 
             return false;
         }
+
     }
 }

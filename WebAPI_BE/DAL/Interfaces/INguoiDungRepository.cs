@@ -23,5 +23,6 @@ namespace DAL.Interfaces
         // Tìm kiếm người dùng theo email
         NguoiDung GetByEmail(string email);
         bool CheckExist(string Email);
+        bool CheckEmailExist(string email, string nguoiDungIdToExclude);
     }
 }

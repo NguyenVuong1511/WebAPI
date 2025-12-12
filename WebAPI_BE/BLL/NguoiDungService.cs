@@ -133,7 +133,7 @@ namespace BLL
 
             try
             {
-                if (_repo.CheckExist(nguoiDung.Email))
+                if (_repo.CheckEmailExist(nguoiDung.Email, nguoiDung.NguoiDungId))
                 {
                     msg = "Email đã tồn tại trong hệ thống.";
                     return false;

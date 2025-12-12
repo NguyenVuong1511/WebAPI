@@ -66,6 +66,13 @@ namespace API_NguoiDung.Controllers
                 return BadRequest(new { message = "Dữ liệu không hợp lệ" });
             }
             bool result = _bus.Update(user, out msg);
+            if (!ModelState.IsValid)
+                return BadRequest(new { success = false, message = "Dữ liệu không hợp lệ", errors = ModelState });
+
+            // Kiểm tra NguoiDungId rỗng/null
+            if (string.IsNullOrWhiteSpace(user.NguoiDungId))
+                return BadRequest(new { success = false, message = "ID người dùng không được để trống" });
+
             if (result)
             {
                 return Ok(new { message = "Cập nhật người dùng thành công" });
