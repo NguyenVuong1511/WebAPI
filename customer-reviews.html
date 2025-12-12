@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Đánh giá của tôi - Khách hàng">
+    <title>Đánh giá của tôi - Travel Viet</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <link rel="stylesheet" href="css/customer-reviews.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <img src="img/Logo.png" alt="Logo">
+                <div class="admin-logo-text">
+                    <h2>Travel Viet</h2>
+                    <p>Khách hàng</p>
+                </div>
+            </div>
+            <nav>
+                <ul class="admin-menu">
+                    <li class="admin-menu-item">
+                        <a href="customer-dashboard.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📊</span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="customer-bookings.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📋</span>
+                            <span>Đặt tour của tôi</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="customer-invoices.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">🧾</span>
+                            <span>Hóa đơn</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="customer-reviews.html" class="admin-menu-link active">
+                            <span class="admin-menu-icon">⭐</span>
+                            <span>Đánh giá của tôi</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="index.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">🏠</span>
+                            <span>Về trang chủ</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1>Đánh giá của tôi</h1>
+                <div class="admin-user">
+                    <div class="admin-user-avatar" id="user-avatar">KH</div>
+                    <div>
+                        <div class="admin-user-name" id="user-name">Khách hàng</div>
+                        <div class="admin-user-role" id="user-role">Khách Hàng</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <div class="filter-section">
+                    <input type="text" id="search-input" class="filter-input" placeholder="Tìm kiếm theo tên tour...">
+                    <select id="rating-filter" class="filter-select">
+                        <option value="">Tất cả đánh giá</option>
+                        <option value="5">5 sao</option>
+                        <option value="4">4 sao</option>
+                        <option value="3">3 sao</option>
+                        <option value="2">2 sao</option>
+                        <option value="1">1 sao</option>
+                    </select>
+                    <button class="cta-button cta-primary" onclick="loadReviews()">🔍 Tìm kiếm</button>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <h2 class="section-title">Danh sách Đánh giá</h2>
+                <div id="reviews-list">
+                    <!-- Danh sách đánh giá sẽ được load ở đây -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="review-detail-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title" id="review-detail-title">Chi tiết Đánh giá</h2>
+            <div id="review-detail-content">
+                <!-- Nội dung sẽ được load ở đây -->
+            </div>
+            <div class="modal-actions">
+                <button class="cta-button cta-secondary" onclick="closeReviewDetailModal()">Đóng</button>
+                <button id="edit-btn" class="cta-button cta-primary" onclick="editReview()" style="display: none;">✏️ Sửa</button>
+                <button id="delete-btn" class="cta-button cta-danger" onclick="deleteReview()" style="display: none;">🗑️ Xóa</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="add-review-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">Thêm Đánh giá mới</h2>
+            <form id="review-form" class="modal-form" onsubmit="saveReview(event)">
+                <div class="form-group">
+                    <label class="form-label required" for="review-tour">Tour</label>
+                    <select id="review-tour" class="form-select" required>
+                        <option value="">Chọn tour</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required" for="review-rating">Đánh giá</label>
+                    <div class="rating-input">
+                        <button type="button" class="star-btn" data-rating="1">⭐</button>
+                        <button type="button" class="star-btn" data-rating="2">⭐</button>
+                        <button type="button" class="star-btn" data-rating="3">⭐</button>
+                        <button type="button" class="star-btn" data-rating="4">⭐</button>
+                        <button type="button" class="star-btn" data-rating="5">⭐</button>
+                        <input type="hidden" id="review-rating" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="review-title">Tiêu đề</label>
+                    <input type="text" id="review-title" class="form-input" placeholder="Nhập tiêu đề đánh giá">
+                </div>
+                <div class="form-group">
+                    <label class="form-label required" for="review-content">Nội dung</label>
+                    <textarea id="review-content" class="form-textarea" rows="5" required placeholder="Nhập nội dung đánh giá..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="cta-button cta-secondary" onclick="closeAddReviewModal()">Hủy</button>
+                    <button type="submit" class="cta-button cta-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/customer-reviews.js"></script>
+</body>
+</html>
+

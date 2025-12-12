@@ -1,26 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('register-form');
-    const fullnameInput = document.getElementById('fullname');
-    const emailInput = document.getElementById('email');
-    const phoneInput = document.getElementById('phone');
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirm-password');
     const togglePasswordBtn = document.getElementById('toggle-password');
     const toggleConfirmPasswordBtn = document.getElementById('toggle-confirm-password');
     const feedback = document.getElementById('register-feedback');
-    const termsCheckbox = document.querySelector('input[name="terms"]');
 
     function showFeedback(message, type = 'success') {
         if (!feedback) return;
         feedback.textContent = message;
         feedback.className = `form-feedback ${type}`;
-        // Auto hide after 5 seconds
-        setTimeout(() => {
-            if (feedback.textContent === message) {
-                feedback.textContent = '';
-                feedback.className = 'form-feedback';
-            }
-        }, 5000);
     }
 
     // Toggle password visibility
@@ -33,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Toggle confirm password visibility
     if (toggleConfirmPasswordBtn && confirmPasswordInput) {
         toggleConfirmPasswordBtn.addEventListener('click', () => {
             const isHidden = confirmPasswordInput.type === 'password';
@@ -43,78 +31,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Real-time password match validation
+    // Real-time password confirmation validation
     if (confirmPasswordInput && passwordInput) {
-        confirmPasswordInput.addEventListener('input', () => {
-            if (confirmPasswordInput.value && passwordInput.value) {
-                if (confirmPasswordInput.value !== passwordInput.value) {
-                    confirmPasswordInput.setCustomValidity('Mật khẩu không khớp');
-                } else {
-                    confirmPasswordInput.setCustomValidity('');
-                }
-            }
-        });
-
-        passwordInput.addEventListener('input', () => {
-            if (confirmPasswordInput.value && passwordInput.value) {
-                if (confirmPasswordInput.value !== passwordInput.value) {
-                    confirmPasswordInput.setCustomValidity('Mật khẩu không khớp');
-                } else {
-                    confirmPasswordInput.setCustomValidity('');
-                }
-            }
-        });
-    }
-
-    // Phone number validation
-    if (phoneInput) {
-        phoneInput.addEventListener('input', () => {
-            const phone = phoneInput.value.replace(/\D/g, '');
-            if (phone.length < 10 || phone.length > 11) {
-                phoneInput.setCustomValidity('Số điện thoại phải có 10-11 chữ số');
+        confirmPasswordInput.addEventListener('input', function() {
+            if (this.value && this.value !== passwordInput.value) {
+                this.setCustomValidity('Mật khẩu không khớp');
             } else {
-                phoneInput.setCustomValidity('');
+                this.setCustomValidity('');
             }
         });
     }
 
-    // Form submission
-    if (form && fullnameInput && emailInput && phoneInput && passwordInput && confirmPasswordInput) {
+    if (form) {
         form.addEventListener('submit', (event) => {
             event.preventDefault();
-
-            // Validate fullname
-            if (!fullnameInput.checkValidity()) {
-                showFeedback('Vui lòng nhập họ tên (ít nhất 2 ký tự).', 'error');
-                fullnameInput.focus();
-                return;
-            }
-
-            // Validate email
-            if (!emailInput.checkValidity()) {
-                showFeedback('Vui lòng nhập email hợp lệ.', 'error');
-                emailInput.focus();
-                return;
-            }
-
-            // Validate phone
-            if (!phoneInput.checkValidity()) {
-                showFeedback('Vui lòng nhập số điện thoại hợp lệ (10-11 chữ số).', 'error');
-                phoneInput.focus();
-                return;
-            }
-
-            // Validate password
-            if (!passwordInput.checkValidity()) {
-                showFeedback('Mật khẩu cần ít nhất 6 ký tự.', 'error');
-                passwordInput.focus();
-                return;
-            }
-
-            // Validate confirm password
-            if (!confirmPasswordInput.checkValidity()) {
-                showFeedback('Vui lòng xác nhận mật khẩu.', 'error');
-                confirmPasswordInput.focus();
+            
+            // Validate all fields
+            if (!form.checkValidity()) {
+                form.reportValidity();
                 return;
             }
 
@@ -125,28 +59,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Check terms agreement
-            if (!termsCheckbox || !termsCheckbox.checked) {
-                showFeedback('Vui lòng đồng ý với Điều khoản sử dụng và Chính sách bảo mật.', 'error');
-                if (termsCheckbox) termsCheckbox.focus();
-                return;
-            }
+            // Collect form data
+            const formData = new FormData(form);
+            const registerData = {
+                // NguoiDung fields
+                email: formData.get('email'),
+                matKhau: formData.get('password'), // Sẽ được hash ở backend
+                hoTen: formData.get('hoTen'),
+                soDienThoai: formData.get('soDienThoai'),
+                vaiTro: 'Khách Hàng', // Default role
+                // KhachHang fields
+                diaChi: formData.get('diaChi'),
+                gioiTinh: formData.get('gioiTinh'),
+                ngaySinh: formData.get('ngaySinh'),
+                cmndHoChieu: formData.get('cmndHoChieu')
+            };
 
-            // Show loading state
+            console.log('Register Data:', registerData);
+
             showFeedback('Đang xử lý đăng ký...', 'success');
             form.classList.add('is-loading');
 
-            // Simulate API call
+            // TODO: Gửi dữ liệu đến API
+            // Giả lập gọi API
             setTimeout(() => {
                 form.classList.remove('is-loading');
-                showFeedback('Đăng ký thành công! Đang chuyển đến trang đăng nhập...', 'success');
+                showFeedback('Đăng ký thành công! Đang chuyển hướng...', 'success');
                 
-                // Redirect to login page after 2 seconds
+                // Redirect to login after 1.5 seconds
                 setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 2000);
+                    window.location.href = 'login.html?registered=true';
+                }, 1500);
             }, 1500);
         });
     }
 });
-
