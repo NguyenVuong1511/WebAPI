@@ -150,5 +150,20 @@ namespace BLL
                 return false;
             }
         }
+        public bool Delete(string nguoiDungId, out string msg)
+        {
+            msg = string.Empty;
+            if(nguoiDungId == null)
+            {
+                msg = "Chưa có người dùng nào được chọn";
+                return false;
+            }
+            else
+            {
+                _repo.Delete(nguoiDungId,out msg);
+                msg = "Xóa thành công người dùng id: " + nguoiDungId;
+                return true;
+            }
+        }
     }
 }

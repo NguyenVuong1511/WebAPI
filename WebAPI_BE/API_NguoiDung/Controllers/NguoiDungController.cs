@@ -79,6 +79,17 @@ namespace API_NguoiDung.Controllers
             }
             return BadRequest(msg);
         }
+        [HttpPost("delete/{id}")]
+        public IActionResult DeleteNguoiDung([FromRoute] string id)
+        {
+            string msg = string.Empty;
 
+            if (_bus.Delete(id, out msg))
+            {
+                return Ok(msg);
+            }
+
+            return BadRequest(msg);
+        }
     }
 }

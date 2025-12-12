@@ -13,5 +13,6 @@ namespace BLL.Interfaces
         public NguoiDung GetById(string nguoiDungId);
         public List<NguoiDung> GetAll();
         public bool Update(NguoiDung nguoiDung, out string msg);
+        public bool Delete(string nguoiDungId, out string msg);
     }
 }
