@@ -165,5 +165,9 @@ namespace BLL
                 return true;
             }
         }
+        public NguoiDung GetByEmail(string email)
+        {
+            return _repo.GetByEmail(email);
+        }
     }
 }
