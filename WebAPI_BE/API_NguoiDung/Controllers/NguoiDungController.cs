@@ -33,40 +33,63 @@ namespace API_NguoiDung.Controllers
         // ==========================
         // Lấy người dùng theo id
         // ==========================
-        // 1. Sửa route: dùng {id} để hứng tham số từ URL
         [HttpGet("get-by-id/{id}")]
-        public IActionResult GetById([FromRoute] string id) // 2. Dùng [FromRoute] thay vì [FromBody]
+        public IActionResult GetById([FromRoute] string id)
         {
-            // Gọi tầng xử lý nghiệp vụ
             NguoiDung user = _bus.GetById(id);
 
-            // 3. Kiểm tra null
             if (user != null)
             {
-                // 4. Bọc kết quả trong Ok() để trả về HTTP 200 chuẩn
                 return Ok(user);
             }
 
-            // 5. Gán nội dung thông báo rõ ràng
             return BadRequest(new { message = "Không tìm thấy người dùng với ID này" });
-            // Hoặc dùng: return NotFound(); sẽ chuẩn hơn cho trường hợp không tìm thấy.
         }
         [HttpGet("get-all")]
         public IActionResult GetAll()
         {
-            // Gọi tầng xử lý nghiệp vụ
             List<NguoiDung> user = _bus.GetAll();
 
-            // 3. Kiểm tra null
             if (user != null)
             {
-                // 4. Bọc kết quả trong Ok() để trả về HTTP 200 chuẩn
                 return Ok(user);
             }
 
-            // 5. Gán nội dung thông báo rõ ràng
             return BadRequest(new { message = "Không tìm thấy người dùng nào" });
-            // Hoặc dùng: return NotFound(); sẽ chuẩn hơn cho trường hợp không tìm thấy.
+        }
+        [HttpPost("update")]
+        public IActionResult UpdateNguoiDung([FromBody] NguoiDung user)
+        {
+            string msg;
+            if (user == null)
+            {
+                return BadRequest(new { message = "Dữ liệu không hợp lệ" });
+            }
+            bool result = _bus.Update(user, out msg);
+            if (!ModelState.IsValid)
+                return BadRequest(new { success = false, message = "Dữ liệu không hợp lệ", errors = ModelState });
+
+            // Kiểm tra NguoiDungId rỗng/null
+            if (string.IsNullOrWhiteSpace(user.NguoiDungId))
+                return BadRequest(new { success = false, message = "ID người dùng không được để trống" });
+
+            if (result)
+            {
+                return Ok(new { message = "Cập nhật người dùng thành công" });
+            }
+            return BadRequest(msg);
+        }
+        [HttpPost("delete/{id}")]
+        public IActionResult DeleteNguoiDung([FromRoute] string id)
+        {
+            string msg = string.Empty;
+
+            if (_bus.Delete(id, out msg))
+            {
+                return Ok(msg);
+            }
+
+            return BadRequest(msg);
         }
     }
 }
