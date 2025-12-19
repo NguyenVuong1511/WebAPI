@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DAL
 {
-    public class TourRepository : ITourRepository
+    public class TourRepository : ITourReository
     {
         private readonly IDatabaseHelper _databaseHelper;
 

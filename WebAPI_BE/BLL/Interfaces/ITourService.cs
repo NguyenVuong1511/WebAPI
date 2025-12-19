@@ -5,24 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-
-namespace DAL.Interfaces
+namespace BLL.Interfaces
 {
-    public interface ITourReository
+    public interface ITourService
     {
-        // Tạo mới tour
         bool Create(Tour newTour, out string msg);
-
-        //Lấy tour theo ID
         Tour GetById(string tourId);
-
-        // Lấy tất cả tour
         List<Tour> GetAll();
-
-        // Cập nhật thông tin tour
         bool Update(Tour tour, out string msg);
-
-        // Xóa tour theo ID
         bool Delete(string tourId, out string msg);
     }
 }
