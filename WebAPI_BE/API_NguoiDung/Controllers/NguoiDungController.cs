@@ -91,5 +91,16 @@ namespace API_NguoiDung.Controllers
 
             return BadRequest(msg);
         }
+
+        [HttpPost("search/{email}")]
+        public IActionResult Search([FromRoute] string email)
+        {
+            NguoiDung user = _bus.GetByEmail(email);
+            if (email != null)
+            {
+                return Ok(user);
+            }
+            return BadRequest(new { message = "Không tìm thấy người dùng với email này" });
+        }
     }
 }
