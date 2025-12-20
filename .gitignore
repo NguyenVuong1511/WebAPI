@@ -38,7 +38,7 @@ node_modules/
 
 # Không nên đẩy các file chứa Connection String thật của máy cá nhân lên
 # Nếu các bạn dùng User Secrets thì không cần lo, nhưng nếu dùng file này thì nên bỏ qua:
-# appsettings.Development.json
+appsettings.Development.json
 
 # Các file sinh ra bởi hệ điều hành
 Thumbs.db
