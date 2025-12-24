@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Danh sách tour du lịch - Khám phá những hành trình tuyệt vời">
+    <title>Danh sách Tour - Du Lịch Việt Nam</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/tours.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-wrapper">
+                    <div class="logo">
+                        <a href="index.html">
+                            <img src="img/Logo.png" alt="logo">
+                        </a>
+                    </div>
+                    
+                    <!-- Desktop Menu -->
+                    <ul class="nav-menu">
+                        <li><a href="index.html" class="nav-link">Trang chủ</a></li>
+                        <li><a href="index.html#about" class="nav-link">Giới thiệu</a></li>
+                        <li><a href="tours.html" class="nav-link active">Tour</a></li>
+                        <li><a href="index.html#destinations" class="nav-link">Điểm đến</a></li>
+                        <li><a href="index.html#deals" class="nav-link">Ưu đãi</a></li>
+                        <li><a href="index.html#services" class="nav-link">Dịch vụ</a></li>
+                        <li><a href="index.html#blog" class="nav-link">Blog</a></li>
+                    </ul>
+                    
+                    <!-- Auth Buttons -->
+                    <div class="auth-buttons" id="auth-buttons">
+                        <a href="login.html" class="auth-btn auth-login">Đăng nhập</a>
+                        <a href="register.html" class="auth-btn auth-register">Đăng ký</a>
+                    </div>
+                    
+                    <!-- User Menu (hidden by default) -->
+                    <div class="user-menu" id="user-menu" style="display: none;">
+                        <div class="user-avatar" id="user-avatar-menu">U</div>
+                        <div class="user-dropdown">
+                            <a href="customer-dashboard.html" class="user-dropdown-item">Dashboard</a>
+                            <a href="customer-bookings.html" class="user-dropdown-item">Đặt tour của tôi</a>
+                            <a href="customer-invoices.html" class="user-dropdown-item">Hóa đơn</a>
+                            <a href="customer-reviews.html" class="user-dropdown-item">Đánh giá</a>
+                            <a href="#" class="user-dropdown-item" onclick="logout()">Đăng xuất</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Hamburger Menu Button -->
+                    <button class="hamburger" aria-label="Toggle menu">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Mobile Menu -->
+        <div class="mobile-menu">
+            <ul class="mobile-nav">
+                <li><a href="index.html" class="mobile-nav-link">Trang chủ</a></li>
+                <li><a href="index.html#about" class="mobile-nav-link">Giới thiệu</a></li>
+                <li><a href="tours.html" class="mobile-nav-link">Tour</a></li>
+                <li><a href="index.html#destinations" class="mobile-nav-link">Điểm đến</a></li>
+                <li><a href="index.html#deals" class="mobile-nav-link">Ưu đãi</a></li>
+                <li><a href="index.html#services" class="mobile-nav-link">Dịch vụ</a></li>
+                <li><a href="index.html#blog" class="mobile-nav-link">Blog</a></li>
+                <li><a href="login.html" class="mobile-nav-link">Đăng nhập</a></li>
+                <li><a href="register.html" class="mobile-nav-link">Đăng ký</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="tours-hero">
+            <div class="container">
+                <h1 class="tours-hero-title">Khám phá Tour Du Lịch</h1>
+                <p class="tours-hero-subtitle">Tìm kiếm hành trình hoàn hảo cho bạn</p>
+            </div>
+        </section>
+
+        <!-- Filters Section -->
+        <section class="tours-filters">
+            <div class="container">
+                <div class="filters-wrapper">
+                    <div class="filter-group">
+                        <input type="text" id="search-input" class="filter-input" placeholder="Tìm kiếm tour...">
+                    </div>
+                    <div class="filter-group">
+                        <select id="region-filter" class="filter-select">
+                            <option value="">Tất cả khu vực</option>
+                            <option value="Miền Bắc">Miền Bắc</option>
+                            <option value="Miền Trung">Miền Trung</option>
+                            <option value="Miền Nam">Miền Nam</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select id="price-filter" class="filter-select">
+                            <option value="">Tất cả giá</option>
+                            <option value="0-2000000">Dưới 2 triệu</option>
+                            <option value="2000000-5000000">2 - 5 triệu</option>
+                            <option value="5000000-10000000">5 - 10 triệu</option>
+                            <option value="10000000-999999999">Trên 10 triệu</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select id="duration-filter" class="filter-select">
+                            <option value="">Tất cả thời gian</option>
+                            <option value="1">1 ngày</option>
+                            <option value="2">2 ngày 1 đêm</option>
+                            <option value="3">3 ngày 2 đêm</option>
+                            <option value="4">4 ngày 3 đêm</option>
+                            <option value="5">5 ngày trở lên</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <button class="filter-btn" onclick="applyFilters()">🔍 Tìm kiếm</button>
+                        <button class="filter-btn filter-btn-reset" onclick="resetFilters()">🔄 Đặt lại</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tours List Section -->
+        <section class="tours-list-section">
+            <div class="container">
+                <div class="tours-header">
+                    <h2 class="tours-section-title">Danh sách Tour</h2>
+                    <div class="tours-count" id="tours-count">Tìm thấy <span id="tours-count-number">0</span> tour</div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="tours-loading" class="tours-loading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <p>Đang tải danh sách tour...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div id="tours-empty" class="tours-empty" style="display: none;">
+                    <div class="empty-icon">✈️</div>
+                    <h3>Không tìm thấy tour nào</h3>
+                    <p>Hãy thử thay đổi bộ lọc để tìm tour phù hợp với bạn</p>
+                </div>
+
+                <!-- Tours Grid -->
+                <div id="tours-grid" class="tours-grid">
+                    <!-- Tours will be rendered here by JavaScript -->
+                </div>
+
+                <!-- Pagination -->
+                <div id="tours-pagination" class="tours-pagination" style="display: none;">
+                    <button class="pagination-btn" id="prev-page" onclick="changePage(-1)">← Trước</button>
+                    <div class="pagination-info">
+                        <span id="current-page">1</span> / <span id="total-pages">1</span>
+                    </div>
+                    <button class="pagination-btn" id="next-page" onclick="changePage(1)">Sau →</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 class="footer-title">Về chúng tôi</h3>
+                    <p>Du Lịch Việt Nam - Đồng hành cùng bạn khám phá vẻ đẹp đất nước</p>
+                </div>
+                <div class="footer-section">
+                    <h3 class="footer-title">Liên hệ</h3>
+                    <p>Email: info@dulichvietnam.com</p>
+                    <p>Điện thoại: 1900 1234</p>
+                </div>
+                <div class="footer-section">
+                    <h3 class="footer-title">Theo dõi</h3>
+                    <div class="footer-social">
+                        <a href="#" class="social-link">Facebook</a>
+                        <a href="#" class="social-link">Instagram</a>
+                        <a href="#" class="social-link">Twitter</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Du Lịch Việt Nam. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script src="js/tours.js"></script>
+</body>
+</html>
+

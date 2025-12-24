@@ -3,6 +3,14 @@ let allBookings = [];
 let currentBookingId = null;
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Kiểm tra đăng nhập
+    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+    if (!user.email || user.role !== 'Khách Hàng') {
+        alert('Vui lòng đăng nhập để truy cập trang này!');
+        window.location.href = 'login.html';
+        return;
+    }
+    
     loadUserInfo();
     loadBookings();
     
@@ -33,6 +41,16 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+    
+    // Đóng modal hủy tour khi click bên ngoài
+    const cancelModal = document.getElementById('cancel-booking-modal');
+    if (cancelModal) {
+        cancelModal.addEventListener('click', function(e) {
+            if (e.target === cancelModal) {
+                closeCancelBookingModal();
+            }
+        });
+    }
 });
 
 function loadUserInfo() {
@@ -156,6 +174,7 @@ function renderBookingsTable(bookings) {
         const row = document.createElement('tr');
         const soNguoi = `${booking.soNguoiLon} người lớn${booking.soTreEm > 0 ? `, ${booking.soTreEm} trẻ em` : ''}`;
         
+        const canCancel = canCancelBooking(booking);
         row.innerHTML = `
             <td>${booking.bookingId.substring(0, 8)}...</td>
             <td>${booking.tourName}</td>
@@ -168,6 +187,8 @@ function renderBookingsTable(bookings) {
                     <button class="action-btn action-btn-secondary" onclick="viewBookingDetail('${booking.bookingId}')">👁️ Chi tiết</button>
                     ${booking.trangThai === 'Chờ thanh toán' ? 
                         `<button class="action-btn action-btn-primary" onclick="makePayment('${booking.bookingId}')">💳 Thanh toán</button>` : ''}
+                    ${canCancel ? 
+                        `<button class="action-btn action-btn-danger" onclick="showCancelBookingModalFromTable('${booking.bookingId}')">✕ Hủy</button>` : ''}
                 </div>
             </td>
         `;
@@ -181,7 +202,8 @@ function getStatusClass(status) {
         'Chờ thanh toán': 'status-pending',
         'Đã thanh toán': 'status-paid',
         'Đã hủy': 'status-cancelled',
-        'Chờ xác nhận': 'status-pending'
+        'Chờ xác nhận': 'status-pending',
+        'Chờ hủy': 'status-pending'
     };
     return statusMap[status] || 'status-pending';
 }
@@ -198,10 +220,19 @@ function viewBookingDetail(bookingId) {
     
     // Hiển thị nút thanh toán nếu cần
     const paymentBtn = document.getElementById('payment-btn');
+    const cancelBtn = document.getElementById('cancel-btn');
+    
     if (booking.trangThai === 'Chờ thanh toán') {
         paymentBtn.style.display = 'block';
     } else {
         paymentBtn.style.display = 'none';
+    }
+    
+    // Hiển thị nút hủy tour nếu booking có thể hủy
+    if (canCancelBooking(booking)) {
+        cancelBtn.style.display = 'block';
+    } else {
+        cancelBtn.style.display = 'none';
     }
     
     showTab('thong-tin');
@@ -379,5 +410,178 @@ function formatDate(dateString) {
     if (!dateString) return '-';
     const date = new Date(dateString);
     return date.toLocaleDateString('vi-VN');
+}
+
+// Hàm kiểm tra xem booking có thể hủy không
+function canCancelBooking(booking) {
+    // Không thể hủy nếu đã hủy hoặc đã hoàn thành
+    if (booking.trangThai === 'Đã hủy' || booking.trangThai === 'Đã hoàn thành') {
+        return false;
+    }
+    
+    // Kiểm tra thời gian: chỉ có thể hủy trước 7 ngày khởi hành
+    if (booking.ngayKhoiHanh) {
+        const ngayKhoiHanh = new Date(booking.ngayKhoiHanh);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        ngayKhoiHanh.setHours(0, 0, 0, 0);
+        
+        const daysUntilDeparture = Math.ceil((ngayKhoiHanh - today) / (1000 * 60 * 60 * 24));
+        
+        // Có thể hủy nếu còn ít nhất 7 ngày trước ngày khởi hành
+        return daysUntilDeparture >= 7;
+    }
+    
+    return false;
+}
+
+// Tính số ngày còn lại trước ngày khởi hành
+function getDaysUntilDeparture(ngayKhoiHanh) {
+    if (!ngayKhoiHanh) return 0;
+    const ngayKhoiHanhDate = new Date(ngayKhoiHanh);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    ngayKhoiHanhDate.setHours(0, 0, 0, 0);
+    
+    return Math.ceil((ngayKhoiHanhDate - today) / (1000 * 60 * 60 * 24));
+}
+
+// Tính phần trăm hoàn tiền dựa trên số ngày trước khởi hành
+function calculateRefundPercentage(daysUntilDeparture) {
+    if (daysUntilDeparture >= 30) {
+        return 100; // Hoàn 100% nếu hủy trước 30 ngày
+    } else if (daysUntilDeparture >= 14) {
+        return 80; // Hoàn 80% nếu hủy trước 14 ngày
+    } else if (daysUntilDeparture >= 7) {
+        return 50; // Hoàn 50% nếu hủy trước 7 ngày
+    } else {
+        return 0; // Không hoàn tiền nếu hủy dưới 7 ngày
+    }
+}
+
+// Hiển thị modal hủy tour từ bảng
+function showCancelBookingModalFromTable(bookingId) {
+    currentBookingId = bookingId;
+    showCancelBookingModal();
+}
+
+// Hiển thị modal hủy tour
+function showCancelBookingModal() {
+    if (!currentBookingId) return;
+    
+    const booking = allBookings.find(b => b.bookingId === currentBookingId);
+    if (!booking) {
+        alert('Không tìm thấy booking');
+        return;
+    }
+    
+    // Kiểm tra điều kiện hủy
+    if (!canCancelBooking(booking)) {
+        alert('Booking này không thể hủy. Vui lòng liên hệ nhân viên để được hỗ trợ.');
+        return;
+    }
+    
+    const daysUntilDeparture = getDaysUntilDeparture(booking.ngayKhoiHanh);
+    const refundPercentage = calculateRefundPercentage(daysUntilDeparture);
+    const refundAmount = (booking.tongTien * refundPercentage) / 100;
+    
+    // Hiển thị chính sách hủy
+    const policyInfo = document.getElementById('cancel-policy-info');
+    policyInfo.innerHTML = `
+        <div class="cancel-policy-title">📋 Chính sách hủy tour</div>
+        <ul class="cancel-policy-list">
+            <li>Hủy trước 30 ngày: Hoàn 100% tiền cọc</li>
+            <li>Hủy trước 14 ngày: Hoàn 80% tiền cọc</li>
+            <li>Hủy trước 7 ngày: Hoàn 50% tiền cọc</li>
+            <li>Hủy dưới 7 ngày: Không hoàn tiền</li>
+        </ul>
+        <div class="cancel-policy-warning">
+            ⚠️ Còn ${daysUntilDeparture} ngày trước ngày khởi hành (${formatDate(booking.ngayKhoiHanh)})
+        </div>
+        <div class="cancel-policy-refund">
+            💰 Số tiền được hoàn lại: ${formatCurrency(refundAmount)} (${refundPercentage}% của ${formatCurrency(booking.tongTien)})
+        </div>
+    `;
+    
+    // Reset form
+    document.getElementById('cancel-reason').value = '';
+    document.getElementById('confirm-cancel').checked = false;
+    
+    // Hiển thị modal
+    document.getElementById('cancel-booking-modal').classList.add('active');
+}
+
+// Đóng modal hủy tour
+function closeCancelBookingModal() {
+    document.getElementById('cancel-booking-modal').classList.remove('active');
+}
+
+// Gửi yêu cầu hủy tour
+function submitCancelBooking() {
+    if (!currentBookingId) return;
+    
+    const booking = allBookings.find(b => b.bookingId === currentBookingId);
+    if (!booking) {
+        alert('Không tìm thấy booking');
+        return;
+    }
+    
+    // Validate form
+    const form = document.getElementById('cancel-booking-form');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    const cancelReason = document.getElementById('cancel-reason').value.trim();
+    if (!cancelReason) {
+        alert('Vui lòng nhập lý do hủy tour');
+        return;
+    }
+    
+    const daysUntilDeparture = getDaysUntilDeparture(booking.ngayKhoiHanh);
+    const refundPercentage = calculateRefundPercentage(daysUntilDeparture);
+    const refundAmount = (booking.tongTien * refundPercentage) / 100;
+    
+    // Xác nhận hủy
+    if (!confirm(`Bạn có chắc chắn muốn hủy tour này không?\n\n` +
+        `Tour: ${booking.tourName}\n` +
+        `Ngày khởi hành: ${formatDate(booking.ngayKhoiHanh)}\n` +
+        `Số tiền được hoàn lại: ${formatCurrency(refundAmount)} (${refundPercentage}%)\n\n` +
+        `Yêu cầu hủy sẽ được gửi đến nhân viên để xử lý.`)) {
+        return;
+    }
+    
+    try {
+        // TODO: Gửi API request để hủy booking
+        // const response = await fetch(`/api/bookings/${currentBookingId}/cancel`, {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify({
+        //         reason: cancelReason,
+        //         refundAmount: refundAmount
+        //     })
+        // });
+        
+        // Mock: Cập nhật trạng thái booking
+        booking.trangThai = 'Chờ hủy';
+        booking.cancelRequest = {
+            reason: cancelReason,
+            refundAmount: refundAmount,
+            refundPercentage: refundPercentage,
+            requestDate: new Date().toISOString().split('T')[0],
+            status: 'Chờ xử lý'
+        };
+        
+        alert('Yêu cầu hủy tour đã được gửi thành công!\nNhân viên sẽ xử lý và liên hệ với bạn trong vòng 24 giờ.');
+        
+        // Đóng modal và reload
+        closeCancelBookingModal();
+        closeBookingDetailModal();
+        loadBookings();
+    } catch (error) {
+        console.error('Error canceling booking:', error);
+        alert('Lỗi khi gửi yêu cầu hủy tour. Vui lòng thử lại sau.');
+    }
 }
 
