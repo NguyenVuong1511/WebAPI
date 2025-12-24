@@ -1,0 +1,20 @@
+{
+  "Routes": [
+    {
+      // --- Cấu hình cho AuthService ---
+      "DownstreamPathTemplate": "/api/auth/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44317 // <-- Kiểm tra đúng Port của AuthService trong launchSettings.json
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/auth/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:18251" // <-- Port của chính Gateway
+  }
+}
