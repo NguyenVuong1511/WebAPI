@@ -1,6 +1,6 @@
 ﻿USE QuanLyDuLich;
 GO
-
+--------------------------------------------------------------------------ĐÀO THỊ THANH-------------------------------------------------------------------------------
 -----------------------------------------------------
 -- 1. THỦ TỤC ĐĂNG KÝ (Register)
 -----------------------------------------------------
@@ -42,4 +42,73 @@ BEGIN
       AND MatKhau = @MatKhau 
       AND TrangThai = 1;
 END
+GO
+
+---------------------------------------------------------
+---3. THỦ TỤC LẤY HẾT DANH SÁCH NGƯỜI DÙNG
+---------------------------------------------------------
+USE QuanLyDuLich;
+GO
+
+-- 1. Lấy danh sách người dùng (có phân trang hoặc lấy hết)
+CREATE PROCEDURE sp_NguoiDung_GetAll
+AS
+BEGIN
+    SELECT NguoiDungId, Email, HoTen, SoDienThoai, DiaChi, VaiTro, TrangThai, NgayTao
+    FROM NguoiDung
+    ORDER BY NgayTao DESC;
+END;
+GO
+
+-- 2. Lấy chi tiết 1 người dùng
+CREATE PROCEDURE sp_NguoiDung_GetById
+    @Id UNIQUEIDENTIFIER
+AS
+BEGIN
+    SELECT NguoiDungId, Email, HoTen, SoDienThoai, DiaChi, VaiTro, TrangThai, NgayTao
+    FROM NguoiDung
+    WHERE NguoiDungId = @Id;
+END;
+GO
+
+-- 3. Thêm mới người dùng (Register)
+CREATE PROCEDURE sp_NguoiDung_Create
+    @Email NVARCHAR(255),
+    @MatKhau NVARCHAR(255),
+    @HoTen NVARCHAR(200),
+    @SoDienThoai NVARCHAR(20),
+    @DiaChi NVARCHAR(300),
+    @VaiTro NVARCHAR(50)
+AS
+BEGIN
+    INSERT INTO NguoiDung (Email, MatKhau, HoTen, SoDienThoai, DiaChi, VaiTro)
+    VALUES (@Email, @MatKhau, @HoTen, @SoDienThoai, @DiaChi, @VaiTro);
+END;
+GO
+
+-- 4. Cập nhật thông tin người dùng
+CREATE PROCEDURE sp_NguoiDung_Update
+    @NguoiDungId UNIQUEIDENTIFIER,
+    @HoTen NVARCHAR(200),
+    @SoDienThoai NVARCHAR(20),
+    @DiaChi NVARCHAR(300),
+    @TrangThai BIT
+AS
+BEGIN
+    UPDATE NguoiDung
+    SET HoTen = @HoTen,
+        SoDienThoai = @SoDienThoai,
+        DiaChi = @DiaChi,
+        TrangThai = @TrangThai
+    WHERE NguoiDungId = @NguoiDungId;
+END;
+GO
+
+-- 5. Xóa người dùng (Nên xóa mềm - đổi trạng thái, nhưng ở đây làm xóa cứng nếu cần)
+CREATE PROCEDURE sp_NguoiDung_Delete
+    @NguoiDungId UNIQUEIDENTIFIER
+AS
+BEGIN
+    DELETE FROM NguoiDung WHERE NguoiDungId = @NguoiDungId;
+END;
 GO
