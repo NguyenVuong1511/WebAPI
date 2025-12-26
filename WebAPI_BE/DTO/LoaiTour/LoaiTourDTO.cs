@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace DTO.LoaiTour
 {
-    internal class LoaiTourDTO
+    public class LoaiTourDTO
     {
+        public Guid LoaiTourId { get; set; }
+        public string TenLoai { get; set; } = string.Empty;
+        public string? MoTa { get; set; }
     }
 }
