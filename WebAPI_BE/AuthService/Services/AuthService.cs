@@ -1,6 +1,5 @@
 ﻿using AuthService.Interfaces;
 using Infrastructure.Interfaces;
-using DTO;
 using Models;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
@@ -8,6 +7,8 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.RegularExpressions;
+using DTO.Auth;
+using DTO.User;
 
 namespace AuthService.Services
 {
