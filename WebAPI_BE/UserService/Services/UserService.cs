@@ -1,5 +1,7 @@
 ﻿using DTO.User;
+using Infrastructure;
 using Infrastructure.Interfaces;
+using Microsoft.Data.SqlClient;
 using System.Data;
 using UserService.Interfaces;
 
@@ -41,6 +43,33 @@ namespace UserService.Services
             }
             return result;
 
+        }
+        public Task<NguoiDungDTO?> GetByIdAsync(Guid id)
+        {
+            string msgError = string.Empty;
+            var dt = _dbHelper.ExecuteSProcedureReturnDataTable(out msgError, "sp_NguoiDung_GetById", "@Id", id);
+            if (!string.IsNullOrEmpty(msgError))
+            {
+                return Task.FromResult<NguoiDungDTO?>(null);
+
+            }
+            if(dt != null && dt.Rows.Count > 0)
+            {
+                var row = dt.Rows[0];
+                var result = new NguoiDungDTO
+                {
+                    NguoiDungId = Guid.Parse(row["NguoiDungId"].ToString()!),
+                    Email = row["Email"].ToString(),
+                    HoTen = row["HoTen"].ToString(),
+                    SDT = row["SoDienThoai"].ToString(),
+                    DiaChi = row["DiaChi"].ToString(),
+                    VaiTro = row["VaiTro"].ToString(),
+                    TrangThai = Convert.ToBoolean(row["TrangThai"]),
+                    NgayTao = Convert.ToDateTime(row["NgayTao"])
+                };
+                return Task.FromResult<NguoiDungDTO?>(result);
+            }
+            return Task.FromResult<NguoiDungDTO?>(null);
         }
     }
 }

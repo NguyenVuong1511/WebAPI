@@ -14,7 +14,7 @@ namespace UserService.Controllers
         {
             _userService = userService;
         }
-        [HttpGet("get-all")] 
+        [HttpGet("get-all")]
         public async Task<IActionResult> GetAll()
         {
             var data = await _userService.GetAllAsync();
@@ -22,10 +22,28 @@ namespace UserService.Controllers
             {
                 Success = true,
                 Message = "Lấy danh sách thành công",
-                Data = data 
+                Data = data
             });
         }
-
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var data = await _userService.GetByIdAsync(id); 
+            if(data == null)
+            {
+                return NotFound(new ApiResponse<NguoiDungDTO> 
+                { 
+                    Success = false, 
+                    Message = "Không tìm thấy người dùng này" 
+                });
+            }
+            return Ok(new ApiResponse<NguoiDungDTO> 
+            {
+                Success = true, 
+                Message = "Thành công", 
+                Data = data
+            });
+        }
         
     }
 }
