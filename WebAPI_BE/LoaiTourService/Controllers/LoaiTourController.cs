@@ -51,12 +51,12 @@ namespace TourManageService.Controllers
             return Ok(result);
         }
 
-        //[HttpDelete("delete/{id}")]
-        //public async Task<IActionResult> Delete(Guid id)
-        //{
-        //    var result = await _loaiTourService.Delete(id);
-        //    return Ok(result);
-        //}
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var result = await _loaiTourService.Delete(id);
+            return Ok(result);
+        }
 
     }
 }

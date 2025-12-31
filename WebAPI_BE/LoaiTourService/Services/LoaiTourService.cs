@@ -154,7 +154,34 @@ namespace TourManageService.Services
                 };
             });
         }
+        public async Task<ApiResponse<bool>> Delete(Guid id)
+        {
+            return await Task.Run(() =>
+            {
+                var msgError = _dbHelper.ExecuteSProcedure(
+                    "sp_DeleteLoaiTour",
+                    "@LoaiTourId", id
+                );
 
+                if (!string.IsNullOrEmpty(msgError))
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = false,
+                        Code = "SQL_ERROR",
+                        Message = msgError
+                    };
+                }
+
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Code = "DELETED",
+                    Message = "Xoá loại tour thành công",
+                    Data = true
+                };
+            });
+        }
 
     }
 }
