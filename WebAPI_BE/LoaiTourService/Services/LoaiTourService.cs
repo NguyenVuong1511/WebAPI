@@ -124,6 +124,36 @@ namespace TourManageService.Services
                 };
             });
         }
+        public async Task<ApiResponse<bool>> Update(UpdateLoaiTourDTO model)
+        {
+            return await Task.Run(() =>
+            {
+                var msgError = _dbHelper.ExecuteSProcedure(
+                    "sp_UpdateLoaiTour",
+                    "@LoaiTourId", model.LoaiTourId,
+                    "@TenLoai", model.TenLoai,
+                    "@MoTa", model.MoTa
+                );
+
+                if (!string.IsNullOrEmpty(msgError))
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = false,
+                        Code = "DUPLICATE",
+                        Message = msgError
+                    };
+                }
+
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Code = "UPDATED",
+                    Message = "Cập nhật loại tour thành công",
+                    Data = true
+                };
+            });
+        }
 
 
     }

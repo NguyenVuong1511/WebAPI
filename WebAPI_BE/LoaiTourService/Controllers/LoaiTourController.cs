@@ -41,15 +41,15 @@ namespace TourManageService.Controllers
         }
 
 
-        //[HttpPut("update")]
-        //public async Task<IActionResult> Update([FromBody] UpdateLoaiTourDTO request)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
+        [HttpPut("update")]
+        public async Task<IActionResult> Update([FromBody] UpdateLoaiTourDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        //    var result = await _loaiTourService.Update(request);
-        //    return Ok(result);
-        //}
+            var result = await _loaiTourService.Update(request);
+            return Ok(result);
+        }
 
         //[HttpDelete("delete/{id}")]
         //public async Task<IActionResult> Delete(Guid id)
