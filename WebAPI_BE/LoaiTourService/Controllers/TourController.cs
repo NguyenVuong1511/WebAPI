@@ -18,5 +18,11 @@ namespace TourManageService.Controllers
             var result = await _tourService.GetAll(keyword);
             return Ok(result);
         }
+        [HttpGet("get-by-id/{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var result = await _tourService.GetById(id);
+            return Ok(result);
+        }
     }
 }
