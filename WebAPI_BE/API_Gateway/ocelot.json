@@ -33,7 +33,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 20886 // <-- Kiểm tra đúng Port của AuthService trong launchSettings.json
+          "Port": 44360 // <-- Kiểm tra đúng Port của AuthService trong launchSettings.json
         }
       ],
       "UpstreamPathTemplate": "/gateway/loaitour/{everything}",
