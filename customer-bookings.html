@@ -121,6 +121,31 @@
             <div class="modal-actions">
                 <button class="cta-button cta-secondary" onclick="closeBookingDetailModal()">Đóng</button>
                 <button id="payment-btn" class="cta-button cta-primary" onclick="makePayment()" style="display: none;">💳 Thanh toán</button>
+                <button id="cancel-btn" class="cta-button cta-danger" onclick="showCancelBookingModal()" style="display: none;">✕ Hủy tour</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Booking Modal -->
+    <div id="cancel-booking-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">Hủy Đặt Tour</h2>
+            <div id="cancel-policy-info" class="cancel-policy-info"></div>
+            <form id="cancel-booking-form" class="cancel-booking-form">
+                <div class="form-group">
+                    <label class="form-label">Lý do hủy tour <span class="required">*</span></label>
+                    <textarea id="cancel-reason" class="form-textarea" rows="4" placeholder="Vui lòng nhập lý do hủy tour..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-checkbox-label">
+                        <input type="checkbox" id="confirm-cancel" required>
+                        <span>Tôi đã đọc và đồng ý với chính sách hủy tour</span>
+                    </label>
+                </div>
+            </form>
+            <div class="modal-actions">
+                <button class="cta-button cta-secondary" onclick="closeCancelBookingModal()">Đóng</button>
+                <button class="cta-button cta-danger" onclick="submitCancelBooking()">Xác nhận hủy</button>
             </div>
         </div>
     </div>

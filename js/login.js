@@ -59,19 +59,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     password: 'kh123456',
                     role: 'Khách Hàng',
                     name: 'Lê Văn C',
-                    redirect: 'index.html'
+                    redirect: 'customer-dashboard.html'
                 },
                 'khachhang2@email.com': {
                     password: 'kh123456',
                     role: 'Khách Hàng',
                     name: 'Phạm Thị D',
-                    redirect: 'index.html'
+                    redirect: 'customer-dashboard.html'
                 },
                 'khachhang3@email.com': {
                     password: 'kh123456',
                     role: 'Khách Hàng',
                     name: 'Hoàng Minh E',
-                    redirect: 'index.html'
+                    redirect: 'customer-dashboard.html'
                 }
             };
 

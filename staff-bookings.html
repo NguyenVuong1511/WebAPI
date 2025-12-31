@@ -128,10 +128,15 @@
             <div class="modal-actions">
                 <button class="cta-button cta-secondary" onclick="closeBookingDetailModal()">Đóng</button>
                 <button class="cta-button cta-primary" id="confirm-booking-btn" onclick="confirmBooking()" style="display: none;">✓ Xác nhận Booking</button>
+                <button class="cta-button cta-success" id="export-voucher-btn" onclick="exportVoucherPDF()" style="display: none;">📄 Xuất Voucher PDF</button>
             </div>
         </div>
     </div>
 
+    <!-- Hidden div for voucher printing -->
+    <div id="voucher-print-area" style="display: none;"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="js/staff-bookings.js"></script>
 </body>
 </html>

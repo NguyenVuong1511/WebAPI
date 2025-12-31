@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Xem Đánh giá - Nhân viên">
+    <title>Xem Đánh giá - Nhân viên</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <link rel="stylesheet" href="css/staff-feedback.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <img src="img/Logo.png" alt="Logo">
+                <div class="admin-logo-text">
+                    <h2>Travel Viet</h2>
+                    <p>Nhân viên</p>
+                </div>
+            </div>
+            <nav>
+                <ul class="admin-menu">
+                    <li class="admin-menu-item">
+                        <a href="staff-dashboard.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📊</span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="staff-bookings.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📋</span>
+                            <span>Quản lý Booking</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="staff-customers.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">👥</span>
+                            <span>Khách hàng</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="staff-tours.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">✈️</span>
+                            <span>Xem Tour</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="staff-feedback.html" class="admin-menu-link active">
+                            <span class="admin-menu-icon">⭐</span>
+                            <span>Đánh giá</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="index.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">🏠</span>
+                            <span>Về trang chủ</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1>Xem Đánh giá</h1>
+                <div class="admin-user">
+                    <div class="admin-user-avatar" id="user-avatar">NV</div>
+                    <div>
+                        <div class="admin-user-name" id="user-name">Nhân viên</div>
+                        <div class="admin-user-role" id="user-role">Nhân viên</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-header">
+                        <span class="stat-title">Tổng đánh giá</span>
+                        <span class="stat-icon">⭐</span>
+                    </div>
+                    <div class="stat-value" id="total-reviews">0</div>
+                    <div class="stat-change">Đánh giá trong hệ thống</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-header">
+                        <span class="stat-title">Điểm trung bình</span>
+                        <span class="stat-icon">📊</span>
+                    </div>
+                    <div class="stat-value" id="average-rating">0.0</div>
+                    <div class="stat-change">Trên 5 sao</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-header">
+                        <span class="stat-title">Đánh giá chờ duyệt</span>
+                        <span class="stat-icon">⏳</span>
+                    </div>
+                    <div class="stat-value" id="pending-reviews">0</div>
+                    <div class="stat-change negative">Cần xử lý</div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-header">
+                        <span class="stat-title">Đánh giá đã duyệt</span>
+                        <span class="stat-icon">✅</span>
+                    </div>
+                    <div class="stat-value" id="approved-reviews">0</div>
+                    <div class="stat-change">Đã được duyệt</div>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <div class="filter-section">
+                    <input type="text" id="search-input" class="filter-input" placeholder="Tìm kiếm theo tên tour, khách hàng...">
+                    <select id="rating-filter" class="filter-select">
+                        <option value="">Tất cả điểm</option>
+                        <option value="5">5 sao</option>
+                        <option value="4">4 sao</option>
+                        <option value="3">3 sao</option>
+                        <option value="2">2 sao</option>
+                        <option value="1">1 sao</option>
+                    </select>
+                    <select id="status-filter" class="filter-select">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="approved">Đã duyệt</option>
+                        <option value="pending">Chờ duyệt</option>
+                        <option value="hidden">Đã ẩn</option>
+                    </select>
+                    <button class="cta-button cta-primary" onclick="loadReviews()">🔍 Tìm kiếm</button>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <h2 class="section-title">Danh sách Đánh giá</h2>
+                <div class="table-container">
+                    <table class="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>Tour</th>
+                                <th>Khách hàng</th>
+                                <th>Điểm</th>
+                                <th>Tiêu đề</th>
+                                <th>Nội dung</th>
+                                <th>Ngày đánh giá</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviews-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="review-detail-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">Chi tiết Đánh giá</h2>
+            <div id="review-detail-content" class="review-detail-content"></div>
+            <div class="modal-actions">
+                <button class="cta-button cta-secondary" onclick="closeReviewDetailModal()">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/staff-feedback.js"></script>
+</body>
+</html>
+
