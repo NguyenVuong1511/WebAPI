@@ -1,12 +1,14 @@
 ﻿using AuthService.Interfaces;
 using Infrastructure.Interfaces;
-using DTO;
 using Models;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using System.Text.RegularExpressions;
+using DTO.Auth;
+using DTO.User;
 
 namespace AuthService.Services
 {
@@ -48,19 +50,41 @@ namespace AuthService.Services
 
             return new ApiResponse<LoginResponseDTO> { Success = false, Message = "Email hoặc mật khẩu không đúng" };
         }
-
         public async Task<ApiResponse<string>> RegisterAsync(NguoiDungRegisterDTO request)
         {
-            // Gọi Store Procedure đăng ký
-            string msgError = _dbHelper.ExecuteSProcedure("sp_NguoiDung_DangKy",
-                "@Email", request.Email,
-                "@MatKhau", request.Password,
-                "@HoTen", request.HoTen);
+            if(IsValidEmail(request.Email))
+            {
+                if(request.Password.Length > 6)
+                {
+                    string msgError = _dbHelper.ExecuteSProcedure("sp_NguoiDung_DangKy",
+                        "@Email", request.Email,
+                        "@MatKhau", request.Password,
+                        "@HoTen", request.HoTen);
 
-            if (string.IsNullOrEmpty(msgError))
-                return new ApiResponse<string> { Success = true, Message = "Đăng ký thành công" };
+                    if (string.IsNullOrEmpty(msgError))
+                        return new ApiResponse<string> { Success = true, Message = "Đăng ký thành công" };
 
-            return new ApiResponse<string> { Success = false, Message = "Đăng ký thất bại: " + msgError };
+                    return new ApiResponse<string> { Success = false, Message = "Đăng ký thất bại: " + msgError };
+                }
+                else
+                {
+                    return new ApiResponse<string> { Success = false, Message = "Mật khẩu phải lớn hơn 6 ký tự" };
+                }
+                
+            }
+            else
+            {
+                return new ApiResponse<string> { Success = false, Message = "Email không đúng định dạng" };
+            }
+            
+        }
+        private bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
+            string pattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+            return Regex.IsMatch(email, pattern);
         }
 
         private string GenerateJwtToken(string email, string role)

@@ -1,4 +1,5 @@
-﻿using DTO;
+﻿using DTO.Auth;
+using DTO.User;
 using Models;
 
 namespace AuthService.Interfaces
