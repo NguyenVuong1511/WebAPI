@@ -30,15 +30,15 @@ namespace TourManageService.Controllers
             return Ok(result);
         }
 
-        //[HttpPost("create")]
-        //public async Task<IActionResult> Create([FromBody] CreateLoaiTourDTO request)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
+        [HttpPost("create")]
+        public async Task<IActionResult> Create([FromBody] CreateLoaiTourDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        //    var result = await _loaiTourService.Create(request);
-        //    return Ok(result);
-        //}
+            var result = await _loaiTourService.Create(request);
+            return Ok(result);
+        }
 
 
         //[HttpPut("update")]

@@ -95,6 +95,35 @@ namespace TourManageService.Services
                 };
             });
         }
+        public async Task<ApiResponse<bool>> Create(CreateLoaiTourDTO model)
+        {
+            return await Task.Run(() =>
+            {
+                var msgError = _dbHelper.ExecuteSProcedure(
+                    "sp_AddLoaiTour",
+                    "@TenLoai", model.TenLoai,
+                    "@MoTa", model.MoTa
+                );
+
+                if (!string.IsNullOrEmpty(msgError))
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = false,
+                        Code = "DUPLICATE",
+                        Message = msgError
+                    };
+                }
+
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Code = "CREATED",
+                    Message = "Thêm loại tour thành công",
+                    Data = true
+                };
+            });
+        }
 
 
     }
