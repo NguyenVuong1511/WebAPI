@@ -1,0 +1,6 @@
+@LoaiTourService_HostAddress = http://localhost:5122
+
+GET {{LoaiTourService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
