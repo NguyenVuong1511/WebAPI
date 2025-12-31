@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using AuthService.Interfaces;
-using DTO;
+using DTO.Auth;
+using DTO.User;
 
 namespace AuthService.Controllers
 {

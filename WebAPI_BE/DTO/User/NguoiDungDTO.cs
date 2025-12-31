@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DTO
+namespace DTO.User
 {
     public class NguoiDungDTO
     {
         public Guid NguoiDungId { get; set; }
-        public string Email {  get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
         public string HoTen { get; set; } = string.Empty;
         public string SDT { get; set; } = string.Empty;
         public string DiaChi { get; set; } = string.Empty;
