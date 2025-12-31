@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DTO.Tour;
+using Microsoft.AspNetCore.Mvc;
 using TourManageService.Interfaces;
 
 namespace TourManageService.Controllers
@@ -22,6 +23,16 @@ namespace TourManageService.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _tourService.GetById(id);
+            return Ok(result);
+        }
+
+        [HttpPost("create")]
+        public async Task<IActionResult> Create([FromBody] CreateTourDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _tourService.Create(request);
             return Ok(result);
         }
     }
