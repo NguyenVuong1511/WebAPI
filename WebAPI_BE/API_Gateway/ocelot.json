@@ -14,6 +14,19 @@
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
     },
     {
+      // --- Cấu hình cho UserService ---
+      "DownstreamPathTemplate": "/api/user/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44363
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/user/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
+    },
+    {
       // --- Cấu hình cho LoaiTour ---
       "DownstreamPathTemplate": "/api/loaitour/{everything}",
       "DownstreamScheme": "https",
@@ -25,7 +38,7 @@
       ],
       "UpstreamPathTemplate": "/gateway/loaitour/{everything}",
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
-    }
+    },
   ],
   "GlobalConfiguration": {
     "BaseUrl": "http://localhost:18251" // <-- Port của chính Gateway
