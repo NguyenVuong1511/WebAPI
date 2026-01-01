@@ -39,6 +39,19 @@
       "UpstreamPathTemplate": "/gateway/loaitour/{everything}",
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
     },
+    {
+      // --- Cấu hình cho BookingService ---
+      "DownstreamPathTemplate": "/api/booking/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44312
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/booking/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
+    }
   ],
   "GlobalConfiguration": {
     "BaseUrl": "http://localhost:18251" // <-- Port của chính Gateway

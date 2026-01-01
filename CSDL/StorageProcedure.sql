@@ -112,3 +112,99 @@ BEGIN
     DELETE FROM NguoiDung WHERE NguoiDungId = @NguoiDungId;
 END;
 GO
+
+--------------------------------------------------------------------------NGUYỄN MINH VƯƠNG-------------------------------------------------------------------------------
+USE QuanLyDuLich;
+GO
+
+-- 1. Thêm mới Booking (Header)
+CREATE OR ALTER PROCEDURE sp_Booking_Insert
+    @BookingId UNIQUEIDENTIFIER,
+    @TourId UNIQUEIDENTIFIER,
+    @NguoiDungId UNIQUEIDENTIFIER,
+    @SoNguoiLon INT,
+    @SoTreEm INT,
+    @TongTien DECIMAL(18,2),
+    @PhuongThucThanhToan NVARCHAR(50),
+    @GhiChu NVARCHAR(MAX)
+AS
+BEGIN
+    INSERT INTO Booking (BookingId, TourId, NguoiDungId, SoNguoiLon, SoTreEm, TongTien, PhuongThucThanhToan, TrangThaiThanhToan, GhiChu, NgayDat)
+    VALUES (@BookingId, @TourId, @NguoiDungId, @SoNguoiLon, @SoTreEm, @TongTien, @PhuongThucThanhToan, N'Chờ xác nhận', @GhiChu, GETDATE());
+END
+GO
+
+-- 2. Thêm chi tiết hành khách (Booking Detail)
+CREATE OR ALTER PROCEDURE sp_BookingChiTiet_Insert
+    @BookingId UNIQUEIDENTIFIER,
+    @HoTen NVARCHAR(200),
+    @LoaiKhach NVARCHAR(50),
+    @CMND NVARCHAR(50)
+AS
+BEGIN
+    INSERT INTO BookingChiTiet (BookingId, HoTen, LoaiKhach, CMND)
+    VALUES (@BookingId, @HoTen, @LoaiKhach, @CMND);
+END
+GO
+
+-- 3. Lấy lịch sử đặt tour của Khách hàng (Kèm tên Tour)
+CREATE OR ALTER PROCEDURE sp_Booking_GetByUserId
+    @NguoiDungId UNIQUEIDENTIFIER
+AS
+BEGIN
+    SELECT b.*, t.TenTour, t.ThoiGianKhoiHanh
+    FROM Booking b
+    INNER JOIN Tour t ON b.TourId = t.TourId
+    WHERE b.NguoiDungId = @NguoiDungId
+    ORDER BY b.NgayDat DESC;
+END
+GO
+
+-- 4. Lấy tất cả đơn hàng (Dành cho Admin)
+CREATE OR ALTER PROCEDURE sp_Booking_GetAll
+AS
+BEGIN
+    SELECT b.*, t.TenTour, nd.Email, nd.HoTen as NguoiDat
+    FROM Booking b
+    INNER JOIN Tour t ON b.TourId = t.TourId
+    INNER JOIN NguoiDung nd ON b.NguoiDungId = nd.NguoiDungId
+    ORDER BY b.NgayDat DESC;
+END
+GO
+
+-- 5. Lấy chi tiết đơn hàng (Gồm danh sách hành khách)
+CREATE OR ALTER PROCEDURE sp_Booking_GetById
+    @BookingId UNIQUEIDENTIFIER
+AS
+BEGIN
+    -- Result set 1: Thông tin chung
+    SELECT b.*, t.TenTour, t.GiaNguoiLon, t.GiaTreEm
+    FROM Booking b
+    INNER JOIN Tour t ON b.TourId = t.TourId
+    WHERE b.BookingId = @BookingId;
+
+    -- Result set 2: Danh sách khách
+    SELECT * FROM BookingChiTiet WHERE BookingId = @BookingId;
+END
+GO
+
+-- 6. Cập nhật trạng thái (Duyệt hoặc Hủy)
+CREATE OR ALTER PROCEDURE sp_Booking_UpdateStatus
+    @BookingId UNIQUEIDENTIFIER,
+    @TrangThaiThanhToan NVARCHAR(50)
+AS
+BEGIN
+    UPDATE Booking
+    SET TrangThaiThanhToan = @TrangThaiThanhToan
+    WHERE BookingId = @BookingId;
+END
+GO
+
+-- 7. Lấy giá Tour để tính toán (Bảo mật: không tin tưởng giá từ FE gửi lên)
+CREATE OR ALTER PROCEDURE sp_Tour_GetPrice
+    @TourId UNIQUEIDENTIFIER
+AS
+BEGIN
+    SELECT GiaNguoiLon, GiaTreEm FROM Tour WHERE TourId = @TourId;
+END
+GO
