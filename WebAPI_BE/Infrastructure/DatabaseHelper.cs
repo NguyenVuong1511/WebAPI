@@ -280,5 +280,79 @@ namespace Infrastructure
 
             return cmd;
         }
+        // =============================================================
+        // PHẦN IMPLEMENT ASYNC (MỚI)
+        // =============================================================
+
+        // 1. Async Execute Stored Procedure (No return data)
+        public async Task<string> ExecuteSProcedureAsync(string procName, params object[] paramObjects)
+        {
+            try
+            {
+                using var conn = new SqlConnection(_connectionString);
+                // Helper CreateCommand vẫn dùng được, nhưng cần truyền conn vào
+                using var cmd = CreateCommand(procName, conn, null, paramObjects);
+
+                await conn.OpenAsync(); // Mở kết nối bất đồng bộ
+                await cmd.ExecuteNonQueryAsync(); // Thực thi bất đồng bộ
+
+                return string.Empty; // Thành công
+            }
+            catch (Exception ex)
+            {
+                return ex.Message; // Trả về lỗi
+            }
+        }
+
+        // 2. Async Execute Stored Procedure (Return DataTable)
+        public async Task<DataTable> ExecuteSProcedureReturnDataTableAsync(string procName, params object[] paramObjects)
+        {
+            var table = new DataTable();
+            using var conn = new SqlConnection(_connectionString);
+            using var cmd = CreateCommand(procName, conn, null, paramObjects);
+
+            await conn.OpenAsync();
+
+            // Dùng ExecuteReaderAsync thay vì SqlDataAdapter.Fill để tận dụng tối đa Async
+            using var reader = await cmd.ExecuteReaderAsync();
+            table.Load(reader); // Load dữ liệu từ Reader vào DataTable
+            return table;
+        }
+
+        // 3. Async Transaction (Quan trọng cho Booking)
+        public async Task<List<string>> ExecuteSProcedureWithTransactionAsync(List<StoreParameterInfo> storeInfos)
+        {
+            var errors = new List<string>();
+
+            // Dùng using để đảm bảo Connection tự đóng, không dùng biến toàn cục _connection để tránh conflict luồng
+            using var conn = new SqlConnection(_connectionString);
+            await conn.OpenAsync();
+            using var trans = conn.BeginTransaction();
+
+            try
+            {
+                foreach (var store in storeInfos)
+                {
+                    using var cmd = new SqlCommand(store.StoreProcedureName, conn, trans);
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    if (store.StoreProcedureParams != null)
+                    {
+                        cmd.Parameters.AddRange(store.StoreProcedureParams.ToArray());
+                    }
+
+                    await cmd.ExecuteNonQueryAsync();
+                }
+
+                trans.Commit(); // Commit nếu chạy hết vòng lặp thành công
+            }
+            catch (Exception ex)
+            {
+                trans.Rollback(); // Rollback nếu có lỗi
+                errors.Add(ex.Message);
+            }
+
+            return errors;
+        }
     }
 }
