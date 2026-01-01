@@ -44,6 +44,16 @@ namespace UserService.Controllers
                 Data = data
             });
         }
-        
+        [HttpPost("create-user")]
+        public async Task<IActionResult> CreateAsync([FromBody] CreateNguoiDungDTO model)
+        {
+            var result = await _userService.CreateAsync(model);
+            if(!result.Success) 
+                return BadRequest(result);
+            return Ok(result);  
+        }
+
+
+
     }
 }

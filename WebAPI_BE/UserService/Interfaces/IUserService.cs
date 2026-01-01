@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Models;
 
 namespace UserService.Interfaces
 {
@@ -9,7 +10,7 @@ namespace UserService.Interfaces
     {
         Task<List<NguoiDungDTO>> GetAllAsync();
         Task<NguoiDungDTO> GetByIdAsync(Guid id);
-        //Task<bool> CreateAsync(NguoiDungRegisterDTO model);
+        Task<ApiResponse<bool>> CreateAsync(CreateNguoiDungDTO model);
         //Task<bool> UpdateAsync(Guid id, NguoiDungUpdateDTO model);
         //Task<bool> DeleteAsync(Guid id);
     }

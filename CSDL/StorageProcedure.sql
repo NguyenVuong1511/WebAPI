@@ -72,19 +72,21 @@ END;
 GO
 
 -- 3. Thêm mới người dùng (Register)
-CREATE PROCEDURE sp_NguoiDung_Create
+CREATE OR ALTER PROCEDURE sp_NguoiDung_Create 
     @Email NVARCHAR(255),
     @MatKhau NVARCHAR(255),
     @HoTen NVARCHAR(200),
     @SoDienThoai NVARCHAR(20),
     @DiaChi NVARCHAR(300),
-    @VaiTro NVARCHAR(50)
+    @VaiTro NVARCHAR(50),
+	@TrangThai BIT
 AS
 BEGIN
-    INSERT INTO NguoiDung (Email, MatKhau, HoTen, SoDienThoai, DiaChi, VaiTro)
-    VALUES (@Email, @MatKhau, @HoTen, @SoDienThoai, @DiaChi, @VaiTro);
+    INSERT INTO NguoiDung (Email, MatKhau, HoTen, SoDienThoai, DiaChi, VaiTro, TrangThai)
+    VALUES (@Email, @MatKhau, @HoTen, @SoDienThoai, @DiaChi, @VaiTro, @TrangThai);
 END;
 GO
+
 
 -- 4. Cập nhật thông tin người dùng
 CREATE PROCEDURE sp_NguoiDung_Update

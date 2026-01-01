@@ -2,6 +2,7 @@
 using Infrastructure;
 using Infrastructure.Interfaces;
 using Microsoft.Data.SqlClient;
+using Models;
 using System.Data;
 using UserService.Interfaces;
 
@@ -70,6 +71,45 @@ namespace UserService.Services
                 return Task.FromResult<NguoiDungDTO?>(result);
             }
             return Task.FromResult<NguoiDungDTO?>(null);
+        }
+        public async Task<ApiResponse<bool>> CreateAsync(CreateNguoiDungDTO model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password) || string.IsNullOrWhiteSpace(model.HoTen) || string.IsNullOrWhiteSpace(model.SDT))
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Đăng ký không thành công",
+                    Data = false,
+                };
+            }
+            var result = await _dbHelper.ExecuteSProcedureAsync("sp_NguoiDung_Create",
+                "@Email", model.Email,
+                "@MatKhau", model.Password,
+                "@HoTen", model.HoTen,
+                "SoDienThoai", model.SDT,
+                "@DiaChi", model.DiaChi,
+                "@VaiTro", model.VaiTro,
+                "@TrangThai", model.TrangThai
+            );
+            if(result == string.Empty)
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Message = "Đăng ký thành công",
+                    Data = true,
+                };
+            }
+            else
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = result,
+                    Data = false,
+                };
+            }
         }
     }
 }
