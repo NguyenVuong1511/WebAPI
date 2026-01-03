@@ -200,5 +200,46 @@ namespace UserService.Services
                 };
             }
         }
+        public async Task<ApiResponse<bool>> UpdatePassAsnyc(UpdatePassNguoiDungDTO model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Email))
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Email không được để trống"
+                };
+            }
+            if (string.IsNullOrWhiteSpace(model.Password))
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Mật khẩu không được để trống"
+                };
+            }
+            var result = await _dbHelper.ExecuteSProcedureAsync(
+                "sp_NguoiDung_DoiMatKhau",
+                "@Email", model.Email,
+                "@Password", model.Password,
+                "@Password_new", model.Password_new
+            );
+            if (string.IsNullOrEmpty(result))
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Message = "Đổi mật khẩu thành công"
+                };
+            }
+            else
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = result,
+                };
+            }
+        }
     }
 }

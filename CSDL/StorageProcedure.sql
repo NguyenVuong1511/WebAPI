@@ -114,6 +114,36 @@ BEGIN
     DELETE FROM NguoiDung WHERE NguoiDungId = @NguoiDungId;
 END;
 GO
+-- 6. Cập nhật mật khẩu người dùng
+CREATE PROCEDURE sp_NguoiDung_DoiMatKhau
+    @Email NVARCHAR(100),
+    @Password NVARCHAR(255),
+    @Password_new NVARCHAR(255)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- 1. Kiểm tra người dùng có tồn tại và mật khẩu hiện tại có đúng không
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM NguoiDung 
+        WHERE Email = @Email 
+          AND MatKhau = @Password
+    )
+    BEGIN
+        RETURN N'Mật khẩu hiện tại không đúng hoặc email không tồn tại';
+    END
+
+    -- 2. Cập nhật mật khẩu mới
+    UPDATE NguoiDung
+    SET MatKhau = @Password_new
+    WHERE Email = @Email;
+
+    -- 3. Thành công
+    RETURN NULL;
+END
+GO
+
 
 --------------------------------------------------------------------------NGUYỄN MINH VƯƠNG-------------------------------------------------------------------------------
 USE QuanLyDuLich;
