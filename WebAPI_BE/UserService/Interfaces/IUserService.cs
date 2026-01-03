@@ -11,7 +11,7 @@ namespace UserService.Interfaces
         Task<List<NguoiDungDTO>> GetAllAsync();
         Task<NguoiDungDTO> GetByIdAsync(Guid id);
         Task<ApiResponse<bool>> CreateAsync(CreateNguoiDungDTO model);
-        //Task<bool> UpdateAsync(Guid id, NguoiDungUpdateDTO model);
-        //Task<bool> DeleteAsync(Guid id);
+        Task<ApiResponse<bool>> UpdateAsync(Guid id, NguoiDungUpdateDTO model);
+        Task<ApiResponse<bool>> DeleteAsync(Guid id);
     }
 }

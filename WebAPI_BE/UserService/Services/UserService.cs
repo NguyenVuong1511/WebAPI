@@ -111,5 +111,94 @@ namespace UserService.Services
                 };
             }
         }
+        public async Task<ApiResponse<bool>> UpdateAsync(Guid id, NguoiDungUpdateDTO model)
+        {
+            if(id == Guid.Empty)
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Người dùng không tồn tại",
+                };
+            }
+            if (string.IsNullOrWhiteSpace(model.HoTen))
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Họ tên không được để trống",
+                    Data = false
+                };
+            }
+            if (string.IsNullOrWhiteSpace(model.SDT))
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Số điện thoại không được để trống",
+                    Data = false
+                };
+            }
+            var result = await _dbHelper.ExecuteSProcedureAsync(
+                "sp_NguoiDung_Update",
+                "@NguoiDungId", id,
+                "@HoTen", model.HoTen,
+                "@SoDienThoai", model.SDT,
+                "@DiaChi", model.DiaChi,
+                "@TrangThai", model.TrangThai
+            );
+            if (string.IsNullOrEmpty(result))
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Message = "Cập nhật thành công",
+                    Data = true
+                };
+            }
+            else
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = result,
+                    Data = false
+                };
+            }
+        }
+        public async Task<ApiResponse<bool>> DeleteAsync(Guid id)
+        {
+            if(id == Guid.Empty)
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Người dùng không tồn tại",
+                    Data = false
+                };
+            }
+            var result = await _dbHelper.ExecuteSProcedureAsync(
+                "sp_NguoiDung_Delete",
+                "@NguoiDungId", id
+            );
+            if (string.IsNullOrEmpty(result))
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Message = "Xóa người dùng thành công",
+                    Data = true
+                };
+            }
+            else
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = result,
+                    Data = false
+                };
+            }
+        }
     }
 }
