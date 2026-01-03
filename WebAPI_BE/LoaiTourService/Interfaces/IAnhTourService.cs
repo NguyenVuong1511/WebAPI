@@ -6,5 +6,6 @@ namespace TourManageService.Interfaces
     public interface IAnhTourService
     {
         Task<ApiResponse<List<AnhTourDTO>>> GetByTourId(Guid tourId);
+        Task<ApiResponse<Guid>> Create(CreateAnhTourDTO model);
     }
 }

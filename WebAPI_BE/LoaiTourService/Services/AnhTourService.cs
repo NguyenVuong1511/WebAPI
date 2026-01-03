@@ -53,5 +53,39 @@ namespace TourManageService.Services
                 };
             });
         }
+
+        public async Task<ApiResponse<Guid>> Create(CreateAnhTourDTO model)
+        {
+            return await Task.Run(() =>
+            {
+                string msgError;
+
+                var result = _dbHelper.ExecuteScalarSProcedure(
+                    out msgError,
+                    "sp_AnhTour_Insert",
+                    "@TourId", model.TourId,
+                    "@LinkAnh", model.LinkAnh
+                );
+
+                if (!string.IsNullOrEmpty(msgError) || result == null)
+                {
+                    return new ApiResponse<Guid>
+                    {
+                        Success = false,
+                        Code = "SQL_ERROR",
+                        Message = msgError
+                    };
+                }
+
+                return new ApiResponse<Guid>
+                {
+                    Success = true,
+                    Code = "CREATED",
+                    Message = "Upload ảnh thành công",
+                    Data = (Guid)result
+                };
+            });
+        }
+
     }
 }

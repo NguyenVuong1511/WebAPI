@@ -20,5 +20,15 @@ namespace TourManageService.Controllers
             var result = await _anhTourService.GetByTourId(tourId);
             return Ok(result);
         }
+
+        [HttpPost("create")]
+        public async Task<IActionResult> Create([FromBody] CreateAnhTourDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _anhTourService.Create(request);
+            return Ok(result);
+        }
     }
 }
