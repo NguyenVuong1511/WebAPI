@@ -1,5 +1,6 @@
 ﻿using DTO.LoaiTour;
 using Microsoft.AspNetCore.Mvc;
+using Models;
 using TourManageService.Interface;
 
 
@@ -14,6 +15,21 @@ namespace TourManageService.Controllers
         public LoaiTourController(ILoaiTourService loaiTourService)
         {
             _loaiTourService = loaiTourService;
+        }
+
+        private IActionResult ReturnResult<T>(ApiResponse<T> result)
+        {
+            if (result.Success) return Ok(result);
+
+            return result.Code switch
+            {
+                "INVALID_DATA" => BadRequest(result),
+                "NOT_FOUND" => NotFound(result),
+                "DUPLICATE" => Conflict(result),
+                "IN_USE" => Conflict(result),
+                "SQL_ERROR" => StatusCode(StatusCodes.Status500InternalServerError, result),
+                _ => BadRequest(result)
+            };
         }
 
         [HttpGet("get-all")]

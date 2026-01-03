@@ -35,5 +35,15 @@ namespace TourManageService.Controllers
             var result = await _tourService.Create(request);
             return Ok(result);
         }
+        [HttpPut("update")]
+        public async Task<IActionResult> Update([FromBody] UpdateTourDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _tourService.Update(request);
+            return Ok(result);
+        }
+
     }
 }

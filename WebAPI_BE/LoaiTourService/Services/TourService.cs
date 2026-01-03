@@ -156,5 +156,43 @@ namespace TourManageService.Services
             });
         }
 
+        public async Task<ApiResponse<bool>> Update(UpdateTourDTO model)
+        {
+            return await Task.Run(() =>
+            {
+                var msgError = _dbHelper.ExecuteSProcedure(
+                    "sp_UpdateTour",
+                    "@TourId", model.TourId,
+                    "@TenTour", model.TenTour,
+                    "@MoTaNgan", model.MoTaNgan,
+                    "@MoTaChiTiet", model.MoTaChiTiet,
+                    "@DiemXuatPhatId", model.DiemXuatPhatId,
+                    "@LoaiTourId", model.LoaiTourId,
+                    "@GiaNguoiLon", model.GiaNguoiLon,
+                    "@GiaTreEm", model.GiaTreEm,
+                    "@ThoiGianKhoiHanh", model.ThoiGianKhoiHanh,
+                    "@TrangThai", model.TrangThai
+                );
+
+                if (!string.IsNullOrEmpty(msgError))
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = false,
+                        Code = "DUPLICATE",
+                        Message = msgError
+                    };
+                }
+
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Code = "UPDATED",
+                    Message = "Cập nhật tour thành công",
+                    Data = true
+                };
+            });
+        }
+
     }
 }
