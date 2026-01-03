@@ -222,5 +222,51 @@ namespace TourManageService.Services
             });
         }
 
+        // User
+        public async Task<ApiResponse<List<TourDTO>>> GetAll(TourUserQueryDTO query)
+        {
+            return await Task.Run(() =>
+            {
+                string msgError;
+
+                var table = _dbHelper.ExecuteSProcedureReturnDataTable(
+                    out msgError,
+                    "sp_GetAllTour_Sort",
+                    "@Keyword", query.Keyword,
+                    "@SortBy", query.SortBy,
+                    "@SortDir", query.SortDir
+                );
+
+                if (!string.IsNullOrEmpty(msgError))
+                {
+                    return new ApiResponse<List<TourDTO>>
+                    {
+                        Success = false,
+                        Code = "SQL_ERROR",
+                        Message = msgError
+                    };
+                }
+
+                var data = table.AsEnumerable().Select(r => new TourDTO
+                {
+                    TourId = r.Field<Guid>("TourId"),
+                    TenTour = r.Field<string>("TenTour"),
+                    MoTaNgan = r.Field<string?>("MoTaNgan"),
+                    GiaNguoiLon = r.Field<decimal>("GiaNguoiLon"),
+                    GiaTreEm = r.Field<decimal>("GiaTreEm"),
+                    ThoiGianKhoiHanh = r.Field<string?>("ThoiGianKhoiHanh"),
+                    NgayTao = r.Field<DateTime>("NgayTao")
+                }).ToList();
+
+                return new ApiResponse<List<TourDTO>>
+                {
+                    Success = true,
+                    Code = "SUCCESS",
+                    Message = "Lấy danh sách tour thành công",
+                    Data = data
+                };
+            });
+        }
+
     }
 }

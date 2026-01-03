@@ -51,5 +51,13 @@ namespace TourManageService.Controllers
             var result = await _tourService.Delete(id);
             return Ok(result);
         }
+
+
+        [HttpPost("user/get-all")]
+        public async Task<IActionResult> GetAll([FromBody] TourUserQueryDTO request)
+        {
+            var result = await _tourService.GetAll(request);
+            return Ok(result);
+        }
     }
 }
