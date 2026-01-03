@@ -11,5 +11,6 @@ namespace TourManageService.Interfaces
 
         Task<ApiResponse<bool>> Create(CreateTourDTO model);
         Task<ApiResponse<bool>> Update(UpdateTourDTO model);
+        Task<ApiResponse<bool>> Delete(Guid id);
     }
 }
