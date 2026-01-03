@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace DTO.AnhTour
 {
-    internal class AnhTourDTO
+    public class AnhTourDTO
     {
+        public Guid AnhTourId { get; set; }
+        public Guid TourId { get; set; }
+        public string LinkAnh { get; set; } = string.Empty;
+        public bool IsAvatar { get; set; }
     }
 }
