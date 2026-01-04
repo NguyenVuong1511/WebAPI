@@ -30,5 +30,13 @@ namespace TourManageService.Controllers
             var result = await _anhTourService.Create(request);
             return Ok(result);
         }
+
+        [HttpDelete("delete/{anhTourId}")]
+        public async Task<IActionResult> Delete(Guid anhTourId)
+        {
+            var result = await _anhTourService.Delete(anhTourId);
+            return Ok(result);
+        }
+
     }
 }
