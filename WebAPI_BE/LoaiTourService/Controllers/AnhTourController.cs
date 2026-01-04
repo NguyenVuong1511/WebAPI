@@ -38,5 +38,15 @@ namespace TourManageService.Controllers
             return Ok(result);
         }
 
+        [HttpPut("set-avatar")]
+        public async Task<IActionResult> SetAvatar([FromBody] SetAnhTourAvatarDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _anhTourService.SetAvatar(request);
+            return Ok(result);
+        }
+
     }
 }
