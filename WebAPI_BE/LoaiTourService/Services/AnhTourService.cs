@@ -87,5 +87,24 @@ namespace TourManageService.Services
             });
         }
 
+        public async Task<ApiResponse<bool>> Delete(Guid anhTourId)
+        {
+            return await Task.Run(() =>
+            {
+                var msgError = _dbHelper.ExecuteSProcedure(
+                    "sp_AnhTour_Delete",
+                    "@AnhTourId", anhTourId
+                );
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Code = "DELETED",
+                    Message = "Xoá ảnh thành công",
+                    Data = true
+                };
+            });
+        }
+
+
     }
 }
