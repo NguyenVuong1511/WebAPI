@@ -87,7 +87,6 @@ BEGIN
 END;
 GO
 
-
 -- 4. Cập nhật thông tin người dùng
 CREATE PROCEDURE sp_NguoiDung_Update
     @NguoiDungId UNIQUEIDENTIFIER,
@@ -105,6 +104,7 @@ BEGIN
     WHERE NguoiDungId = @NguoiDungId;
 END;
 GO
+
 
 -- 5. Xóa người dùng (Nên xóa mềm - đổi trạng thái, nhưng ở đây làm xóa cứng nếu cần)
 CREATE PROCEDURE sp_NguoiDung_Delete
@@ -143,6 +143,33 @@ BEGIN
     RETURN NULL;
 END
 GO
+--- 7. Thay đổi trạng thái tài khoản
+CREATE PROCEDURE sp_NguoiDung_DoiTrangThai
+    @Email NVARCHAR(100),
+    @TrangThai BIT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Kiểm tra người dùng có tồn tại không
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM NguoiDung 
+        WHERE Email = @Email
+    )
+    BEGIN
+        RETURN N'Người dùng không tồn tại';
+    END
+
+    -- Cập nhật trạng thái
+    UPDATE NguoiDung
+    SET TrangThai = @TrangThai
+    WHERE Email = @Email;
+
+    RETURN NULL;
+END
+GO
+
 
 
 --------------------------------------------------------------------------NGUYỄN MINH VƯƠNG-------------------------------------------------------------------------------

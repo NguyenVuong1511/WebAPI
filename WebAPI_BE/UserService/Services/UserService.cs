@@ -241,5 +241,47 @@ namespace UserService.Services
                 };
             }
         }
+        public async Task<ApiResponse<bool>> Lock_UnlockAsnyc(bool check, string email)
+        {
+            var result = await _dbHelper.ExecuteSProcedureAsync("sp_NguoiDung_DoiTrangThai", "@Email", email, "@TrangThai", check);
+            if (check == true)
+            {
+                if(result == null)
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = true,
+                        Message = "Mở khóa tài khoản thành công"
+                    };
+                }
+                else
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = false,
+                        Message = result
+                    };
+                }
+            }
+            else
+            {
+                if (result == null)
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = true,
+                        Message = "Đã khóa tài khoản"
+                    };
+                }
+                else
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = false,
+                        Message = result
+                    };
+                }
+            }
+        }
     }
 }

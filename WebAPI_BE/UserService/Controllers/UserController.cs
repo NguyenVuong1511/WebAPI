@@ -3,6 +3,7 @@ using UserService.Interfaces;
 using Models;
 using DTO.User;
 using Microsoft.AspNetCore.Authorization;
+using System.Reflection;
 
 namespace UserService.Controllers
 {
@@ -77,6 +78,15 @@ namespace UserService.Controllers
         public async Task<IActionResult> UpdatePassAsnyc([FromBody] UpdatePassNguoiDungDTO model)
         {
             var result = await _userService.UpdatePassAsnyc(model);
+            if (!result.Success)
+                return BadRequest(result);
+            return Ok(result);
+        }
+        [HttpPost("lock-unlock")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Lock_UnlockAsnyc([FromQuery] bool check,[FromQuery] string email)
+        {
+            var result = await _userService.Lock_UnlockAsnyc(check, email);
             if (!result.Success)
                 return BadRequest(result);
             return Ok(result);

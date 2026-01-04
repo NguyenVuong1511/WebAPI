@@ -12,7 +12,7 @@ namespace UserService.Interfaces
         Task<List<NguoiDungDTO>> GetAllAsync();
         Task<ApiResponse<bool>> CreateAsync(CreateNguoiDungDTO model);
         Task<ApiResponse<bool>> DeleteAsync(Guid id);
-        //Task<ApiResponse<bool>> Lock_UnlockAsnyc(bool check);
+        Task<ApiResponse<bool>> Lock_UnlockAsnyc(bool check, string email);
         //Khách hàng
         Task<ApiResponse<bool>> UpdateAsync(Guid id, NguoiDungUpdateDTO model);
         Task<NguoiDungDTO> GetByIdAsync(Guid id);
