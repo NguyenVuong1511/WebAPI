@@ -8,5 +8,6 @@ namespace TourManageService.Interfaces
         Task<ApiResponse<List<AnhTourDTO>>> GetByTourId(Guid tourId);
         Task<ApiResponse<Guid>> Create(CreateAnhTourDTO model);
         Task<ApiResponse<bool>> Delete(Guid anhTourId);
+        Task<ApiResponse<bool>> SetAvatar(SetAnhTourAvatarDTO model);
     }
 }
