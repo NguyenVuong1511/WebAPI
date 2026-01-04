@@ -95,6 +95,15 @@ namespace TourManageService.Services
                     "sp_AnhTour_Delete",
                     "@AnhTourId", anhTourId
                 );
+                if (!string.IsNullOrEmpty(msgError))
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = false,
+                        Code = "SQL_ERROR",
+                        Message = msgError
+                    };
+                }
                 return new ApiResponse<bool>
                 {
                     Success = true,
