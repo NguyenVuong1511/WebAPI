@@ -1,9 +1,11 @@
 ﻿using DTO.Tour;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TourManageService.Interfaces;
 
 namespace TourManageService.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class TourController : ControllerBase
@@ -54,6 +56,7 @@ namespace TourManageService.Controllers
 
 
         [HttpPost("user/get-all")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll([FromBody] TourUserQueryDTO request)
         {
             var result = await _tourService.GetAll(request);

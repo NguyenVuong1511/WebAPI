@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DTO.AnhTour
 {
-    public class SetAnhTourAvatar
+    public class SetAnhTourAvatarDTO
     {
         [Required]
         public Guid AnhTourId { get; set; }

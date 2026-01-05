@@ -1,4 +1,5 @@
 ﻿using Infrastructure;
+using Infrastructure.Extensions;
 using Infrastructure.Interfaces;
 using TourManageService.Interface;
 using TourManageService.Interfaces;
@@ -13,6 +14,7 @@ builder.Services.AddControllers();
 // --- CẤU HÌNH SWAGGER (Bắt buộc để chạy được giao diện test API) ---
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCustomJwtAuthentication(builder.Configuration);
 
 // --- ĐĂNG KÝ DEPENDENCY INJECTION (DI) ---
 // Infrastructure
@@ -34,6 +36,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseHttpsRedirection(); // Khuyến nghị thêm
 

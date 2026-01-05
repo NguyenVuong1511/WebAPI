@@ -113,6 +113,35 @@ namespace TourManageService.Services
                 };
             });
         }
+        public async Task<ApiResponse<bool>> SetAvatar(SetAnhTourAvatarDTO model)
+        {
+            return await Task.Run(() =>
+            {
+                var msgError = _dbHelper.ExecuteSProcedure(
+                    "sp_AnhTour_SetAvatar",
+                    "@AnhTourId", model.AnhTourId,
+                    "@TourId", model.TourId
+                );
+
+                if (!string.IsNullOrEmpty(msgError))
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = false,
+                        Code = "SQL_ERROR",
+                        Message = msgError
+                    };
+                }
+
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Code = "SUCCESS",
+                    Message = "Đặt ảnh đại diện thành công",
+                    Data = true
+                };
+            });
+        }
 
 
     }

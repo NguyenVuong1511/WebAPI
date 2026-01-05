@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DTO.AnhTour;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TourManageService.Interfaces;
-using DTO.AnhTour;
 namespace TourManageService.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class AnhTourController : Controller
@@ -15,6 +17,7 @@ namespace TourManageService.Controllers
         }
 
         [HttpGet("get-by-tour/{tourId}")]
+        
         public async Task<IActionResult> GetByTourId(Guid tourId)
         {
             var result = await _anhTourService.GetByTourId(tourId);
@@ -22,6 +25,7 @@ namespace TourManageService.Controllers
         }
 
         [HttpPost("create")]
+        
         public async Task<IActionResult> Create([FromBody] CreateAnhTourDTO request)
         {
             if (!ModelState.IsValid)
@@ -32,6 +36,7 @@ namespace TourManageService.Controllers
         }
 
         [HttpDelete("delete/{anhTourId}")]
+        
         public async Task<IActionResult> Delete(Guid anhTourId)
         {
             var result = await _anhTourService.Delete(anhTourId);
@@ -39,6 +44,7 @@ namespace TourManageService.Controllers
         }
 
         [HttpPut("set-avatar")]
+        
         public async Task<IActionResult> SetAvatar([FromBody] SetAnhTourAvatarDTO request)
         {
             if (!ModelState.IsValid)

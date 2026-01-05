@@ -1,4 +1,5 @@
 ﻿using DTO.LoaiTour;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using TourManageService.Interface;
@@ -6,6 +7,7 @@ using TourManageService.Interface;
 
 namespace TourManageService.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class LoaiTourController : Controller
