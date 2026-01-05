@@ -18,10 +18,10 @@ namespace BookingService.Controllers
         }
 
         // ==========================================================
-        // 1. KHÁCH HÀNG: ĐẶT TOUR (Create Booking)
-        // Method: POST /api/booking/create
+        // 1. KHÁCH HÀNG: ĐẶT TOUR
         // ==========================================================
         [HttpPost("create")]
+        [Authorize]
         public async Task<IActionResult> CreateBooking([FromBody] CreateBookingRequest request)
         {
             if (request == null)
@@ -38,17 +38,17 @@ namespace BookingService.Controllers
 
             if (result.Success)
             {
-                return Ok(result); // Trả về 200 OK
+                return Ok(result);
             }
 
-            return BadRequest(result); // Trả về 400 Bad Request kèm lỗi
+            return BadRequest(result);
         }
 
         // ==========================================================
-        // 2. KHÁCH HÀNG: XEM LỊCH SỬ (Get History)
-        // Method: GET /api/booking/history/{userId}
+        // 2. KHÁCH HÀNG: XEM LỊCH SỬ
         // ==========================================================
         [HttpGet("history/{userId}")]
+        [Authorize]
         public async Task<IActionResult> GetMyHistory(Guid userId)
         {
             if (userId == Guid.Empty)
@@ -61,10 +61,10 @@ namespace BookingService.Controllers
         }
 
         // ==========================================================
-        // 3. KHÁCH HÀNG: HỦY ĐƠN (Cancel Booking)
-        // Method: PUT /api/booking/cancel/{bookingId}?userId=...
+        // 3. KHÁCH HÀNG: HỦY ĐƠN
         // ==========================================================
-        [HttpPut("cancel/{bookingId}")]
+        [HttpPost("cancel/{bookingId}")]
+        [Authorize]
         public async Task<IActionResult> CancelBooking(Guid bookingId, [FromQuery] Guid userId)
         {
             if (userId == Guid.Empty)
@@ -81,8 +81,7 @@ namespace BookingService.Controllers
         }
 
         // ==========================================================
-        // 4. ADMIN: XEM TẤT CẢ ĐƠN (Get All)
-        // Method: GET /api/booking/admin/all
+        // 4. ADMIN: XEM TẤT CẢ ĐƠN
         // ==========================================================
         [HttpGet("admin/all")]
         [Authorize(Roles = "Admin")]
@@ -93,10 +92,9 @@ namespace BookingService.Controllers
         }
 
         // ==========================================================
-        // 5. ADMIN: DUYỆT ĐƠN (Approve)
-        // Method: PUT /api/booking/admin/approve/{bookingId}
+        // 5. ADMIN: DUYỆT ĐƠN
         // ==========================================================
-        [HttpPut("admin/approve/{bookingId}")]
+        [HttpPost("admin/approve/{bookingId}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ApproveBooking(Guid bookingId)
         {
@@ -109,14 +107,27 @@ namespace BookingService.Controllers
         }
 
         // ==========================================================
-        // 6. XEM CHI TIẾT ĐƠN (Get Detail)
-        // Method: GET /api/booking/detail/{bookingId}
+        // 6. XEM CHI TIẾT ĐƠN
         // ==========================================================
         [HttpGet("detail/{bookingId}")]
-        public async Task<IActionResult> GetBookingDetail(Guid bookingId)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetBookingDetail([FromRoute] Guid bookingId)
         {
+            if (bookingId == Guid.Empty)
+            {
+                return BadRequest(new { Success = false, Message = "Booking Id không hợp lệ." });
+            }
+
             var result = await _bookingService.GetBookingDetailAsync(bookingId);
-            return Ok(result);
+
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
         }
     }
 }
