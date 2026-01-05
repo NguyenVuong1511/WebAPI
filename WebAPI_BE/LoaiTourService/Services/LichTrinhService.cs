@@ -55,5 +55,40 @@ namespace TourManageService.Services
                 };
             });
         }
+
+        public async Task<ApiResponse<Guid>> Create(CreateLichTrinhDTO model)
+        {
+            return await Task.Run(() =>
+            {
+                string msgError;
+
+                var result = _dbHelper.ExecuteScalarSProcedure(
+                    out msgError,
+                    "sp_LichTrinh_Insert",
+                    "@TourId", model.TourId,
+                    "@NgayThu", model.NgayThu,
+                    "@TieuDe", model.TieuDe,
+                    "@NoiDung", model.NoiDung
+                );
+
+                if (!string.IsNullOrEmpty(msgError) || result == null)
+                {
+                    return new ApiResponse<Guid>
+                    {
+                        Success = false,
+                        Code = "SQL_ERROR",
+                        Message = msgError
+                    };
+                }
+
+                return new ApiResponse<Guid>
+                {
+                    Success = true,
+                    Code = "CREATED",
+                    Message = "Thêm lịch trình thành công",
+                    Data = (Guid)result
+                };
+            });
+        }
     }
 }

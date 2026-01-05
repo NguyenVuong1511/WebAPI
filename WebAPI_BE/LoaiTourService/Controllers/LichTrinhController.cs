@@ -21,5 +21,17 @@ namespace TourManageService.Controllers
             var result = await _lichTrinhService.GetByTourId(tourId);
             return Ok(result);
         }
+
+
+        [HttpPost("create")]
+        public async Task<IActionResult> Create([FromBody] CreateLichTrinhDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _lichTrinhService.Create(request);
+            return Ok(result);
+        }
+
     }
 }
