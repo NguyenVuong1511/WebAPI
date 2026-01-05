@@ -265,7 +265,7 @@ namespace UserService.Services
             }
             else
             {
-                if (result == null)
+                if (result == string.Empty)
                 {
                     return new ApiResponse<bool>
                     {
