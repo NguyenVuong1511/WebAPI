@@ -33,5 +33,23 @@ namespace TourManageService.Controllers
             return Ok(result);
         }
 
+        [HttpPut("update")]
+        public async Task<IActionResult> Update([FromBody] UpdateLichTrinhDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _lichTrinhService.Update(request);
+            return Ok(result);
+        }
+
+
+        [HttpDelete("delete/{lichTrinhId}")]
+        public async Task<IActionResult> Delete(Guid lichTrinhId)
+        {
+            var result = await _lichTrinhService.Delete(lichTrinhId);
+            return Ok(result);
+        }
+
     }
 }

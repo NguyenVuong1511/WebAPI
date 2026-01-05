@@ -25,6 +25,8 @@ builder.Services.AddScoped<ILoaiTourService, LoaiTourService>();
 
 // Nếu bạn có TourService trong cùng project này, hãy đăng ký thêm:
 builder.Services.AddScoped<ITourService, TourService>();
+builder.Services.AddScoped<IAnhTourService, AnhTourService>();
+builder.Services.AddScoped<ILichTrinhService, LichTrinhService>();
 
 var app = builder.Build();
 

@@ -90,5 +90,66 @@ namespace TourManageService.Services
                 };
             });
         }
+        public async Task<ApiResponse<bool>> Update(UpdateLichTrinhDTO model)
+        {
+            return await Task.Run(() =>
+            {
+                var msgError = _dbHelper.ExecuteSProcedure(
+                    "sp_LichTrinh_Update",
+                    "@LichTrinhId", model.LichTrinhId,
+                    "@NgayThu", model.NgayThu,
+                    "@TieuDe", model.TieuDe,
+                    "@NoiDung", model.NoiDung
+                );
+
+                if (!string.IsNullOrEmpty(msgError))
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = false,
+                        Code = "SQL_ERROR",
+                        Message = msgError
+                    };
+                }
+
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Code = "UPDATED",
+                    Message = "Cập nhật lịch trình thành công",
+                    Data = true
+                };
+            });
+        }
+
+
+        public async Task<ApiResponse<bool>> Delete(Guid lichTrinhId)
+        {
+            return await Task.Run(() =>
+            {
+                var msgError = _dbHelper.ExecuteSProcedure(
+                    "sp_LichTrinh_Delete",
+                    "@LichTrinhId", lichTrinhId
+                );
+
+                if (!string.IsNullOrEmpty(msgError))
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = false,
+                        Code = "SQL_ERROR",
+                        Message = msgError
+                    };
+                }
+
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Code = "DELETED",
+                    Message = "Xoá lịch trình thành công",
+                    Data = true
+                };
+            });
+        }
     }
 }
