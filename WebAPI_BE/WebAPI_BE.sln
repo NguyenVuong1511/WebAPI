@@ -25,11 +25,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserService", "UserService\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TourManageService", "LoaiTourService\TourManageService.csproj", "{7D078E99-2DE7-4753-BD9D-E22D1B70081E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookingService", "BookingService\BookingService.csproj", "{39B67BAF-3FCF-4F14-AF2E-7671507A0740}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookingService", "BookingService\BookingService.csproj", "{39B67BAF-3FCF-4F14-AF2E-7671507A0740}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneralService", "GeneralService\GeneralService.csproj", "{8D35447D-F2F1-4FBE-9B8F-DD962B16B5C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneralService", "GeneralService\GeneralService.csproj", "{8D35447D-F2F1-4FBE-9B8F-DD962B16B5C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeedbackService", "FeedbackService\FeedbackService.csproj", "{E09FDC5C-0375-4CE2-B786-6DABF3169913}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedbackService", "FeedbackService\FeedbackService.csproj", "{E09FDC5C-0375-4CE2-B786-6DABF3169913}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

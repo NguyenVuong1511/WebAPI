@@ -12,11 +12,23 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// 1. Đăng ký Dependency Injection
+// 1. THÊM CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://127.0.0.1:5500", "http://localhost:5500")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+        // Nếu bạn cần gửi cookie/credentials thì thêm .AllowCredentials() 
+    });
+});
+
+// 2. Đăng ký DI
 builder.Services.AddScoped<IDatabaseHelper, DatabaseHelper>();
 builder.Services.AddScoped<IAuthService, AuthService.Services.AuthService>();
 
-// 2. Cấu hình Authentication JWT
+// 3. Cấu hình JWT (như cũ)
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]);
 
@@ -42,7 +54,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// 4. DÙNG CORS – đặt TRƯỚC Authentication/Authorization
+app.UseCors("AllowFrontend");
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 app.Run();
