@@ -14,8 +14,8 @@ namespace BookingService.Interfaces
         Task<ApiResponse<string>> CancelBookingAsync(Guid bookingId, Guid userId);
 
         // --- ADMIN ---
-        Task<ApiResponse<List<BookingViewModel>>> GetAllBookingsAsync();
+        Task<ApiResponse<List<BookingAdminViewModel>>> GetAllBookingsAsync();
         Task<ApiResponse<string>> ApproveBookingAsync(Guid bookingId);
-        Task<ApiResponse<BookingViewModel>> GetBookingDetailAsync(Guid bookingId); // Thêm hàm xem chi tiết nếu cần
+        Task<ApiResponse<BookingViewModel>> GetBookingDetailAsync(Guid bookingId);
     }
 }

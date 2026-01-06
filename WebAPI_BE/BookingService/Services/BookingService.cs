@@ -146,12 +146,9 @@ namespace BookingService.Services
         {
             var response = new ApiResponse<string>();
 
-            // Logic mở rộng: Nên check xem đơn hàng có phải của userId này không trước khi hủy
-            // Nhưng ở đây ta gọi thẳng procedure update
-
             string result = await _dbHelper.ExecuteSProcedureAsync("sp_Booking_UpdateStatus",
                 "@BookingId", bookingId,
-                "@TrangThaiThanhToan", "Đã hủy"); // Trạng thái text cứng hoặc dùng Enum
+                "@TrangThaiThanhToan", "Đã hủy");
 
             if (string.IsNullOrEmpty(result))
             {
@@ -169,9 +166,9 @@ namespace BookingService.Services
         // ==========================================================
         // ADMIN: XEM TẤT CẢ ĐƠN
         // ==========================================================
-        public async Task<ApiResponse<List<BookingViewModel>>> GetAllBookingsAsync()
+        public async Task<ApiResponse<List<BookingAdminViewModel>>> GetAllBookingsAsync()
         {
-            var response = new ApiResponse<List<BookingViewModel>>();
+            var response = new ApiResponse<List<BookingAdminViewModel>>();
             try
             {
                 var dt = await _dbHelper.ExecuteSProcedureReturnDataTableAsync("sp_Booking_GetAll");
@@ -183,7 +180,7 @@ namespace BookingService.Services
                 }
                 else
                 {
-                    response.Data = (List<BookingViewModel>)dt.ConvertTo<BookingViewModel>();
+                    response.Data = (List<BookingAdminViewModel>)dt.ConvertTo<BookingAdminViewModel>();
                     response.Success = true;
                 }
             }
@@ -220,17 +217,64 @@ namespace BookingService.Services
         }
 
         // ==========================================================
-        // ADMIN/USER: XEM CHI TIẾT ĐƠN (Header + Detail)
+        // ADMIN/USER: XEM CHI TIẾT ĐƠN
         // ==========================================================
         public async Task<ApiResponse<BookingViewModel>> GetBookingDetailAsync(Guid bookingId)
         {
-            // Hàm này cần xử lý hơi khác vì SP trả về 2 bảng (Header và Detail)
-            // Tuy nhiên ExecuteSProcedureReturnDataTableAsync hiện tại chỉ lấy bảng đầu tiên (Header).
-            // Nếu muốn lấy cả Detail, bạn cần nâng cấp DatabaseHelper để hỗ trợ DataSet hoặc gọi 2 lần.
-            // Ở mức độ cơ bản, tôi sẽ chỉ lấy thông tin chung.
-
             var response = new ApiResponse<BookingViewModel>();
-            // Code tạm thời lấy Header
+
+            try
+            {
+                DataSet ds = await _dbHelper.ExecuteSProcedureReturnDataSetAsync("sp_Booking_GetById", "@BookingId", bookingId);
+
+                // 3. Kiểm tra dữ liệu bảng 1 (Header)
+                if (ds == null || ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+                {
+                    response.Success = false;
+                    response.Message = "Không tìm thấy đơn hàng.";
+                    return response;
+                }
+
+                // 4. Map dữ liệu Header (Bảng 0)
+                DataRow headerRow = ds.Tables[0].Rows[0];
+                var bookingVM = new BookingViewModel
+                {
+                    BookingId = (Guid)headerRow["BookingId"],
+                    TenTour = headerRow["TenTour"].ToString(),
+                    NgayDat = Convert.ToDateTime(headerRow["NgayDat"]),
+                    TongTien = Convert.ToDecimal(headerRow["TongTien"]),
+                    TrangThaiThanhToan = headerRow["TrangThaiThanhToan"].ToString(),
+                    SoNguoiLon = Convert.ToInt32(headerRow["SoNguoiLon"]),
+                    SoTreEm = Convert.ToInt32(headerRow["SoTreEm"]),
+                    DanhSachHanhKhach = new List<BookingChiTietViewModel>()
+                };
+
+                // 5. Map dữ liệu Chi tiết
+                // Kiểm tra xem có bảng thứ 2 và bảng đó có dữ liệu không
+                if (ds.Tables.Count > 1 && ds.Tables[1].Rows.Count > 0)
+                {
+                    foreach (DataRow row in ds.Tables[1].Rows)
+                    {
+                        var khach = new BookingChiTietViewModel
+                        {
+                            HoTen = row["HoTen"].ToString(),
+                            LoaiKhach = row["LoaiKhach"].ToString(),
+                            CMND = row["CMND"] != DBNull.Value ? row["CMND"].ToString() : ""
+                        };
+
+                        bookingVM.DanhSachHanhKhach.Add(khach);
+                    }
+                }
+
+                response.Data = bookingVM;
+                response.Success = true;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = "Lỗi khi lấy chi tiết đơn hàng: " + ex.Message;
+            }
+
             return response;
         }
     }
