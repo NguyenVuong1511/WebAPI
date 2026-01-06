@@ -2,6 +2,8 @@
 using UserService.Interfaces;
 using Models;
 using DTO.User;
+using Microsoft.AspNetCore.Authorization;
+using System.Reflection;
 
 namespace UserService.Controllers
 {
@@ -15,6 +17,7 @@ namespace UserService.Controllers
             _userService = userService;
         }
         [HttpGet("get-all")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
         {
             var data = await _userService.GetAllAsync();
@@ -25,25 +28,69 @@ namespace UserService.Controllers
                 Data = data
             });
         }
-        [HttpGet("{id}")]
+        [HttpGet("get-by-id/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var data = await _userService.GetByIdAsync(id); 
-            if(data == null)
+            var data = await _userService.GetByIdAsync(id);
+            if (data == null)
             {
-                return NotFound(new ApiResponse<NguoiDungDTO> 
-                { 
-                    Success = false, 
-                    Message = "Không tìm thấy người dùng này" 
+                return NotFound(new ApiResponse<NguoiDungDTO>
+                {
+                    Success = false,
+                    Message = "Không tìm thấy người dùng này"
                 });
             }
-            return Ok(new ApiResponse<NguoiDungDTO> 
+            return Ok(new ApiResponse<NguoiDungDTO>
             {
-                Success = true, 
-                Message = "Thành công", 
+                Success = true,
+                Message = "Thành công",
                 Data = data
             });
         }
-        
+        [HttpPost("create")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateAsync([FromBody] CreateNguoiDungDTO model)
+        {
+            var result = await _userService.CreateAsync(model);
+            if (!result.Success)
+                return BadRequest(result);
+            return Ok(result);
+        }
+        [HttpPost("update/{id}")]
+        public async Task<IActionResult> UpdateAsync([FromRoute] Guid id,[FromBody] NguoiDungUpdateDTO model)
+        {
+            var result = await _userService.UpdateAsync(id, model);
+            if(!result.Success)
+                return BadRequest(result);
+            return Ok(result);
+        }
+        [HttpPost("delete/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteAsync([FromRoute]Guid id)
+        {
+            var result = await _userService.DeleteAsync(id);
+            if (!result.Success)
+                return BadRequest(result);
+            return Ok(result);
+        }
+        [HttpPost("update-pass")]
+        public async Task<IActionResult> UpdatePassAsnyc([FromBody] UpdatePassNguoiDungDTO model)
+        {
+            var result = await _userService.UpdatePassAsnyc(model);
+            if (!result.Success)
+                return BadRequest(result);
+            return Ok(result);
+        }
+        [HttpPost("lock-unlock")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Lock_UnlockAsnyc([FromQuery] bool check,[FromQuery] string email)
+        {
+            var result = await _userService.Lock_UnlockAsnyc(check, email);
+            if (!result.Success)
+                return BadRequest(result);
+            return Ok(result);
+        }
     }
+
 }

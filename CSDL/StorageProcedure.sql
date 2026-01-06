@@ -72,17 +72,18 @@ END;
 GO
 
 -- 3. Thêm mới người dùng (Register)
-CREATE PROCEDURE sp_NguoiDung_Create
+CREATE OR ALTER PROCEDURE sp_NguoiDung_Create 
     @Email NVARCHAR(255),
     @MatKhau NVARCHAR(255),
     @HoTen NVARCHAR(200),
     @SoDienThoai NVARCHAR(20),
     @DiaChi NVARCHAR(300),
-    @VaiTro NVARCHAR(50)
+    @VaiTro NVARCHAR(50),
+	@TrangThai BIT
 AS
 BEGIN
-    INSERT INTO NguoiDung (Email, MatKhau, HoTen, SoDienThoai, DiaChi, VaiTro)
-    VALUES (@Email, @MatKhau, @HoTen, @SoDienThoai, @DiaChi, @VaiTro);
+    INSERT INTO NguoiDung (Email, MatKhau, HoTen, SoDienThoai, DiaChi, VaiTro, TrangThai)
+    VALUES (@Email, @MatKhau, @HoTen, @SoDienThoai, @DiaChi, @VaiTro, @TrangThai);
 END;
 GO
 
@@ -104,6 +105,7 @@ BEGIN
 END;
 GO
 
+
 -- 5. Xóa người dùng (Nên xóa mềm - đổi trạng thái, nhưng ở đây làm xóa cứng nếu cần)
 CREATE PROCEDURE sp_NguoiDung_Delete
     @NguoiDungId UNIQUEIDENTIFIER
@@ -112,6 +114,63 @@ BEGIN
     DELETE FROM NguoiDung WHERE NguoiDungId = @NguoiDungId;
 END;
 GO
+-- 6. Cập nhật mật khẩu người dùng
+CREATE PROCEDURE sp_NguoiDung_DoiMatKhau
+    @Email NVARCHAR(100),
+    @Password NVARCHAR(255),
+    @Password_new NVARCHAR(255)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- 1. Kiểm tra người dùng có tồn tại và mật khẩu hiện tại có đúng không
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM NguoiDung 
+        WHERE Email = @Email 
+          AND MatKhau = @Password
+    )
+    BEGIN
+        RETURN N'Mật khẩu hiện tại không đúng hoặc email không tồn tại';
+    END
+
+    -- 2. Cập nhật mật khẩu mới
+    UPDATE NguoiDung
+    SET MatKhau = @Password_new
+    WHERE Email = @Email;
+
+    -- 3. Thành công
+    RETURN NULL;
+END
+GO
+--- 7. Thay đổi trạng thái tài khoản
+CREATE PROCEDURE sp_NguoiDung_DoiTrangThai
+    @Email NVARCHAR(100),
+    @TrangThai BIT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Kiểm tra người dùng có tồn tại không
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM NguoiDung 
+        WHERE Email = @Email
+    )
+    BEGIN
+        RETURN N'Người dùng không tồn tại';
+    END
+
+    -- Cập nhật trạng thái
+    UPDATE NguoiDung
+    SET TrangThai = @TrangThai
+    WHERE Email = @Email;
+
+    RETURN NULL;
+END
+GO
+
+
 
 --------------------------------------------------------------------------NGUYỄN MINH VƯƠNG-------------------------------------------------------------------------------
 USE QuanLyDuLich;

@@ -2,6 +2,7 @@
 using Infrastructure;
 using Infrastructure.Interfaces;
 using Microsoft.Data.SqlClient;
+using Models;
 using System.Data;
 using UserService.Interfaces;
 
@@ -70,6 +71,217 @@ namespace UserService.Services
                 return Task.FromResult<NguoiDungDTO?>(result);
             }
             return Task.FromResult<NguoiDungDTO?>(null);
+        }
+        public async Task<ApiResponse<bool>> CreateAsync(CreateNguoiDungDTO model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password) || string.IsNullOrWhiteSpace(model.HoTen) || string.IsNullOrWhiteSpace(model.SDT))
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Đăng ký không thành công",
+                    Data = false,
+                };
+            }
+            var result = await _dbHelper.ExecuteSProcedureAsync("sp_NguoiDung_Create",
+                "@Email", model.Email,
+                "@MatKhau", model.Password,
+                "@HoTen", model.HoTen,
+                "SoDienThoai", model.SDT,
+                "@DiaChi", model.DiaChi,
+                "@VaiTro", model.VaiTro,
+                "@TrangThai", model.TrangThai
+            );
+            if(result == string.Empty)
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Message = "Đăng ký thành công",
+                    Data = true,
+                };
+            }
+            else
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = result,
+                    Data = false,
+                };
+            }
+        }
+        public async Task<ApiResponse<bool>> UpdateAsync(Guid id, NguoiDungUpdateDTO model)
+        {
+            if(id == Guid.Empty)
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Người dùng không tồn tại",
+                };
+            }
+            if (string.IsNullOrWhiteSpace(model.HoTen))
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Họ tên không được để trống",
+                    Data = false
+                };
+            }
+            if (string.IsNullOrWhiteSpace(model.SDT))
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Số điện thoại không được để trống",
+                    Data = false
+                };
+            }
+            var result = await _dbHelper.ExecuteSProcedureAsync(
+                "sp_NguoiDung_Update",
+                "@NguoiDungId", id,
+                "@HoTen", model.HoTen,
+                "@SoDienThoai", model.SDT,
+                "@DiaChi", model.DiaChi,
+                "@TrangThai", model.TrangThai
+            );
+            if (string.IsNullOrEmpty(result))
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Message = "Cập nhật thành công",
+                    Data = true
+                };
+            }
+            else
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = result,
+                    Data = false
+                };
+            }
+        }
+        public async Task<ApiResponse<bool>> DeleteAsync(Guid id)
+        {
+            if(id == Guid.Empty)
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Người dùng không tồn tại",
+                    Data = false
+                };
+            }
+            var result = await _dbHelper.ExecuteSProcedureAsync(
+                "sp_NguoiDung_Delete",
+                "@NguoiDungId", id
+            );
+            if (string.IsNullOrEmpty(result))
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Message = "Xóa người dùng thành công",
+                    Data = true
+                };
+            }
+            else
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = result,
+                    Data = false
+                };
+            }
+        }
+        public async Task<ApiResponse<bool>> UpdatePassAsnyc(UpdatePassNguoiDungDTO model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Email))
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Email không được để trống"
+                };
+            }
+            if (string.IsNullOrWhiteSpace(model.Password))
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Mật khẩu không được để trống"
+                };
+            }
+            var result = await _dbHelper.ExecuteSProcedureAsync(
+                "sp_NguoiDung_DoiMatKhau",
+                "@Email", model.Email,
+                "@Password", model.Password,
+                "@Password_new", model.Password_new
+            );
+            if (string.IsNullOrEmpty(result))
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Message = "Đổi mật khẩu thành công"
+                };
+            }
+            else
+            {
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = result,
+                };
+            }
+        }
+        public async Task<ApiResponse<bool>> Lock_UnlockAsnyc(bool check, string email)
+        {
+            var result = await _dbHelper.ExecuteSProcedureAsync("sp_NguoiDung_DoiTrangThai", "@Email", email, "@TrangThai", check);
+            if (check == true)
+            {
+                if(result == null)
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = true,
+                        Message = "Mở khóa tài khoản thành công"
+                    };
+                }
+                else
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = false,
+                        Message = result
+                    };
+                }
+            }
+            else
+            {
+                if (result == string.Empty)
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = true,
+                        Message = "Đã khóa tài khoản"
+                    };
+                }
+                else
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = false,
+                        Message = result
+                    };
+                }
+            }
         }
     }
 }

@@ -1,7 +1,8 @@
-using Infrastructure.Interfaces;
+using GeneralService.Interfaces;
+using GeneralService.Service;
 using Infrastructure;
 using Infrastructure.Extensions;
-using GeneralService.Interfaces;
+using Infrastructure.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,9 +15,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
 builder.Services.AddScoped<IDatabaseHelper, DatabaseHelper>();
 
+builder.Services.AddScoped<ITinTucService, TinTucService>();
+builder.Services.AddScoped<IDiaDiemService, DiaDiemService>();
 builder.Services.AddScoped<IContactService, GeneralService.Services.ContactService>();
 
 // ==========================================
