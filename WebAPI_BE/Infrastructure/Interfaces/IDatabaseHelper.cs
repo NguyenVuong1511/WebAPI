@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Data.SqlClient;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks; // Cần thêm namespace này
@@ -35,7 +36,9 @@ namespace Infrastructure.Interfaces
         DataTable ExecuteQueryToDataTable(string strquery, out string msgError);
         object ExecuteScalar(string strquery, out string msgError);
         string ExecuteSProcedure(string procName, params object[] paramObjects);
+        public object ExecuteScalarSProcedure(out string msgError, string procName, params object[] paramObjects);
         DataTable ExecuteSProcedureReturnDataTable(out string msgError, string procName, params object[] paramObjects);
         List<string> ExecuteSProcedureWithTransaction(List<StoreParameterInfo> storeInfos);
+        Task<DataSet> ExecuteSProcedureReturnDataSetAsync(string spName, params object[] paramObjects);
     }
 }

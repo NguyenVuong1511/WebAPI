@@ -267,3 +267,95 @@ BEGIN
     SELECT GiaNguoiLon, GiaTreEm FROM Tour WHERE TourId = @TourId;
 END
 GO
+
+USE QuanLyDuLich;
+GO
+
+-- 1. Lấy danh sách đánh giá theo Tour (Kèm tên người dùng)
+CREATE PROCEDURE sp_DanhGia_GetByTourId
+    @TourId UNIQUEIDENTIFIER
+AS
+BEGIN
+    SELECT 
+        dg.DanhGiaId,
+        dg.TourId,
+        dg.NguoiDungId,
+        nd.HoTen AS TenNguoiDung, -- Join để lấy tên hiển thị lên UI
+        nd.Email,
+        dg.SoSao,
+        dg.BinhLuan,
+        dg.NgayDanhGia
+    FROM DanhGia dg
+    INNER JOIN NguoiDung nd ON dg.NguoiDungId = nd.NguoiDungId
+    WHERE dg.TourId = @TourId
+    ORDER BY dg.NgayDanhGia DESC;
+END
+GO
+
+-- 2. Thêm mới đánh giá
+CREATE PROCEDURE sp_DanhGia_Insert
+    @TourId UNIQUEIDENTIFIER,
+    @NguoiDungId UNIQUEIDENTIFIER,
+    @SoSao INT,
+    @BinhLuan NVARCHAR(MAX)
+AS
+BEGIN
+    INSERT INTO DanhGia (TourId, NguoiDungId, SoSao, BinhLuan, NgayDanhGia)
+    VALUES (@TourId, @NguoiDungId, @SoSao, @BinhLuan, GETDATE());
+END
+GO
+
+-- 3. Xóa đánh giá (Dành cho Admin nếu vi phạm)
+CREATE PROCEDURE sp_DanhGia_Delete
+    @DanhGiaId UNIQUEIDENTIFIER
+AS
+BEGIN
+    DELETE FROM DanhGia WHERE DanhGiaId = @DanhGiaId;
+END
+GO
+
+USE QuanLyDuLich;
+GO
+
+-- 1. Gửi liên hệ (Dành cho Khách hàng/Guest)
+CREATE OR ALTER PROCEDURE sp_LienHe_Insert
+    @HoTen NVARCHAR(200),
+    @Email NVARCHAR(200),
+    @TieuDe NVARCHAR(300),
+    @NoiDung NVARCHAR(MAX)
+AS
+BEGIN
+    INSERT INTO LienHe (HoTen, Email, TieuDe, NoiDung, NgayGui, DaXem)
+    VALUES (@HoTen, @Email, @TieuDe, @NoiDung, GETDATE(), 0);
+END
+GO
+
+-- 2. Lấy danh sách liên hệ (Dành cho Admin)
+CREATE OR ALTER PROCEDURE sp_LienHe_GetAll
+AS
+BEGIN
+    SELECT LienHeId, HoTen, Email, TieuDe, NoiDung, NgayGui, DaXem
+    FROM LienHe
+    ORDER BY DaXem ASC, NgayGui DESC; -- Ưu tiên hiện tin chưa xem trước, mới nhất lên đầu
+END
+GO
+
+-- 3. Đánh dấu đã xem (Dành cho Admin)
+CREATE OR ALTER PROCEDURE sp_LienHe_MarkAsRead
+    @LienHeId UNIQUEIDENTIFIER
+AS
+BEGIN
+    UPDATE LienHe
+    SET DaXem = 1
+    WHERE LienHeId = @LienHeId;
+END
+GO
+
+-- 4. Xóa liên hệ (Nếu cần dọn dẹp spam)
+CREATE OR ALTER PROCEDURE sp_LienHe_Delete
+    @LienHeId UNIQUEIDENTIFIER
+AS
+BEGIN
+    DELETE FROM LienHe WHERE LienHeId = @LienHeId;
+END
+GO

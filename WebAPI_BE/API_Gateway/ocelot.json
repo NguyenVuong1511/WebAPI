@@ -1,4 +1,8 @@
 {
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:18251" // <-- Port của chính Gateway
+  },
+  // --- Cấu hình các Routes
   "Routes": [
     {
       // --- Cấu hình cho AuthService ---
@@ -7,7 +11,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 44317 // <-- Kiểm tra đúng Port của AuthService trong launchSettings.json
+          "Port": 44317
         }
       ],
       "UpstreamPathTemplate": "/gateway/auth/{everything}",
@@ -33,7 +37,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 44360 // <-- Kiểm tra đúng Port của AuthService trong launchSettings.json
+          "Port": 44360
         }
       ],
       "UpstreamPathTemplate": "/gateway/loaitour/{everything}",
@@ -77,9 +81,45 @@
       ],
       "UpstreamPathTemplate": "/gateway/diadiem/{everything}",
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
+    },
+    {
+      // --- Cấu hình cho BookingThongKeService ---
+      "DownstreamPathTemplate": "/api/bookingthongke/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44312
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/bookingthongke/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
+    },
+    {
+      // --- Cấu hình cho FeedbackService ---
+      "DownstreamPathTemplate": "/api/feedback/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44301
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/feedback/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
+    },
+    {
+      // --- Cấu hình cho GeneralService ---
+      "DownstreamPathTemplate": "/api/contact/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44362
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/contact/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
     }
-  ],
-  "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:18251" // <-- Port của chính Gateway
-  }
+  ]
 }

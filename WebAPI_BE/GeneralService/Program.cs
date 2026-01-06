@@ -19,6 +19,7 @@ builder.Services.AddScoped<IDatabaseHelper, DatabaseHelper>();
 
 builder.Services.AddScoped<ITinTucService, TinTucService>();
 builder.Services.AddScoped<IDiaDiemService, DiaDiemService>();
+builder.Services.AddScoped<IContactService, GeneralService.Services.ContactService>();
 
 // ==========================================
 // 2. BUILD APP

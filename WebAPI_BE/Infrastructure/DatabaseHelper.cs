@@ -324,7 +324,6 @@ namespace Infrastructure
         {
             var errors = new List<string>();
 
-            // Dùng using để đảm bảo Connection tự đóng, không dùng biến toàn cục _connection để tránh conflict luồng
             using var conn = new SqlConnection(_connectionString);
             await conn.OpenAsync();
             using var trans = conn.BeginTransaction();
@@ -344,7 +343,7 @@ namespace Infrastructure
                     await cmd.ExecuteNonQueryAsync();
                 }
 
-                trans.Commit(); // Commit nếu chạy hết vòng lặp thành công
+                trans.Commit();
             }
             catch (Exception ex)
             {
@@ -353,6 +352,28 @@ namespace Infrastructure
             }
 
             return errors;
+        }
+        // Trong DatabaseHelper.cs
+
+        public async Task<DataSet> ExecuteSProcedureReturnDataSetAsync(string spName, params object[] paramObjects)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                // 1. Tái sử dụng hàm CreateCommand có sẵn của bạn.
+                // Hàm này đã có logic vòng lặp (i += 2) để xử lý cặp tham số ("@Key", Value).
+                using (SqlCommand cmd = CreateCommand(spName, conn, null, paramObjects))
+                {
+                    await conn.OpenAsync();
+
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        DataSet ds = new DataSet();
+                        // Adapter.Fill hỗ trợ lấy về nhiều bảng (Result Sets)
+                        adapter.Fill(ds);
+                        return ds;
+                    }
+                }
+            }
         }
     }
 }
