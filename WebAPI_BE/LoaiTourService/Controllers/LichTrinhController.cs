@@ -1,0 +1,59 @@
+﻿using DTO.LichTrinh;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using TourManageService.Interfaces;
+
+namespace TourManageService.Controllers
+{
+
+    [Authorize(Roles = "Admin")]
+    [ApiController]
+    [Route("api/[controller]")]
+    public class LichTrinhController : Controller
+    {
+        private readonly ILichTrinhService _lichTrinhService;
+
+        public LichTrinhController(ILichTrinhService lichTrinhService)
+        {
+            _lichTrinhService = lichTrinhService;
+        }
+
+        [HttpGet("get-by-tour/{tourId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetByTourId(Guid tourId)
+        {
+            var result = await _lichTrinhService.GetByTourId(tourId);
+            return Ok(result);
+        }
+
+
+        [HttpPost("create")]
+        public async Task<IActionResult> Create([FromBody] CreateLichTrinhDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _lichTrinhService.Create(request);
+            return Ok(result);
+        }
+
+        [HttpPut("update")]
+        public async Task<IActionResult> Update([FromBody] UpdateLichTrinhDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _lichTrinhService.Update(request);
+            return Ok(result);
+        }
+
+
+        [HttpDelete("delete/{lichTrinhId}")]
+        public async Task<IActionResult> Delete(Guid lichTrinhId)
+        {
+            var result = await _lichTrinhService.Delete(lichTrinhId);
+            return Ok(result);
+        }
+
+    }
+}

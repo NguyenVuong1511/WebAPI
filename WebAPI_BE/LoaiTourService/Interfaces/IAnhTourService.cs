@@ -1,0 +1,13 @@
+﻿using DTO.AnhTour;
+using Models;
+
+namespace TourManageService.Interfaces
+{
+    public interface IAnhTourService
+    {
+        Task<ApiResponse<List<AnhTourDTO>>> GetByTourId(Guid tourId);
+        Task<ApiResponse<Guid>> Create(CreateAnhTourDTO model);
+        Task<ApiResponse<bool>> Delete(Guid anhTourId);
+        Task<ApiResponse<bool>> SetAvatar(SetAnhTourAvatarDTO model);
+    }
+}

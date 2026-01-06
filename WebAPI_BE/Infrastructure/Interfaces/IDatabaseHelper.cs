@@ -26,7 +26,7 @@ namespace Infrastructure.Interfaces
         // 3. Thực thi Transaction nhiều thủ tục (VD: Create Booking + Create Detail)
         // Trả về danh sách lỗi (List<string>). Nếu Count == 0 là thành công.
         Task<List<string>> ExecuteSProcedureWithTransactionAsync(List<StoreParameterInfo> storeInfos);
-        
+
         // ==========================================
         // CÁC HÀM SYNC CŨ (Giữ lại để không lỗi code cũ)
         // ==========================================
@@ -38,6 +38,7 @@ namespace Infrastructure.Interfaces
         string ExecuteSProcedure(string procName, params object[] paramObjects);
         public object ExecuteScalarSProcedure(out string msgError, string procName, params object[] paramObjects);
         DataTable ExecuteSProcedureReturnDataTable(out string msgError, string procName, params object[] paramObjects);
+        object ExecuteScalarSProcedure(out string msgError, string procName, params object[] paramObjects);
         List<string> ExecuteSProcedureWithTransaction(List<StoreParameterInfo> storeInfos);
         Task<DataSet> ExecuteSProcedureReturnDataSetAsync(string spName, params object[] paramObjects);
     }

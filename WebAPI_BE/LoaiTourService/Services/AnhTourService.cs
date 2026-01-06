@@ -1,0 +1,148 @@
+﻿using DTO.AnhTour;
+using Infrastructure.Interfaces;
+using Models;
+using System.Data;
+using TourManageService.Interfaces;
+namespace TourManageService.Services
+{
+    public class AnhTourService : IAnhTourService
+    {
+        private readonly IDatabaseHelper _dbHelper;
+
+        public AnhTourService(IDatabaseHelper dbHelper)
+        {
+            _dbHelper = dbHelper;
+        }
+
+        public async Task<ApiResponse<List<AnhTourDTO>>> GetByTourId(Guid tourId)
+        {
+            return await Task.Run(() =>
+            {
+                string msgError;
+
+                var table = _dbHelper.ExecuteSProcedureReturnDataTable(
+                    out msgError,
+                    "sp_AnhTour_GetByTourId",
+                    "@TourId", tourId
+                );
+
+                if (!string.IsNullOrEmpty(msgError))
+                {
+                    return new ApiResponse<List<AnhTourDTO>>
+                    {
+                        Success = false,
+                        Code = "SQL_ERROR",
+                        Message = msgError
+                    };
+                }
+
+                var data = table.AsEnumerable().Select(r => new AnhTourDTO
+                {
+                    AnhTourId = r.Field<Guid>("AnhTourId"),
+                    TourId = r.Field<Guid>("TourId"),
+                    LinkAnh = r.Field<string>("LinkAnh"),
+                    IsAvatar = r.Field<bool>("IsAvatar")
+                }).ToList();
+
+                return new ApiResponse<List<AnhTourDTO>>
+                {
+                    Success = true,
+                    Code = "SUCCESS",
+                    Message = "Lấy danh sách ảnh tour thành công",
+                    Data = data
+                };
+            });
+        }
+
+        public async Task<ApiResponse<Guid>> Create(CreateAnhTourDTO model)
+        {
+            return await Task.Run(() =>
+            {
+                string msgError;
+
+                var result = _dbHelper.ExecuteScalarSProcedure(
+                    out msgError,
+                    "sp_AnhTour_Insert",
+                    "@TourId", model.TourId,
+                    "@LinkAnh", model.LinkAnh
+                );
+
+                if (!string.IsNullOrEmpty(msgError) || result == null)
+                {
+                    return new ApiResponse<Guid>
+                    {
+                        Success = false,
+                        Code = "SQL_ERROR",
+                        Message = msgError
+                    };
+                }
+
+                return new ApiResponse<Guid>
+                {
+                    Success = true,
+                    Code = "CREATED",
+                    Message = "Upload ảnh thành công",
+                    Data = (Guid)result
+                };
+            });
+        }
+
+        public async Task<ApiResponse<bool>> Delete(Guid anhTourId)
+        {
+            return await Task.Run(() =>
+            {
+                var msgError = _dbHelper.ExecuteSProcedure(
+                    "sp_AnhTour_Delete",
+                    "@AnhTourId", anhTourId
+                );
+                if (!string.IsNullOrEmpty(msgError))
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = false,
+                        Code = "SQL_ERROR",
+                        Message = msgError
+                    };
+                }
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Code = "DELETED",
+                    Message = "Xoá ảnh thành công",
+                    Data = true
+                };
+            });
+        }
+        public async Task<ApiResponse<bool>> SetAvatar(SetAnhTourAvatarDTO model)
+        {
+            return await Task.Run(() =>
+            {
+                var msgError = _dbHelper.ExecuteSProcedure(
+                    "sp_AnhTour_SetAvatar",
+                    "@AnhTourId", model.AnhTourId,
+                    "@TourId", model.TourId
+                );
+
+                if (!string.IsNullOrEmpty(msgError))
+                {
+                    return new ApiResponse<bool>
+                    {
+                        Success = false,
+                        Code = "SQL_ERROR",
+                        Message = msgError
+                    };
+                }
+
+                return new ApiResponse<bool>
+                {
+                    Success = true,
+                    Code = "SUCCESS",
+                    Message = "Đặt ảnh đại diện thành công",
+                    Data = true
+                };
+            });
+        }
+
+
+    }
+}

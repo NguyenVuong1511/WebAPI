@@ -3,6 +3,7 @@ using Infrastructure;
 using Infrastructure.Interfaces;
 using Models;
 using System.Data;
+using System.Text.RegularExpressions;
 using TourManageService.Interface;
 
 
@@ -15,6 +16,31 @@ namespace TourManageService.Services
         public LoaiTourService(IDatabaseHelper dbHelper)
         {
             _dbHelper = dbHelper;
+        }
+        private static string NormalizeTenLoai(string? input)
+        {
+            if (input == null) return string.Empty;
+            return Regex.Replace(input.Trim(), @"\s+", " ");
+        }
+
+        private static string? NormalizeNullable(string? input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return null;
+            return input.Trim();
+        }
+
+        private static string MapErrorToCode(string msg)
+        {
+            if (string.IsNullOrWhiteSpace(msg)) return "SQL_ERROR";
+
+            var m = msg.ToLowerInvariant();
+
+            if (m.Contains("đã tồn tại")) return "DUPLICATE";
+            if (m.Contains("không tìm thấy")) return "NOT_FOUND";
+            if (m.Contains("không thể xoá") || m.Contains("đang được sử dụng")) return "IN_USE";
+            if (m.Contains("không được để trống") || m.Contains("tối đa")) return "INVALID_DATA";
+
+            return "SQL_ERROR";
         }
         public async Task<ApiResponse<List<LoaiTourDTO>>> GetAll()
         {
@@ -50,6 +76,15 @@ namespace TourManageService.Services
         }
         public async Task<ApiResponse<LoaiTourDTO>> GetById(Guid id)
         {
+            if (id == Guid.Empty)
+            {
+                return new ApiResponse<LoaiTourDTO>
+                {
+                    Success = false,
+                    Code = "INVALID_DATA",
+                    Message = "LoaiTourId không hợp lệ"
+                };
+            }
             return await Task.Run(() =>
             {
                 string msgError;
@@ -64,7 +99,7 @@ namespace TourManageService.Services
                     return new ApiResponse<LoaiTourDTO>
                     {
                         Success = false,
-                        Code = "SQL_ERROR",
+                        Code = MapErrorToCode(msgError),
                         Message = msgError
                     };
                 }
@@ -97,6 +132,38 @@ namespace TourManageService.Services
         }
         public async Task<ApiResponse<bool>> Create(CreateLoaiTourDTO model)
         {
+            if (model == null)
+            {
+                return new ApiResponse<bool> 
+                { 
+                    Success = false, 
+                    Code = "INVALID_DATA", 
+                    Message = "Dữ liệu không hợp lệ" 
+                };
+            }
+
+            var tenLoai = NormalizeTenLoai(model.TenLoai);
+            if (string.IsNullOrWhiteSpace(tenLoai))
+            {
+                return new ApiResponse<bool> 
+                { 
+                    Success = false, 
+                    Code = "INVALID_DATA", 
+                    Message = "Tên loại không được để trống" 
+                };
+            }
+
+            if (tenLoai.Length > 100)
+            {
+                return new ApiResponse<bool> 
+                { Success = false, 
+                    Code = "INVALID_DATA", 
+                    Message = "Tên loại tối đa 100 ký tự" 
+                };
+            }
+
+            var moTa = NormalizeNullable(model.MoTa);
+
             return await Task.Run(() =>
             {
                 var msgError = _dbHelper.ExecuteSProcedure(
@@ -110,7 +177,7 @@ namespace TourManageService.Services
                     return new ApiResponse<bool>
                     {
                         Success = false,
-                        Code = "DUPLICATE",
+                        Code = MapErrorToCode(msgError),
                         Message = msgError
                     };
                 }
@@ -126,6 +193,49 @@ namespace TourManageService.Services
         }
         public async Task<ApiResponse<bool>> Update(UpdateLoaiTourDTO model)
         {
+            if (model == null)
+            {
+                return new ApiResponse<bool> 
+                { 
+                    Success = false, 
+                    Code = "INVALID_DATA", 
+                    Message = "Dữ liệu không hợp lệ" 
+                };
+            }
+
+            if (model.LoaiTourId == Guid.Empty)
+            {
+                return new ApiResponse<bool> 
+                { 
+                    Success = false, 
+                    Code = "INVALID_DATA", 
+                    Message = "LoaiTourId không hợp lệ" 
+                };
+            }
+
+            var tenLoai = NormalizeTenLoai(model.TenLoai);
+            if (string.IsNullOrWhiteSpace(tenLoai))
+            {
+                return new ApiResponse<bool> 
+                { 
+                    Success = false, 
+                    Code = "INVALID_DATA", 
+                    Message = "Tên loại không được để trống" 
+                };
+            }
+
+            if (tenLoai.Length > 100)
+            {
+                return new ApiResponse<bool> 
+                { 
+                    Success = false, 
+                    Code = "INVALID_DATA", 
+                    Message = "Tên loại tối đa 100 ký tự" 
+                };
+            }
+
+            var moTa = NormalizeNullable(model.MoTa);
+
             return await Task.Run(() =>
             {
                 var msgError = _dbHelper.ExecuteSProcedure(
@@ -140,7 +250,7 @@ namespace TourManageService.Services
                     return new ApiResponse<bool>
                     {
                         Success = false,
-                        Code = "DUPLICATE",
+                        Code = MapErrorToCode(msgError),
                         Message = msgError
                     };
                 }
@@ -156,6 +266,15 @@ namespace TourManageService.Services
         }
         public async Task<ApiResponse<bool>> Delete(Guid id)
         {
+            if (id == Guid.Empty)
+            {
+                return new ApiResponse<bool> 
+                { 
+                    Success = false, 
+                    Code = "INVALID_DATA", 
+                    Message = "LoaiTourId không hợp lệ" 
+                };
+            }
             return await Task.Run(() =>
             {
                 var msgError = _dbHelper.ExecuteSProcedure(
@@ -168,7 +287,7 @@ namespace TourManageService.Services
                     return new ApiResponse<bool>
                     {
                         Success = false,
-                        Code = "SQL_ERROR",
+                        Code = MapErrorToCode(msgError),
                         Message = msgError
                     };
                 }
