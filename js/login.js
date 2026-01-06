@@ -1,114 +1,183 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('login-form');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const togglePasswordBtn = document.getElementById('toggle-password');
-    const feedback = document.getElementById('login-feedback');
+(() => {
+    const app = angular.module('travelApp', []);
 
-    function showFeedback(message, type = 'success') {
-        if (!feedback) return;
-        feedback.textContent = message;
-        feedback.className = `form-feedback ${type}`;
-    }
+    app.constant('API_CONFIG', {
+        // Chọn 1 đường gọi API: Gateway hoặc AuthService trực tiếp
+        USE_GATEWAY: false, // Để true nếu Gateway đã bật CORS
+        GATEWAY_URL: 'http://localhost:18251/gateway',
+        AUTH_SERVICE_URL: 'http://localhost:16787/api', // Nếu dùng HTTPS đổi thành https://localhost:44317/api
+        ENDPOINTS: {
+            LOGIN: '/auth/login'
+        }
+    });
 
-    if (togglePasswordBtn && passwordInput) {
-        togglePasswordBtn.addEventListener('click', () => {
-            const isHidden = passwordInput.type === 'password';
-            passwordInput.type = isHidden ? 'text' : 'password';
-            togglePasswordBtn.textContent = isHidden ? '🙈' : '👁️';
-            togglePasswordBtn.setAttribute('aria-label', isHidden ? 'Ẩn mật khẩu' : 'Hiện mật khẩu');
-        });
-    }
+    app.service('SessionService', ['$window', function ($window) {
+        const STORAGE_KEY = 'user';
 
-    if (form && emailInput && passwordInput) {
-        form.addEventListener('submit', (event) => {
-            event.preventDefault();
-            if (!emailInput.checkValidity()) {
-                showFeedback('Vui lòng nhập email hợp lệ.', 'error');
-                emailInput.focus();
-                return;
+        this.bootstrapFromLocal = function () {
+            const cachedUser = $window.localStorage.getItem(STORAGE_KEY);
+            if (cachedUser && !$window.sessionStorage.getItem(STORAGE_KEY)) {
+                $window.sessionStorage.setItem(STORAGE_KEY, cachedUser);
             }
+        };
 
-            if (!passwordInput.checkValidity()) {
-                showFeedback('Mật khẩu cần ít nhất 6 ký tự.', 'error');
-                passwordInput.focus();
-                return;
-            }
-
-            // Demo accounts - Dựa trên database schema
-            const demoAccounts = {
-                'admin@dulich.com': {
-                    password: 'admin123',
-                    role: 'Quản Trị Viên',
-                    name: 'Nguyễn Văn A',
-                    redirect: 'admin-dashboard.html'
-                },
-                'manager@dulich.com': {
-                    password: 'manager123',
-                    role: 'Quản Lý',
-                    name: 'Trần Thị B',
-                    redirect: 'admin-dashboard.html'
-                },
-                'nhanvien@dulich.com': {
-                    password: 'nhanvien123',
-                    role: 'Nhân viên',
-                    name: 'Nguyễn Thị F',
-                    redirect: 'staff-dashboard.html'
-                },
-                'khachhang1@email.com': {
-                    password: 'kh123456',
-                    role: 'Khách Hàng',
-                    name: 'Lê Văn C',
-                    redirect: 'customer-dashboard.html'
-                },
-                'khachhang2@email.com': {
-                    password: 'kh123456',
-                    role: 'Khách Hàng',
-                    name: 'Phạm Thị D',
-                    redirect: 'customer-dashboard.html'
-                },
-                'khachhang3@email.com': {
-                    password: 'kh123456',
-                    role: 'Khách Hàng',
-                    name: 'Hoàng Minh E',
-                    redirect: 'customer-dashboard.html'
-                }
+        this.saveUser = function (user, remember) {
+            const payload = {
+                email: user.email,
+                role: user.role,
+                accessToken: user.accessToken
             };
 
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
+            $window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
 
-            // Kiểm tra tài khoản demo
-            const account = demoAccounts[email];
-            
-            if (!account) {
-                showFeedback('Email không tồn tại trong hệ thống.', 'error');
-                emailInput.focus();
-                return;
+            if (remember) {
+                $window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+            } else {
+                $window.localStorage.removeItem(STORAGE_KEY);
             }
+        };
 
-            if (account.password !== password) {
-                showFeedback('Mật khẩu không chính xác.', 'error');
-                passwordInput.focus();
-                return;
+        this.getStoredUser = function () {
+            const raw = $window.sessionStorage.getItem(STORAGE_KEY) || $window.localStorage.getItem(STORAGE_KEY);
+            if (!raw) return null;
+            try {
+                return JSON.parse(raw);
+            } catch (error) {
+                return null;
             }
+        };
+    }]);
 
-            // Lưu thông tin đăng nhập vào sessionStorage (tạm thời)
-            sessionStorage.setItem('user', JSON.stringify({
-                email: email,
-                name: account.name,
-                role: account.role
-            }));
-
-            showFeedback(`Đăng nhập thành công! Chào mừng ${account.name}`, 'success');
-            form.classList.add('is-loading');
-
-            // Redirect sau 1.5 giây
-            setTimeout(() => {
-                form.classList.remove('is-loading');
-                window.location.href = account.redirect;
-            }, 1500);
-        });
+    // Helper đơn giản để chuẩn hóa response/data từ BE (camelCase hoặc PascalCase)
+    function normalizeResponse(raw) {
+        const success = raw?.success ?? raw?.Success ?? false;
+        const message = raw?.message ?? raw?.Message ?? '';
+        const data = raw?.data ?? raw?.Data ?? {};
+        return {
+            success,
+            message,
+            data: {
+                email: data.email ?? data.Email ?? '',
+                role: data.role ?? data.Role ?? '',
+                accessToken: data.accessToken ?? data.AccessToken ?? ''
+            }
+        };
     }
-});
 
+    app.service('AuthService', ['$http', 'API_CONFIG', '$q', function ($http, API_CONFIG, $q) {
+        this.login = function (payload) {
+            const baseUrl = API_CONFIG.USE_GATEWAY ? API_CONFIG.GATEWAY_URL : API_CONFIG.AUTH_SERVICE_URL;
+            const url = baseUrl + API_CONFIG.ENDPOINTS.LOGIN;
+
+            return $http.post(url, {
+                email: payload.email,
+                password: payload.password
+            }, {
+                headers: { 'Content-Type': 'application/json' },
+                timeout: 10000
+            }).then(function (response) {
+                return normalizeResponse(response.data);
+            }).catch(function (error) {
+                const norm = normalizeResponse(error?.data || {});
+                const fallback = error?.status === 0
+                    ? 'Không thể kết nối server. Kiểm tra API chạy & CORS.'
+                    : (norm.message || error?.message || 'Đăng nhập thất bại');
+
+                return $q.reject({
+                    message: fallback,
+                    data: norm.data,
+                    status: error?.status
+                });
+            });
+        };
+    }]);
+
+    app.factory('RedirectService', [function () {
+        const redirectMap = {
+            'Admin': 'admin-dashboard.html',
+            'Khách Hàng': 'index.html'
+        };
+
+        return {
+            getRedirectUrl(role) {
+                return redirectMap[role] || 'customer-dashboard.html';
+            }
+        };
+    }]);
+
+    app.controller('LoginController', [
+        '$timeout',
+        '$window',
+        'AuthService',
+        'SessionService',
+        'RedirectService',
+        function ($timeout, $window, AuthService, SessionService, RedirectService) {
+            const vm = this;
+            vm.form = {
+                email: '',
+                password: '',
+                remember: true
+            };
+            vm.loading = false;
+            vm.showPassword = false;
+            vm.feedback = {};
+
+            SessionService.bootstrapFromLocal();
+            const existingUser = SessionService.getStoredUser();
+            if (existingUser && existingUser.email) {
+                vm.form.email = existingUser.email;
+                vm.form.remember = Boolean($window.localStorage.getItem('user'));
+            }
+
+            vm.togglePassword = function () {
+                vm.showPassword = !vm.showPassword;
+            };
+
+            vm.submit = function (form) {
+                if (form && form.$invalid) {
+                    vm.feedback = { type: 'error', message: 'Vui lòng điền đầy đủ thông tin hợp lệ.' };
+                    return;
+                }
+
+                vm.loading = true;
+                vm.feedback = {};
+
+                AuthService.login(vm.form)
+                    .then(function(result) {
+                        if (!result.success) {
+                            vm.feedback = { type: 'error', message: result.message || 'Đăng nhập thất bại. Vui lòng thử lại.' };
+                            return;
+                        }
+
+                        var data = result.data || {};
+                        if (!data.email || !data.role || !data.accessToken) {
+                            vm.feedback = { type: 'error', message: 'Dữ liệu đăng nhập không hợp lệ. Vui lòng thử lại.' };
+                            return;
+                        }
+
+                        SessionService.saveUser({
+                            email: data.email,
+                            role: data.role,
+                            accessToken: data.accessToken
+                        }, vm.form.remember);
+
+                        vm.feedback = { type: 'success', message: result.message || 'Đăng nhập thành công!' };
+
+                        $timeout(function() {
+                            var redirectUrl = RedirectService.getRedirectUrl(data.role);
+                            $window.location.href = redirectUrl;
+                        }, 800);
+                    })
+                    .catch(function(error) {
+                        vm.feedback = {
+                            type: 'error',
+                            message: error.message || 'Không thể đăng nhập. Vui lòng kiểm tra email/mật khẩu.'
+                        };
+                    })
+                    .finally(function() {
+                        vm.loading = false;
+                    });
+            };
+        }
+    ]);
+})();

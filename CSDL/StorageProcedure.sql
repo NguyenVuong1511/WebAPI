@@ -300,3 +300,41 @@ BEGIN
     DELETE FROM LienHe WHERE LienHeId = @LienHeId;
 END
 GO
+
+USE QuanLyDuLich;
+GO
+
+CREATE OR ALTER PROCEDURE sp_ThongKe_Dashboard
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- BẢNG 1: SỐ LIỆU TỔNG QUÁT (Doanh thu & Số booking tháng này)
+    SELECT 
+        -- Tổng doanh thu (Chỉ tính các đơn KHÔNG PHẢI trạng thái 'Hủy' hoặc 'Chờ xác nhận' nếu muốn chặt chẽ hơn)
+        ISNULL(SUM(CASE WHEN TrangThaiThanhToan = N'Đã thanh toán' THEN TongTien ELSE 0 END), 0) AS TongDoanhThu,
+        
+        -- Tổng số Booking trong tháng hiện tại
+        (SELECT COUNT(BookingId) 
+         FROM Booking 
+         WHERE MONTH(NgayDat) = MONTH(GETDATE()) 
+           AND YEAR(NgayDat) = YEAR(GETDATE())) AS BookingTrongThang,
+
+        -- Tổng số khách hàng (User)
+        (SELECT COUNT(NguoiDungId) FROM NguoiDung WHERE VaiTro = N'Khách Hàng') AS TongKhachHang
+
+    FROM Booking;
+
+    -- BẢNG 2: TOP 5 TOUR NỔI BẬT (Được đặt nhiều nhất)
+    SELECT TOP 5 
+        t.TenTour,
+        t.GiaNguoiLon,
+        COUNT(b.BookingId) AS SoLuotDat,
+        ISNULL(SUM(b.TongTien), 0) AS DoanhThuTour
+    FROM Booking b
+    INNER JOIN Tour t ON b.TourId = t.TourId
+    WHERE b.TrangThaiThanhToan <> N'Hủy' -- Không tính đơn hủy
+    GROUP BY t.TenTour, t.GiaNguoiLon
+    ORDER BY COUNT(b.BookingId) DESC;
+END
+GO
