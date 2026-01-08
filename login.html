@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" ng-app="travelApp">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/login.css">
 </head>
-<body class="auth-body" ng-controller="LoginController as vm">
+<body class="auth-body">
     <header class="auth-header">
         <a href="index.html" class="auth-logo">
             <img src="img/Logo.png" alt="Travel Viet Logo">
@@ -51,12 +51,7 @@
                     <h2>Chào mừng trở lại 👋</h2>
                     <p>Nhập thông tin để tiếp tục hành trình cùng Travel Viet.</p>
                 </div>
-                <form id="login-form"
-                      name="loginForm"
-                      class="auth-form"
-                      ng-class="{'is-loading': vm.loading}"
-                      ng-submit="vm.submit(loginForm)"
-                      novalidate>
+                <form id="login-form" class="auth-form" novalidate>
                     <div class="form-group">
                         <label for="email">Email</label>
                         <div class="input-field">
@@ -64,8 +59,6 @@
                                    id="email"
                                    name="email"
                                    placeholder="ban@domain.com"
-                                   ng-model="vm.form.email"
-                                   ng-disabled="vm.loading"
                                    required>
                             <span class="input-icon">✉️</span>
                         </div>
@@ -73,44 +66,37 @@
                     <div class="form-group">
                         <label for="password">Mật khẩu</label>
                         <div class="input-field password-field">
-                            <input ng-attr-type="{{vm.showPassword ? 'text' : 'password'}}"
+                            <input type="password"
                                    id="password"
                                    name="password"
                                    placeholder="••••••••"
-                                   ng-model="vm.form.password"
-                                   ng-disabled="vm.loading"
                                    required
                                    minlength="6">
                             <button type="button"
                                     class="toggle-password"
                                     aria-label="Hiện mật khẩu"
-                                    id="toggle-password"
-                                    ng-click="vm.togglePassword()">
-                                {{ vm.showPassword ? '🙈' : '👁️' }}
+                                    id="toggle-password">
+                                👁️
                             </button>
                         </div>
                     </div>
                     <div class="form-meta">
                         <label class="remember-me">
                             <input type="checkbox"
+                                   id="remember"
                                    name="remember"
-                                   ng-model="vm.form.remember"
-                                   ng-disabled="vm.loading">
+                                   checked>
                             <span>Ghi nhớ đăng nhập</span>
                         </label>
                         <a href="#" class="forgot-password">Quên mật khẩu?</a>
                     </div>
-                    <button type="submit"
-                            class="auth-submit"
-                            ng-disabled="loginForm.$invalid || vm.loading">
-                        {{ vm.loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+                    <button type="submit" class="auth-submit">
+                        Đăng nhập
                     </button>
                     <div id="login-feedback"
                          class="form-feedback"
-                         aria-live="polite"
-                         ng-if="vm.feedback.message"
-                         ng-class="vm.feedback.type">
-                        {{ vm.feedback.message }}
+                         style="display: none;"
+                         aria-live="polite">
                     </div>
                     <div class="divider">
                         <span>Hoặc</span>
@@ -134,7 +120,8 @@
         </section>
     </main>
 
-    <script src="js/angular.min.js"></script>
+    <script src="js/api-config.js"></script>
+    <script src="js/auth-helper.js"></script>
     <script src="js/login.js"></script>
 </body>
 </html>

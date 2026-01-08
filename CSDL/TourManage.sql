@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 ﻿use QuanLyDuLich
 GO
 
@@ -541,74 +541,135 @@ BEGIN
     DELETE FROM AnhTour
     WHERE AnhTourId = @AnhTourId;
 END
-=======
-﻿use QuanLyDuLich
-GO
 
-----------------------------------------------------------------
--- ------------------------- LOAI TOUR -------------------------
-----------------------------------------------------------------
-CREATE PROCEDURE sp_GetAllLoaiTour
+
+-------------------------------------------------------------
+-------------------LICH TRINH----------------------------------
+CREATE PROCEDURE [dbo].[sp_LichTrinh_GetByTourId]
+    @TourId UNIQUEIDENTIFIER
 AS
 BEGIN
-    SELECT LoaiTourId, TenLoai, MoTa
-    FROM LoaiTour;
-END;
-GO
+    SET NOCOUNT ON;
 
-CREATE PROCEDURE sp_AddLoaiTour
-    @TenLoai NVARCHAR(100),
-    @MoTa NVARCHAR(MAX)
-AS
-BEGIN
-    IF EXISTS (SELECT 1 FROM LoaiTour WHERE TenLoai = @TenLoai)
+    -- 1. Kiểm tra Tour tồn tại
+    IF NOT EXISTS (
+        SELECT 1 FROM Tour WHERE TourId = @TourId
+    )
     BEGIN
-        RAISERROR('Tên loại tour này đã tồn tại!', 16, 1);
+        RAISERROR(N'Không tìm thấy tour!', 16, 1);
         RETURN;
     END
 
-    INSERT INTO LoaiTour (TenLoai, MoTa)
-    VALUES (@TenLoai, @MoTa);
-END;
-
+    -- 2. Lấy lịch trình
+    SELECT
+        LichTrinhId,
+        TourId,
+        NgayThu,
+        TieuDe,
+        NoiDung
+    FROM LichTrinh
+    WHERE TourId = @TourId
+    ORDER BY NgayThu ASC;
+END
 GO
 
-CREATE PROCEDURE sp_UpdateLoaiTour
-    @LoaiTourId UNIQUEIDENTIFIER,
-    @TenLoai NVARCHAR(100),
-    @MoTa NVARCHAR(MAX)
+
+CREATE PROCEDURE [dbo].[sp_LichTrinh_Insert]
+    @TourId UNIQUEIDENTIFIER,
+    @NgayThu INT,
+    @TieuDe NVARCHAR(300),
+    @NoiDung NVARCHAR(MAX)
 AS
 BEGIN
-    IF EXISTS (SELECT 1 FROM LoaiTour WHERE TenLoai = @TenLoai AND LoaiTourId <> @LoaiTourId)
+    SET NOCOUNT ON;
+
+    -- 1. Kiểm tra Tour tồn tại
+    IF NOT EXISTS (
+        SELECT 1 FROM Tour WHERE TourId = @TourId
+    )
     BEGIN
-        RAISERROR('Tên loại tour này đã tồn tại!', 16, 1);
+        RAISERROR(N'Không tìm thấy tour để thêm lịch trình!', 16, 1);
         RETURN;
     END
 
-    UPDATE LoaiTour
-    SET TenLoai = @TenLoai,
-        MoTa = @MoTa
-    WHERE LoaiTourId = @LoaiTourId;
-END;
+    -- 2. Validate Ngày thứ
+    IF @NgayThu <= 0
+    BEGIN
+        RAISERROR(N'Ngày thứ phải lớn hơn 0!', 16, 1);
+        RETURN;
+    END
 
+    -- 3. Insert
+    INSERT INTO LichTrinh
+    (
+        TourId,
+        NgayThu,
+        TieuDe,
+        NoiDung
+    )
+    OUTPUT INSERTED.LichTrinhId
+    VALUES
+    (
+        @TourId,
+        @NgayThu,
+        @TieuDe,
+        @NoiDung
+    );
+END
 GO
 
-CREATE PROCEDURE sp_DeleteLoaiTour
-    @LoaiTourId UNIQUEIDENTIFIER
-AS
-BEGIN
-    DELETE FROM LoaiTour
-    WHERE LoaiTourId = @LoaiTourId;
-END;
-GO
 
-CREATE PROCEDURE sp_GetLoaiTourById
-    @LoaiTourId UNIQUEIDENTIFIER
+CREATE PROCEDURE [dbo].[sp_LichTrinh_Update]
+    @LichTrinhId UNIQUEIDENTIFIER,
+    @NgayThu INT,
+    @TieuDe NVARCHAR(300),
+    @NoiDung NVARCHAR(MAX)
 AS
 BEGIN
-    SELECT LoaiTourId, TenLoai, MoTa
-    FROM LoaiTour
-    WHERE LoaiTourId = @LoaiTourId;
-END;
->>>>>>> 546ce29f44de3df8c16f1b30b3d1399b466ff9fa
+    SET NOCOUNT ON;
+
+    -- 1. Kiểm tra tồn tại
+    IF NOT EXISTS (
+        SELECT 1 FROM LichTrinh WHERE LichTrinhId = @LichTrinhId
+    )
+    BEGIN
+        RAISERROR(N'Không tìm thấy lịch trình cần cập nhật!', 16, 1);
+        RETURN;
+    END
+
+    -- 2. Validate Ngày thứ
+    IF @NgayThu <= 0
+    BEGIN
+        RAISERROR(N'Ngày thứ phải lớn hơn 0!', 16, 1);
+        RETURN;
+    END
+
+    -- 3. Update
+    UPDATE LichTrinh
+    SET
+        NgayThu = @NgayThu,
+        TieuDe = @TieuDe,
+        NoiDung = @NoiDung
+    WHERE LichTrinhId = @LichTrinhId;
+END
+GO
+CREATE PROCEDURE [dbo].[sp_LichTrinh_Delete]
+    @LichTrinhId UNIQUEIDENTIFIER
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- 1. Kiểm tra tồn tại
+    IF NOT EXISTS (
+        SELECT 1 FROM LichTrinh WHERE LichTrinhId = @LichTrinhId
+    )
+    BEGIN
+        RAISERROR(N'Không tìm thấy lịch trình cần xoá!', 16, 1);
+        RETURN;
+    END
+
+    -- 2. Xoá
+    DELETE FROM LichTrinh
+    WHERE LichTrinhId = @LichTrinhId;
+END
 GO

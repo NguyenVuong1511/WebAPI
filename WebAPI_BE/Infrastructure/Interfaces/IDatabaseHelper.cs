@@ -38,7 +38,7 @@ namespace Infrastructure.Interfaces
         string ExecuteSProcedure(string procName, params object[] paramObjects);
         public object ExecuteScalarSProcedure(out string msgError, string procName, params object[] paramObjects);
         DataTable ExecuteSProcedureReturnDataTable(out string msgError, string procName, params object[] paramObjects);
-        object ExecuteScalarSProcedure(out string msgError, string procName, params object[] paramObjects);
+       
         List<string> ExecuteSProcedureWithTransaction(List<StoreParameterInfo> storeInfos);
         Task<DataSet> ExecuteSProcedureReturnDataSetAsync(string spName, params object[] paramObjects);
     }

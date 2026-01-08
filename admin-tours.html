@@ -79,45 +79,88 @@
                         <div class="admin-user-name" id="user-name">Nguyễn Văn A</div>
                         <div class="admin-user-role" id="user-role">Quản Trị Viên</div>
                     </div>
+                    <button onclick="logout()" style="margin-left: 15px; padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Đăng xuất</button>
                 </div>
             </div>
 
+            <!-- Tab Navigation -->
             <div class="dashboard-section">
-                <div class="filter-section">
-                    <input type="text" id="search-input" class="filter-input" placeholder="Tìm kiếm theo tên tour...">
-                    <select id="status-filter" class="filter-select">
-                        <option value="">Tất cả trạng thái</option>
-                        <option value="Đã phát hành">Đã phát hành</option>
-                        <option value="Bản nháp">Bản nháp</option>
-                        <option value="Đã hủy">Đã hủy</option>
-                    </select>
-                    <button class="cta-button cta-primary" onclick="loadTours()">🔍 Tìm kiếm</button>
-                    <button class="cta-button cta-secondary" onclick="showAddTourModal()">➕ Tạo Tour mới</button>
+                <div class="tab-navigation">
+                    <button class="tab-nav-btn active" onclick="switchMainTab('tours')">📋 Quản lý Tour</button>
+                    <button class="tab-nav-btn" onclick="switchMainTab('categories')">📂 Loại Tour</button>
                 </div>
             </div>
 
-            <div class="dashboard-section">
-                <h2 class="section-title">Danh sách Tour</h2>
-                <div class="table-container">
-                    <table class="bookings-table">
-                        <thead>
-                            <tr>
-                                <th>Tên Tour</th>
-                                <th>Mô tả ngắn</th>
-                                <th>Số ngày</th>
-                                <th>Ngày bắt đầu</th>
-                                <th>Ngày kết thúc</th>
-                                <th>Trạng thái</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tours-table-body"></tbody>
-                    </table>
+            <!-- Tours Tab -->
+            <div id="tours-tab" class="tab-panel active">
+                <div class="dashboard-section">
+                    <div class="filter-section">
+                        <input type="text" id="search-input" class="filter-input" placeholder="🔍 Tìm kiếm theo tên tour...">
+                        <select id="loaitour-filter" class="filter-select">
+                            <option value="">Tất cả loại tour</option>
+                        </select>
+                        <select id="status-filter" class="filter-select">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="Hoạt động">Hoạt động</option>
+                            <option value="Không hoạt động">Không hoạt động</option>
+                        </select>
+                        <button class="cta-button cta-primary" onclick="loadTours()">Tìm kiếm</button>
+                        <button class="cta-button cta-secondary" onclick="showAddTourModal()">➕ Tạo Tour mới</button>
+                    </div>
+                </div>
+
+                <div class="dashboard-section">
+                    <h2 class="section-title">Danh sách Tour</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: var(--spacing-md);">
+                        💡 Nhấn vào <strong>"👁️ Chi tiết"</strong> để quản lý <strong>Lịch trình</strong> và <strong>Ảnh Tour</strong>
+                    </p>
+                    <div class="table-container">
+                        <table class="bookings-table">
+                            <thead>
+                                <tr>
+                                    <th>Tên Tour</th>
+                                    <th>Loại Tour</th>
+                                    <th>Mô tả ngắn</th>
+                                    <th>Giá người lớn</th>
+                                    <th>Giá trẻ em</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tours-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories Tab -->
+            <div id="categories-tab" class="tab-panel" style="display: none;">
+                <div class="dashboard-section">
+                    <div class="filter-section">
+                        <button class="cta-button cta-secondary" onclick="showAddCategoryModal()">➕ Thêm Loại Tour</button>
+                    </div>
+                </div>
+
+                <div class="dashboard-section">
+                    <h2 class="section-title">Danh sách Loại Tour</h2>
+                    <div class="table-container">
+                        <table class="bookings-table">
+                            <thead>
+                                <tr>
+                                    <th>Tên Loại</th>
+                                    <th>Mô tả</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categories-table-body"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
 
+    <!-- Tour Modal -->
     <div id="tour-modal" class="modal-overlay">
         <div class="modal-content modal-content-large">
             <h2 class="modal-title" id="modal-title">Thêm Tour mới</h2>
@@ -126,47 +169,50 @@
                 <div class="tour-form-grid">
                     <div class="form-group">
                         <label class="form-label required" for="tour-ten">Tên Tour</label>
-                        <input type="text" id="tour-ten" class="form-input" required>
+                        <input type="text" id="tour-ten" class="form-input" required maxlength="300">
                     </div>
                     <div class="form-group">
-                        <label class="form-label required" for="tour-so-ngay">Số ngày</label>
-                        <input type="number" id="tour-so-ngay" class="form-input" required min="1">
+                        <label class="form-label required" for="tour-loai">Loại Tour</label>
+                        <select id="tour-loai" class="form-select" required>
+                            <option value="">Chọn loại tour</option>
+                        </select>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label required" for="tour-mota-ngan">Mô tả ngắn</label>
-                    <textarea id="tour-mota-ngan" class="form-textarea" required rows="3"></textarea>
+                    <label class="form-label" for="tour-mota-ngan">Mô tả ngắn</label>
+                    <textarea id="tour-mota-ngan" class="form-textarea" rows="2" maxlength="500"></textarea>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="tour-mota-chitiet">Mô tả chi tiết</label>
-                    <textarea id="tour-mota-chitiet" class="form-textarea" rows="5"></textarea>
+                    <textarea id="tour-mota-chitiet" class="form-textarea" rows="4"></textarea>
                 </div>
                 <div class="tour-form-grid">
                     <div class="form-group">
-                        <label class="form-label" for="tour-ngay-batdau">Ngày bắt đầu</label>
-                        <input type="date" id="tour-ngay-batdau" class="form-input">
+                        <label class="form-label required" for="tour-diem-xuatphat">Điểm xuất phát</label>
+                        <select id="tour-diem-xuatphat" class="form-select" required>
+                            <option value="">Chọn điểm xuất phát</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="tour-ngay-ketthuc">Ngày kết thúc</label>
-                        <input type="date" id="tour-ngay-ketthuc" class="form-input">
+                        <label class="form-label" for="tour-thoigian-khoihanh">Thời gian khởi hành</label>
+                        <input type="text" id="tour-thoigian-khoihanh" class="form-input" placeholder="VD: Hàng ngày, Thứ 2-4-6">
+                    </div>
+                </div>
+                <div class="tour-form-grid">
+                    <div class="form-group">
+                        <label class="form-label required" for="tour-gia-nguoilon">Giá người lớn (VNĐ)</label>
+                        <input type="number" id="tour-gia-nguoilon" class="form-input" required min="0" step="1000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="tour-gia-treEm">Giá trẻ em (VNĐ)</label>
+                        <input type="number" id="tour-gia-treEm" class="form-input" min="0" step="1000" value="0">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="tour-diem-xuatphat">Điểm xuất phát</label>
-                    <select id="tour-diem-xuatphat" class="form-select">
-                        <option value="">Chọn điểm xuất phát</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="tour-hinhanh">Hình ảnh (URL)</label>
-                    <input type="text" id="tour-hinhanh" class="form-input" placeholder="https://example.com/image.jpg">
-                </div>
-                <div class="form-group">
-                    <label class="form-label required" for="tour-trangthai">Trạng thái</label>
-                    <select id="tour-trangthai" class="form-select" required>
-                        <option value="Bản nháp">Bản nháp</option>
-                        <option value="Đã phát hành">Đã phát hành</option>
-                        <option value="Đã hủy">Đã hủy</option>
+                    <label class="form-label" for="tour-trangthai">Trạng thái</label>
+                    <select id="tour-trangthai" class="form-select">
+                        <option value="Hoạt động">Hoạt động</option>
+                        <option value="Không hoạt động">Không hoạt động</option>
                     </select>
                 </div>
                 <div class="modal-actions">
@@ -177,13 +223,13 @@
         </div>
     </div>
 
+    <!-- Tour Detail Modal -->
     <div id="tour-detail-modal" class="modal-overlay">
         <div class="modal-content modal-content-large">
             <h2 class="modal-title" id="tour-detail-title">Chi tiết Tour</h2>
             <div class="tab-container">
-                <button class="tab-button active" onclick="showTab('lich-trinh')">Lịch trình</button>
-                <button class="tab-button" onclick="showTab('dia-diem')">Địa điểm</button>
-                <button class="tab-button" onclick="showTab('gia-tour')">Giá Tour</button>
+                <button class="tab-button active" onclick="showDetailTab('lich-trinh')">📅 Lịch trình</button>
+                <button class="tab-button" onclick="showDetailTab('anh-tour')">🖼️ Ảnh Tour</button>
             </div>
             <div id="tour-detail-content" class="tab-content active">
                 <!-- Nội dung tab sẽ được load ở đây -->
@@ -194,6 +240,75 @@
         </div>
     </div>
 
+    <!-- Schedule Modal -->
+    <div id="schedule-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title" id="schedule-modal-title">Thêm Lịch trình</h2>
+            <form id="schedule-form" class="modal-form" onsubmit="saveSchedule(event)">
+                <input type="hidden" id="schedule-id">
+                <input type="hidden" id="schedule-tour-id">
+                <div class="form-group">
+                    <label class="form-label required" for="schedule-ngaythu">Ngày thứ</label>
+                    <input type="number" id="schedule-ngaythu" class="form-input" required min="1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="schedule-tieude">Tiêu đề</label>
+                    <input type="text" id="schedule-tieude" class="form-input" maxlength="300">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="schedule-noidung">Nội dung</label>
+                    <textarea id="schedule-noidung" class="form-textarea" rows="5"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="cta-button cta-secondary" onclick="closeScheduleModal()">Hủy</button>
+                    <button type="submit" class="cta-button cta-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="image-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">Thêm Ảnh Tour</h2>
+            <form id="image-form" class="modal-form" onsubmit="saveImage(event)">
+                <input type="hidden" id="image-tour-id">
+                <div class="form-group">
+                    <label class="form-label required" for="image-link">Link ảnh</label>
+                    <input type="text" id="image-link" class="form-input" required placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="cta-button cta-secondary" onclick="closeImageModal()">Hủy</button>
+                    <button type="submit" class="cta-button cta-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div id="category-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title" id="category-modal-title">Thêm Loại Tour</h2>
+            <form id="category-form" class="modal-form" onsubmit="saveCategory(event)">
+                <input type="hidden" id="category-id">
+                <div class="form-group">
+                    <label class="form-label required" for="category-ten">Tên Loại</label>
+                    <input type="text" id="category-ten" class="form-input" required maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="category-mota">Mô tả</label>
+                    <textarea id="category-mota" class="form-textarea" rows="3"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="cta-button cta-secondary" onclick="closeCategoryModal()">Hủy</button>
+                    <button type="submit" class="cta-button cta-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api-config.js"></script>
+    <script src="js/auth-helper.js"></script>
     <script src="js/admin-tours.js"></script>
 </body>
 </html>

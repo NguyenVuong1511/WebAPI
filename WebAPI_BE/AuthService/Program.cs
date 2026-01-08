@@ -12,15 +12,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// 1. THÊM CORS
+// 1. THÊM CORS - CHO PHÉP TẤT CẢ (CHỈ ĐỂ TEST)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://127.0.0.1:5500", "http://localhost:5500")
+        policy.AllowAnyOrigin()  // Cho phép mọi origin
               .AllowAnyHeader()
               .AllowAnyMethod();
-        // Nếu bạn cần gửi cookie/credentials thì thêm .AllowCredentials() 
     });
 });
 

@@ -397,3 +397,5 @@ BEGIN
     ORDER BY COUNT(b.BookingId) DESC;
 END
 GO
+
+SELECT * FROM NguoiDung WHERE Email = 'admin@gmail.com';

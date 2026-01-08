@@ -28,6 +28,15 @@ builder.Services.AddScoped<ITourService, TourService>();
 builder.Services.AddScoped<IAnhTourService, AnhTourService>();
 builder.Services.AddScoped<ILichTrinhService, LichTrinhService>();
 
+// CORS Configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 // 2. Configure the HTTP request pipeline.
@@ -38,6 +47,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowAll");
+
 app.UseAuthentication();
 app.UseAuthorization();
 

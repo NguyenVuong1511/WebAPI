@@ -1,13 +1,25 @@
-// Admin Tours Management JavaScript
+// Admin Tours Management JavaScript - Kết nối API
 let allTours = [];
+let allCategories = [];
 let allDiaDiems = [];
 let currentTourId = null;
+let currentSchedules = [];
+let currentImages = [];
 
 document.addEventListener('DOMContentLoaded', function() {
-    loadUserInfo();
+    // Kiểm tra quyền admin
+    if (!AuthHelper.requireAuth('Admin')) {
+        return;
+    }
+
+    console.log('Admin Tours loaded');
+    
+    // Load initial data
     loadDiaDiems();
+    loadCategories();
     loadTours();
     
+    // Setup event listeners
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
         searchInput.addEventListener('keypress', function(e) {
@@ -37,115 +49,281 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-function loadUserInfo() {
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
-    if (user.name) {
-        const nameParts = user.name.split(' ');
-        const initials = nameParts.length >= 2 
-            ? nameParts[0][0] + nameParts[nameParts.length - 1][0]
-            : user.name[0];
-        document.getElementById('user-avatar').textContent = initials.toUpperCase();
-        document.getElementById('user-name').textContent = user.name;
-        document.getElementById('user-role').textContent = user.role || 'Quản Trị Viên';
+/**
+ * Logout function
+ */
+function logout() {
+    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+        AuthHelper.logout();
+        window.location.href = '/login.html';
     }
 }
 
-function loadDiaDiems() {
-    // Mock data - Địa điểm từ database
-    allDiaDiems = [
-        { diaDiemId: '190BD314-58DC-4587-A449-74E6F20F4955', tenDiaDiem: 'Sân bay Tân Sơn Nhất' },
-        { diaDiemId: '5CA44023-B4A2-46F4-9092-A1BDE32CB988', tenDiaDiem: 'Vịnh Hạ Long' },
-        { diaDiemId: '5D68A6A0-D383-4DA9-BDE3-F88B96F01E9C', tenDiaDiem: 'Phố cổ Hội An' },
-        { diaDiemId: 'AEF070DF-5311-41BB-ADDA-BC4FD5A3F5B2', tenDiaDiem: 'Chợ Bến Thành' },
-        { diaDiemId: 'D6266497-2549-4EBE-957B-CE05B4E2D38E', tenDiaDiem: 'Đà Lạt' }
-    ];
-
-    const select = document.getElementById('tour-diem-xuatphat');
-    if (select) {
-        allDiaDiems.forEach(dd => {
-            const option = document.createElement('option');
-            option.value = dd.diaDiemId;
-            option.textContent = dd.tenDiaDiem;
-            select.appendChild(option);
-        });
+/**
+ * Switch main tabs (Tours / Categories)
+ */
+function switchMainTab(tabName) {
+    // Update tab buttons
+    const tabButtons = document.querySelectorAll('.tab-nav-btn');
+    tabButtons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Update tab panels
+    document.getElementById('tours-tab').style.display = tabName === 'tours' ? 'block' : 'none';
+    document.getElementById('categories-tab').style.display = tabName === 'categories' ? 'block' : 'none';
+    
+    // Load data for selected tab
+    if (tabName === 'categories') {
+        loadCategories();
     }
 }
 
-function loadTours() {
-    // Mock data - Tours từ database
-    allTours = [
-        {
-            tourId: '21214074-E7AA-43E3-8FE2-E3F33A8089F6',
-            tenTour: 'Tour Miền Bắc: Hà Nội - Hạ Long - Sa Pa',
-            moTaNgan: 'Khám phá vẻ đẹp kỳ vĩ của Vịnh Hạ Long và nét văn hóa độc đáo tại Sa Pa.',
-            moTaChiTiet: 'Chi tiết hành trình 5 ngày, bao gồm tham quan Vịnh Hạ Long, leo núi Hàm Rồng, khám phá bản làng...',
-            soNgay: 5,
-            thoiGian_BatDau: '2025-01-15',
-            thoiGian_KetThuc: '2025-01-19',
-            diemXuatPhat: '190BD314-58DC-4587-A449-74E6F20F4955',
-            hinhAnh: 'hinh_anh_tour_mien_bac.jpg',
-            trangThai: 'Đã phát hành'
-        },
-        {
-            tourId: '3A5B895A-3411-4F01-AABC-1D6C6D4DF3D1',
-            tenTour: 'Tour Di sản Miền Trung: Đà Nẵng - Hội An - Huế',
-            moTaNgan: 'Hành trình khám phá 3 Di sản Văn hóa Thế giới tại Miền Trung.',
-            moTaChiTiet: 'Chi tiết hành trình 4 ngày 3 đêm, tham quan Phố cổ Hội An, Cố đô Huế, Bà Nà Hills...',
-            soNgay: 4,
-            thoiGian_BatDau: '2025-02-20',
-            thoiGian_KetThuc: '2025-02-23',
-            diemXuatPhat: '5CA44023-B4A2-46F4-9092-A1BDE32CB988',
-            hinhAnh: 'hinh_anh_tour_mien_trung.jpg',
-            trangThai: 'Đã phát hành'
-        },
-        {
-            tourId: '844A695E-B3F3-47DE-A68A-E7088101B8E9',
-            tenTour: 'Tour Đà Lạt: Thành phố Ngàn Hoa',
-            moTaNgan: 'Tận hưởng khí hậu mát mẻ và các điểm tham quan nổi tiếng tại Đà Lạt.',
-            moTaChiTiet: 'Tour 3 ngày, tham quan Thung lũng Tình Yêu, Hồ Xuân Hương, Thiền viện Trúc Lâm...',
-            soNgay: 3,
-            thoiGian_BatDau: '2025-03-10',
-            thoiGian_KetThuc: '2025-03-12',
-            diemXuatPhat: '5D68A6A0-D383-4DA9-BDE3-F88B96F01E9C',
-            hinhAnh: 'hinh_anh_tour_dalat.jpg',
-            trangThai: 'Đã phát hành'
-        },
-        {
-            tourId: 'AC507766-06B7-4CB8-A129-116FBC938C11',
-            tenTour: 'Tour TP.HCM - Miền Tây Sông Nước',
-            moTaNgan: 'Khám phá cuộc sống sông nước và vườn trái cây Miền Tây.',
-            moTaChiTiet: 'Tour 2 ngày, tham quan chợ nổi Cái Răng, lò kẹo dừa, miệt vườn...',
-            soNgay: 2,
-            thoiGian_BatDau: '2025-04-05',
-            thoiGian_KetThuc: '2025-04-06',
-            diemXuatPhat: 'AEF070DF-5311-41BB-ADDA-BC4FD5A3F5B2',
-            hinhAnh: 'hinh_anh_tour_mientay.jpg',
-            trangThai: 'Bản nháp'
-        },
-        {
-            tourId: 'EAFF1F4C-EBCD-46A6-B7EB-3F131731D8B2',
-            tenTour: 'Tour Côn Đảo Hồi Tưởng',
-            moTaNgan: 'Khám phá lịch sử và bãi biển đẹp của Côn Đảo.',
-            moTaChiTiet: 'Tour 3 ngày 2 đêm, viếng nghĩa trang Hàng Dương, tham quan bãi Đầm Trầu.',
-            soNgay: 3,
-            thoiGian_BatDau: '2025-05-01',
-            thoiGian_KetThuc: '2025-05-03',
-            diemXuatPhat: 'D6266497-2549-4EBE-957B-CE05B4E2D38E',
-            hinhAnh: 'hinh_anh_tour_condao.jpg',
-            trangThai: 'Đã phát hành'
+// ======================
+// LOẠI TOUR (CATEGORIES)
+// ======================
+
+/**
+ * Load tour categories from API
+ */
+async function loadCategories() {
+    try {
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.LOAITOUR_GET_ALL);
+        const response = await APIHelper.get(url);
+
+        if (response.success && response.data) {
+            allCategories = response.data;
+            renderCategoriesTable(allCategories);
+            updateCategorySelects();
+        } else {
+            console.error('Failed to load categories:', response.message);
+            allCategories = [];
+            renderCategoriesTable([]);
         }
-    ];
+    } catch (error) {
+        console.error('Error loading categories:', error);
+        allCategories = [];
+        renderCategoriesTable([]);
+    }
+}
 
-    const searchTerm = document.getElementById('search-input').value.toLowerCase();
-    const statusFilter = document.getElementById('status-filter').value;
+function renderCategoriesTable(categories) {
+    const tbody = document.getElementById('categories-table-body');
+    if (!tbody) return;
 
-    const filteredTours = allTours.filter(tour => {
-        const matchSearch = !searchTerm || tour.tenTour.toLowerCase().includes(searchTerm);
-        const matchStatus = !statusFilter || tour.trangThai === statusFilter;
-        return matchSearch && matchStatus;
+    tbody.innerHTML = '';
+
+    if (categories.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: var(--spacing-xl);">Chưa có loại tour nào</td></tr>';
+        return;
+    }
+
+    categories.forEach(cat => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${cat.tenLoai || '-'}</td>
+            <td>${cat.moTa || '-'}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="action-btn action-btn-secondary" onclick="editCategory('${cat.loaiTourId}')">✏️ Sửa</button>
+                    <button class="action-btn action-btn-danger" onclick="deleteCategory('${cat.loaiTourId}')">🗑️ Xóa</button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
     });
+}
 
-    renderToursTable(filteredTours);
+function updateCategorySelects() {
+    // Update tour form category select
+    const tourLoaiSelect = document.getElementById('tour-loai');
+    if (tourLoaiSelect) {
+        const currentValue = tourLoaiSelect.value;
+        tourLoaiSelect.innerHTML = '<option value="">Chọn loại tour</option>';
+        allCategories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat.loaiTourId;
+            option.textContent = cat.tenLoai;
+            tourLoaiSelect.appendChild(option);
+        });
+        if (currentValue) tourLoaiSelect.value = currentValue;
+    }
+    
+    // Update filter select
+    const filterSelect = document.getElementById('loaitour-filter');
+    if (filterSelect) {
+        const currentValue = filterSelect.value;
+        filterSelect.innerHTML = '<option value="">Tất cả loại tour</option>';
+        allCategories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat.loaiTourId;
+            option.textContent = cat.tenLoai;
+            filterSelect.appendChild(option);
+        });
+        if (currentValue) filterSelect.value = currentValue;
+    }
+}
+
+function showAddCategoryModal() {
+    document.getElementById('category-modal-title').textContent = 'Thêm Loại Tour';
+    document.getElementById('category-form').reset();
+    document.getElementById('category-id').value = '';
+    document.getElementById('category-modal').classList.add('active');
+}
+
+function editCategory(categoryId) {
+    const category = allCategories.find(c => c.loaiTourId === categoryId);
+    if (!category) {
+        alert('Không tìm thấy loại tour');
+        return;
+    }
+
+    document.getElementById('category-modal-title').textContent = 'Sửa Loại Tour';
+    document.getElementById('category-id').value = category.loaiTourId;
+    document.getElementById('category-ten').value = category.tenLoai || '';
+    document.getElementById('category-mota').value = category.moTa || '';
+    document.getElementById('category-modal').classList.add('active');
+}
+
+async function saveCategory(event) {
+    event.preventDefault();
+    
+    const categoryId = document.getElementById('category-id').value;
+    const data = {
+        tenLoai: document.getElementById('category-ten').value,
+        moTa: document.getElementById('category-mota').value
+    };
+
+    try {
+        let response;
+        if (categoryId) {
+            // Update
+            data.loaiTourId = categoryId;
+            const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.LOAITOUR_UPDATE);
+            response = await APIHelper.put(url, data);
+        } else {
+            // Create
+            const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.LOAITOUR_CREATE);
+            response = await APIHelper.post(url, data);
+        }
+
+        if (response.success) {
+            alert(categoryId ? 'Cập nhật loại tour thành công!' : 'Tạo loại tour thành công!');
+            closeCategoryModal();
+            loadCategories();
+        } else {
+            alert('Lỗi: ' + (response.message || 'Không thể lưu loại tour'));
+        }
+    } catch (error) {
+        console.error('Error saving category:', error);
+        alert('Lỗi khi lưu loại tour');
+    }
+}
+
+async function deleteCategory(categoryId) {
+    if (!confirm('Bạn có chắc chắn muốn xóa loại tour này?')) return;
+
+    try {
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.LOAITOUR_DELETE) + `/${categoryId}`;
+        const response = await APIHelper.delete(url);
+
+        if (response.success) {
+            alert('Xóa loại tour thành công!');
+            loadCategories();
+        } else {
+            alert('Lỗi: ' + (response.message || 'Không thể xóa loại tour'));
+        }
+    } catch (error) {
+        console.error('Error deleting category:', error);
+        alert('Lỗi khi xóa loại tour');
+    }
+}
+
+function closeCategoryModal() {
+    document.getElementById('category-modal').classList.remove('active');
+}
+
+// ======================
+// ĐỊA ĐIỂM
+// ======================
+
+async function loadDiaDiems() {
+    try {
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.DIADIEM_GET_ALL);
+        const response = await APIHelper.get(url);
+
+        if (response.success && response.data) {
+            allDiaDiems = response.data;
+            updateDiaDiemSelect();
+        } else {
+            console.error('Failed to load dia diems:', response.message);
+            allDiaDiems = [];
+        }
+    } catch (error) {
+        console.error('Error loading dia diems:', error);
+        allDiaDiems = [];
+    }
+}
+
+function updateDiaDiemSelect() {
+    const select = document.getElementById('tour-diem-xuatphat');
+    if (!select) return;
+
+    const currentValue = select.value;
+    select.innerHTML = '<option value="">Chọn điểm xuất phát</option>';
+    
+    allDiaDiems.forEach(dd => {
+        const option = document.createElement('option');
+        option.value = dd.diaDiemId;
+        option.textContent = dd.tenDiaDiem;
+        select.appendChild(option);
+    });
+    
+    if (currentValue) select.value = currentValue;
+}
+
+// ======================
+// TOURS
+// ======================
+
+/**
+ * Load tours from API
+ */
+async function loadTours() {
+    try {
+        const searchTerm = document.getElementById('search-input').value;
+        const loaiTourFilter = document.getElementById('loaitour-filter').value;
+        const statusFilter = document.getElementById('status-filter').value;
+        
+        let url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.TOUR_GET_ALL);
+        if (searchTerm) {
+            url += `?keyword=${encodeURIComponent(searchTerm)}`;
+        }
+        
+        const response = await APIHelper.get(url);
+
+        if (response.success && response.data) {
+            allTours = response.data;
+            
+            // Apply filters
+            let filteredTours = allTours;
+            if (loaiTourFilter) {
+                filteredTours = filteredTours.filter(t => t.loaiTourId === loaiTourFilter);
+            }
+            if (statusFilter) {
+                filteredTours = filteredTours.filter(t => t.trangThai === statusFilter);
+            }
+            
+            renderToursTable(filteredTours);
+        } else {
+            console.error('Failed to load tours:', response.message);
+            allTours = [];
+            renderToursTable([]);
+        }
+    } catch (error) {
+        console.error('Error loading tours:', error);
+        allTours = [];
+        renderToursTable([]);
+    }
 }
 
 function renderToursTable(tours) {
@@ -160,19 +338,24 @@ function renderToursTable(tours) {
     }
 
     tours.forEach(tour => {
+        const loaiTour = allCategories.find(c => c.loaiTourId === tour.loaiTourId);
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${tour.tenTour}</td>
-            <td>${tour.moTaNgan || '-'}</td>
-            <td>${tour.soNgay} ngày</td>
-            <td>${formatDate(tour.thoiGian_BatDau)}</td>
-            <td>${formatDate(tour.thoiGian_KetThuc)}</td>
-            <td><span class="status-badge ${getStatusClass(tour.trangThai)}">${tour.trangThai}</span></td>
+            <td>${tour.tenTour || '-'}</td>
+            <td>${loaiTour ? loaiTour.tenLoai : '-'}</td>
+            <td style="max-width: 300px;">${tour.moTaNgan || '-'}</td>
+            <td style="text-align: right;">${FormatHelper.currency(tour.giaNguoiLon)}</td>
+            <td style="text-align: right;">${FormatHelper.currency(tour.giaTreEm)}</td>
+            <td><span class="status-badge ${getStatusClass(tour.trangThai)}">${tour.trangThai || 'Không hoạt động'}</span></td>
             <td>
                 <div class="action-buttons">
-                    <button class="action-btn action-btn-secondary" onclick="viewTourDetail('${tour.tourId}')">👁️ Chi tiết</button>
-                    <button class="action-btn action-btn-secondary" onclick="editTour('${tour.tourId}')">✏️ Sửa</button>
-                    <button class="action-btn action-btn-danger" onclick="deleteTour('${tour.tourId}')">🗑️ Xóa</button>
+                    <button class="action-btn action-btn-primary" onclick="viewTourDetail('${tour.tourId}')" 
+                            title="Quản lý Lịch trình & Ảnh tour"
+                            style="background: #4CAF50;">
+                        📋 Lịch trình & Ảnh
+                    </button>
+                    <button class="action-btn action-btn-secondary" onclick="editTour('${tour.tourId}')" title="Sửa thông tin tour">✏️</button>
+                    <button class="action-btn action-btn-danger" onclick="deleteTour('${tour.tourId}')" title="Xóa tour">🗑️</button>
                 </div>
             </td>
         `;
@@ -181,62 +364,110 @@ function renderToursTable(tours) {
 }
 
 function getStatusClass(status) {
-    const statusMap = {
-        'Đã phát hành': 'status-confirmed',
-        'Bản nháp': 'status-pending',
-        'Đã hủy': 'status-cancelled'
-    };
-    return statusMap[status] || 'status-pending';
+    if (status === 'Hoạt động') return 'status-confirmed';
+    if (status === 'Không hoạt động') return 'status-cancelled';
+    return 'status-pending';
 }
 
 function showAddTourModal() {
     document.getElementById('modal-title').textContent = 'Tạo Tour mới';
     document.getElementById('tour-form').reset();
     document.getElementById('tour-id').value = '';
+    document.getElementById('tour-trangthai').value = 'Hoạt động';
     document.getElementById('tour-modal').classList.add('active');
 }
 
 function editTour(tourId) {
+    const tour = allTours.find(t => t.tourId === tourId);
+    if (!tour) {
+        alert('Không tìm thấy tour');
+        return;
+    }
+
+    document.getElementById('modal-title').textContent = 'Sửa Tour';
+    document.getElementById('tour-id').value = tour.tourId;
+    document.getElementById('tour-ten').value = tour.tenTour || '';
+    document.getElementById('tour-loai').value = tour.loaiTourId || '';
+    document.getElementById('tour-mota-ngan').value = tour.moTaNgan || '';
+    document.getElementById('tour-mota-chitiet').value = tour.moTaChiTiet || '';
+    document.getElementById('tour-diem-xuatphat').value = tour.diemXuatPhatId || '';
+    document.getElementById('tour-thoigian-khoihanh').value = tour.thoiGianKhoiHanh || '';
+    document.getElementById('tour-gia-nguoilon').value = tour.giaNguoiLon || 0;
+    document.getElementById('tour-gia-treEm').value = tour.giaTreEm || 0;
+    document.getElementById('tour-trangthai').value = tour.trangThai || 'Hoạt động';
+    document.getElementById('tour-modal').classList.add('active');
+}
+
+async function saveTour(event) {
+    event.preventDefault();
+    
+    const tourId = document.getElementById('tour-id').value;
+    const data = {
+        tenTour: document.getElementById('tour-ten').value,
+        loaiTourId: document.getElementById('tour-loai').value,
+        moTaNgan: document.getElementById('tour-mota-ngan').value,
+        moTaChiTiet: document.getElementById('tour-mota-chitiet').value,
+        diemXuatPhatId: document.getElementById('tour-diem-xuatphat').value,
+        thoiGianKhoiHanh: document.getElementById('tour-thoigian-khoihanh').value,
+        giaNguoiLon: parseFloat(document.getElementById('tour-gia-nguoilon').value) || 0,
+        giaTreEm: parseFloat(document.getElementById('tour-gia-treEm').value) || 0,
+        trangThai: document.getElementById('tour-trangthai').value
+    };
+
     try {
-        const tour = allTours.find(t => t.tourId === tourId);
-        if (!tour) {
-            alert('Không tìm thấy tour');
-            return;
+        let response;
+        if (tourId) {
+            // Update
+            data.tourId = tourId;
+            const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.TOUR_UPDATE);
+            response = await APIHelper.put(url, data);
+        } else {
+            // Create
+            const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.TOUR_CREATE);
+            response = await APIHelper.post(url, data);
         }
 
-        document.getElementById('modal-title').textContent = 'Sửa Tour';
-        document.getElementById('tour-id').value = tour.tourId;
-        document.getElementById('tour-ten').value = tour.tenTour;
-        document.getElementById('tour-mota-ngan').value = tour.moTaNgan || '';
-        document.getElementById('tour-mota-chitiet').value = tour.moTaChiTiet || '';
-        document.getElementById('tour-so-ngay').value = tour.soNgay;
-        document.getElementById('tour-ngay-batdau').value = tour.thoiGian_BatDau || '';
-        document.getElementById('tour-ngay-ketthuc').value = tour.thoiGian_KetThuc || '';
-        document.getElementById('tour-diem-xuatphat').value = tour.diemXuatPhat || '';
-        document.getElementById('tour-hinhanh').value = tour.hinhAnh || '';
-        document.getElementById('tour-trangthai').value = tour.trangThai;
-        document.getElementById('tour-modal').classList.add('active');
+        if (response.success) {
+            alert(tourId ? 'Cập nhật tour thành công!' : 'Tạo tour thành công!');
+            closeTourModal();
+            loadTours();
+        } else {
+            alert('Lỗi: ' + (response.message || 'Không thể lưu tour'));
+        }
     } catch (error) {
-        console.error('Error loading tour:', error);
-        alert('Lỗi khi tải thông tin tour');
+        console.error('Error saving tour:', error);
+        alert('Lỗi khi lưu tour');
     }
 }
 
-function saveTour(event) {
-    event.preventDefault();
-    const tourId = document.getElementById('tour-id').value;
-    alert(tourId ? 'Cập nhật tour thành công!' : 'Tạo tour thành công!');
-    closeTourModal();
-    loadTours();
-}
-
-function deleteTour(tourId) {
+async function deleteTour(tourId) {
     if (!confirm('Bạn có chắc chắn muốn xóa tour này?')) return;
-    alert('Xóa tour thành công!');
-    loadTours();
+
+    try {
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.TOUR_DELETE) + `/${tourId}`;
+        const response = await APIHelper.delete(url);
+
+        if (response.success) {
+            alert('Xóa tour thành công!');
+            loadTours();
+        } else {
+            alert('Lỗi: ' + (response.message || 'Không thể xóa tour'));
+        }
+    } catch (error) {
+        console.error('Error deleting tour:', error);
+        alert('Lỗi khi xóa tour');
+    }
 }
 
-function viewTourDetail(tourId) {
+function closeTourModal() {
+    document.getElementById('tour-modal').classList.remove('active');
+}
+
+// ======================
+// TOUR DETAIL (SCHEDULE & IMAGES)
+// ======================
+
+async function viewTourDetail(tourId) {
     currentTourId = tourId;
     const tour = allTours.find(t => t.tourId === tourId);
     if (!tour) {
@@ -245,210 +476,322 @@ function viewTourDetail(tourId) {
     }
 
     document.getElementById('tour-detail-title').textContent = tour.tenTour;
-    showTab('lich-trinh');
+    await showDetailTab('lich-trinh');
     document.getElementById('tour-detail-modal').classList.add('active');
 }
 
-function showTab(tabName) {
+async function showDetailTab(tabName) {
     // Update tab buttons
     const tabButtons = document.querySelectorAll('#tour-detail-modal .tab-button');
     tabButtons.forEach(btn => btn.classList.remove('active'));
     
     // Find and activate clicked button
-    const clickedButton = event ? event.target : tabButtons[0];
-    if (clickedButton) {
-        clickedButton.classList.add('active');
+    if (event && event.target) {
+        event.target.classList.add('active');
+    } else {
+        tabButtons[0].classList.add('active');
     }
 
     const content = document.getElementById('tour-detail-content');
     if (!content) return;
 
     if (tabName === 'lich-trinh') {
-        // Mock data - Lịch trình
-        content.innerHTML = `
-            <div style="margin-bottom: var(--spacing-md);">
-                <button class="cta-button cta-secondary" onclick="addLichTrinh()">➕ Thêm lịch trình</button>
-            </div>
-            <table class="tour-detail-table">
-                <thead>
-                    <tr>
-                        <th>Ngày thứ</th>
-                        <th>Tiêu đề</th>
-                        <th>Giờ bắt đầu</th>
-                        <th>Giờ kết thúc</th>
-                        <th>Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Khởi hành và tham quan Vịnh Hạ Long</td>
-                        <td>08:00</td>
-                        <td>18:00</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="action-btn action-btn-secondary" onclick="editLichTrinh('1')">Sửa</button>
-                                <button class="action-btn action-btn-danger" onclick="deleteLichTrinh('1')">Xóa</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Khám phá hang động</td>
-                        <td>07:30</td>
-                        <td>16:00</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="action-btn action-btn-secondary" onclick="editLichTrinh('2')">Sửa</button>
-                                <button class="action-btn action-btn-danger" onclick="deleteLichTrinh('2')">Xóa</button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        `;
-    } else if (tabName === 'dia-diem') {
-        // Mock data - Địa điểm
-        content.innerHTML = `
-            <div style="margin-bottom: var(--spacing-md);">
-                <button class="cta-button cta-secondary" onclick="addDiaDiemToTour()">➕ Thêm địa điểm</button>
-            </div>
-            <table class="tour-detail-table">
-                <thead>
-                    <tr>
-                        <th>Tên địa điểm</th>
-                        <th>Loại</th>
-                        <th>Thứ tự tham quan</th>
-                        <th>Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Vịnh Hạ Long</td>
-                        <td>Danh lam thắng cảnh</td>
-                        <td>1</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="action-btn action-btn-danger" onclick="removeDiaDiem('1')">Xóa</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Phố cổ Hội An</td>
-                        <td>Di tích lịch sử</td>
-                        <td>2</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="action-btn action-btn-danger" onclick="removeDiaDiem('2')">Xóa</button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        `;
-    } else if (tabName === 'gia-tour') {
-        // Mock data - Giá tour
-        content.innerHTML = `
-            <div style="margin-bottom: var(--spacing-md);">
-                <button class="cta-button cta-secondary" onclick="addGiaTour()">➕ Thêm giá</button>
-            </div>
-            <table class="tour-detail-table">
-                <thead>
-                    <tr>
-                        <th>Tên giá</th>
-                        <th>Giá</th>
-                        <th>Đơn vị</th>
-                        <th>Ngày áp dụng</th>
-                        <th>Trạng thái</th>
-                        <th>Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Giá người lớn 5N4Đ</td>
-                        <td>8.500.000₫</td>
-                        <td>VNĐ</td>
-                        <td>01/01/2025 - 30/06/2025</td>
-                        <td><span class="status-badge status-confirmed">Hoạt động</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="action-btn action-btn-secondary" onclick="editGiaTour('1')">Sửa</button>
-                                <button class="action-btn action-btn-danger" onclick="deleteGiaTour('1')">Xóa</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Giá trẻ em 5N4Đ</td>
-                        <td>5.000.000₫</td>
-                        <td>VNĐ</td>
-                        <td>01/01/2025 - 30/06/2025</td>
-                        <td><span class="status-badge status-confirmed">Hoạt động</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="action-btn action-btn-secondary" onclick="editGiaTour('2')">Sửa</button>
-                                <button class="action-btn action-btn-danger" onclick="deleteGiaTour('2')">Xóa</button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        `;
+        await loadSchedules();
+        renderSchedulesTab();
+    } else if (tabName === 'anh-tour') {
+        await loadImages();
+        renderImagesTab();
     }
     
-    // Update tab content display
     content.classList.add('active');
-}
-
-function closeTourModal() {
-    document.getElementById('tour-modal').classList.remove('active');
 }
 
 function closeTourDetailModal() {
     document.getElementById('tour-detail-modal').classList.remove('active');
+    currentTourId = null;
 }
 
-// Placeholder functions for tour detail actions
-function addLichTrinh() {
-    alert('Chức năng thêm lịch trình sẽ được tích hợp sau');
-}
+// ======================
+// LỊCH TRÌNH (SCHEDULES)
+// ======================
 
-function editLichTrinh(id) {
-    alert('Chức năng sửa lịch trình sẽ được tích hợp sau');
-}
+async function loadSchedules() {
+    if (!currentTourId) return;
 
-function deleteLichTrinh(id) {
-    if (confirm('Bạn có chắc chắn muốn xóa lịch trình này?')) {
-        alert('Xóa lịch trình thành công!');
+    try {
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.LICHTRINH_GET_BY_TOUR) + `/${currentTourId}`;
+        const response = await APIHelper.get(url);
+
+        if (response.success && response.data) {
+            currentSchedules = response.data;
+        } else {
+            currentSchedules = [];
+        }
+    } catch (error) {
+        console.error('Error loading schedules:', error);
+        currentSchedules = [];
     }
 }
 
-function addDiaDiemToTour() {
-    alert('Chức năng thêm địa điểm vào tour sẽ được tích hợp sau');
+function renderSchedulesTab() {
+    const content = document.getElementById('tour-detail-content');
+    if (!content) return;
+
+    let tableRows = '';
+    if (currentSchedules.length === 0) {
+        tableRows = '<tr><td colspan="4" style="text-align: center; padding: var(--spacing-xl);">Chưa có lịch trình nào</td></tr>';
+    } else {
+        currentSchedules.sort((a, b) => a.ngayThu - b.ngayThu);
+        currentSchedules.forEach(sch => {
+            tableRows += `
+                <tr>
+                    <td>${sch.ngayThu}</td>
+                    <td>${sch.tieuDe || '-'}</td>
+                    <td style="max-width: 400px; white-space: pre-wrap;">${sch.noiDung || '-'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-secondary" onclick="editSchedule('${sch.lichTrinhId}')">✏️ Sửa</button>
+                            <button class="action-btn action-btn-danger" onclick="deleteSchedule('${sch.lichTrinhId}')">🗑️ Xóa</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    content.innerHTML = `
+        <div style="margin-bottom: var(--spacing-md);">
+            <button class="cta-button cta-secondary" onclick="showAddScheduleModal()">➕ Thêm lịch trình</button>
+        </div>
+        <table class="bookings-table">
+            <thead>
+                <tr>
+                    <th>Ngày thứ</th>
+                    <th>Tiêu đề</th>
+                    <th>Nội dung</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${tableRows}
+            </tbody>
+        </table>
+    `;
 }
 
-function removeDiaDiem(id) {
-    if (confirm('Bạn có chắc chắn muốn xóa địa điểm này khỏi tour?')) {
-        alert('Xóa địa điểm thành công!');
+function showAddScheduleModal() {
+    document.getElementById('schedule-modal-title').textContent = 'Thêm Lịch trình';
+    document.getElementById('schedule-form').reset();
+    document.getElementById('schedule-id').value = '';
+    document.getElementById('schedule-tour-id').value = currentTourId;
+    document.getElementById('schedule-modal').classList.add('active');
+}
+
+function editSchedule(scheduleId) {
+    const schedule = currentSchedules.find(s => s.lichTrinhId === scheduleId);
+    if (!schedule) {
+        alert('Không tìm thấy lịch trình');
+        return;
+    }
+
+    document.getElementById('schedule-modal-title').textContent = 'Sửa Lịch trình';
+    document.getElementById('schedule-id').value = schedule.lichTrinhId;
+    document.getElementById('schedule-tour-id').value = schedule.tourId;
+    document.getElementById('schedule-ngaythu').value = schedule.ngayThu || 1;
+    document.getElementById('schedule-tieude').value = schedule.tieuDe || '';
+    document.getElementById('schedule-noidung').value = schedule.noiDung || '';
+    document.getElementById('schedule-modal').classList.add('active');
+}
+
+async function saveSchedule(event) {
+    event.preventDefault();
+    
+    const scheduleId = document.getElementById('schedule-id').value;
+    const data = {
+        tourId: document.getElementById('schedule-tour-id').value,
+        ngayThu: parseInt(document.getElementById('schedule-ngaythu').value),
+        tieuDe: document.getElementById('schedule-tieude').value,
+        noiDung: document.getElementById('schedule-noidung').value
+    };
+
+    try {
+        let response;
+        if (scheduleId) {
+            // Update
+            data.lichTrinhId = scheduleId;
+            const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.LICHTRINH_UPDATE);
+            response = await APIHelper.put(url, data);
+        } else {
+            // Create
+            const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.LICHTRINH_CREATE);
+            response = await APIHelper.post(url, data);
+        }
+
+        if (response.success) {
+            alert(scheduleId ? 'Cập nhật lịch trình thành công!' : 'Tạo lịch trình thành công!');
+            closeScheduleModal();
+            await loadSchedules();
+            renderSchedulesTab();
+        } else {
+            alert('Lỗi: ' + (response.message || 'Không thể lưu lịch trình'));
+        }
+    } catch (error) {
+        console.error('Error saving schedule:', error);
+        alert('Lỗi khi lưu lịch trình');
     }
 }
 
-function addGiaTour() {
-    alert('Chức năng thêm giá tour sẽ được tích hợp sau');
-}
+async function deleteSchedule(scheduleId) {
+    if (!confirm('Bạn có chắc chắn muốn xóa lịch trình này?')) return;
 
-function editGiaTour(id) {
-    alert('Chức năng sửa giá tour sẽ được tích hợp sau');
-}
+    try {
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.LICHTRINH_DELETE) + `/${scheduleId}`;
+        const response = await APIHelper.delete(url);
 
-function deleteGiaTour(id) {
-    if (confirm('Bạn có chắc chắn muốn xóa giá tour này?')) {
-        alert('Xóa giá tour thành công!');
+        if (response.success) {
+            alert('Xóa lịch trình thành công!');
+            await loadSchedules();
+            renderSchedulesTab();
+        } else {
+            alert('Lỗi: ' + (response.message || 'Không thể xóa lịch trình'));
+        }
+    } catch (error) {
+        console.error('Error deleting schedule:', error);
+        alert('Lỗi khi xóa lịch trình');
     }
 }
 
-function formatDate(dateString) {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN');
+function closeScheduleModal() {
+    document.getElementById('schedule-modal').classList.remove('active');
 }
 
+// ======================
+// ẢNH TOUR (IMAGES)
+// ======================
+
+async function loadImages() {
+    if (!currentTourId) return;
+
+    try {
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.ANHTOUR_GET_BY_TOUR) + `/${currentTourId}`;
+        const response = await APIHelper.get(url);
+
+        if (response.success && response.data) {
+            currentImages = response.data;
+        } else {
+            currentImages = [];
+        }
+    } catch (error) {
+        console.error('Error loading images:', error);
+        currentImages = [];
+    }
+}
+
+function renderImagesTab() {
+    const content = document.getElementById('tour-detail-content');
+    if (!content) return;
+
+    let imageCards = '';
+    if (currentImages.length === 0) {
+        imageCards = '<p style="text-align: center; padding: var(--spacing-xl); color: var(--text-secondary);">Chưa có ảnh nào</p>';
+    } else {
+        currentImages.forEach(img => {
+            const isAvatar = img.isAvatar ? '⭐ Ảnh đại diện' : '';
+            imageCards += `
+                <div class="image-card" style="border: 1px solid var(--border-color); border-radius: 8px; padding: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                    <img src="${img.linkAnh}" alt="Tour image" style="width: 100%; max-height: 300px; object-fit: cover; border-radius: 4px; margin-bottom: var(--spacing-sm);" onerror="this.src='img/placeholder.jpg'">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--primary-color); font-weight: 600;">${isAvatar}</span>
+                        <div class="action-buttons">
+                            ${!img.isAvatar ? `<button class="action-btn action-btn-secondary" onclick="setAsAvatar('${img.anhTourId}')">⭐ Đặt làm đại diện</button>` : ''}
+                            <button class="action-btn action-btn-danger" onclick="deleteImage('${img.anhTourId}')">🗑️ Xóa</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    content.innerHTML = `
+        <div style="margin-bottom: var(--spacing-md);">
+            <button class="cta-button cta-secondary" onclick="showAddImageModal()">➕ Thêm ảnh</button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--spacing-md);">
+            ${imageCards}
+        </div>
+    `;
+}
+
+function showAddImageModal() {
+    document.getElementById('image-form').reset();
+    document.getElementById('image-tour-id').value = currentTourId;
+    document.getElementById('image-modal').classList.add('active');
+}
+
+async function saveImage(event) {
+    event.preventDefault();
+    
+    const data = {
+        tourId: document.getElementById('image-tour-id').value,
+        linkAnh: document.getElementById('image-link').value
+    };
+
+    try {
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.ANHTOUR_CREATE);
+        const response = await APIHelper.post(url, data);
+
+        if (response.success) {
+            alert('Thêm ảnh thành công!');
+            closeImageModal();
+            await loadImages();
+            renderImagesTab();
+        } else {
+            alert('Lỗi: ' + (response.message || 'Không thể thêm ảnh'));
+        }
+    } catch (error) {
+        console.error('Error saving image:', error);
+        alert('Lỗi khi thêm ảnh');
+    }
+}
+
+async function setAsAvatar(imageId) {
+    try {
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.ANHTOUR_SET_AVATAR);
+        const response = await APIHelper.put(url, { anhTourId: imageId });
+
+        if (response.success) {
+            alert('Đặt ảnh đại diện thành công!');
+            await loadImages();
+            renderImagesTab();
+        } else {
+            alert('Lỗi: ' + (response.message || 'Không thể đặt ảnh đại diện'));
+        }
+    } catch (error) {
+        console.error('Error setting avatar:', error);
+        alert('Lỗi khi đặt ảnh đại diện');
+    }
+}
+
+async function deleteImage(imageId) {
+    if (!confirm('Bạn có chắc chắn muốn xóa ảnh này?')) return;
+
+    try {
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.ANHTOUR_DELETE) + `/${imageId}`;
+        const response = await APIHelper.delete(url);
+
+        if (response.success) {
+            alert('Xóa ảnh thành công!');
+            await loadImages();
+            renderImagesTab();
+        } else {
+            alert('Lỗi: ' + (response.message || 'Không thể xóa ảnh'));
+        }
+    } catch (error) {
+        console.error('Error deleting image:', error);
+        alert('Lỗi khi xóa ảnh');
+    }
+}
+
+function closeImageModal() {
+    document.getElementById('image-modal').classList.remove('active');
+}
