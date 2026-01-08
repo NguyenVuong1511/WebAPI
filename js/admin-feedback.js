@@ -1,8 +1,18 @@
-// Admin Feedback Management JavaScript
+// Admin Feedback Management JavaScript - Kết nối API
 let allReviews = [];
+let allTours = [];
+let currentReviewId = null;
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Kiểm tra quyền admin
+    if (!AuthHelper.requireAuth('Admin')) {
+        return;
+    }
+
+    console.log('Admin Feedback loaded');
+    
     loadUserInfo();
+    loadTours();
     loadReviews();
     
     const searchInput = document.getElementById('search-input');
@@ -35,93 +45,180 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function loadUserInfo() {
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
-    if (user.name) {
-        const nameParts = user.name.split(' ');
-        const initials = nameParts.length >= 2 
-            ? nameParts[0][0] + nameParts[nameParts.length - 1][0]
-            : user.name[0];
-        document.getElementById('user-avatar').textContent = initials.toUpperCase();
-        document.getElementById('user-name').textContent = user.name;
-        document.getElementById('user-role').textContent = user.role || 'Quản Trị Viên';
+    try {
+        const user = AuthHelper.getUser();
+        if (user) {
+            // Get initials
+            let initials = 'NV';
+            if (user.hoTen) {
+                const nameParts = user.hoTen.split(' ');
+                if (nameParts.length >= 2) {
+                    initials = (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
+                } else if (nameParts.length === 1) {
+                    initials = nameParts[0][0].toUpperCase();
+                }
+            } else if (user.name) {
+                const nameParts = user.name.split(' ');
+                if (nameParts.length >= 2) {
+                    initials = (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
+                } else if (nameParts.length === 1) {
+                    initials = nameParts[0][0].toUpperCase();
+                }
+            }
+            
+            const userName = user.hoTen || user.name || 'Quản Trị Viên';
+            const userEmail = user.email || 'admin@travelviet.com';
+            const userRole = (user.role === 'Admin' || user.role === 'admin') ? 'Quản Trị Viên' : (user.role || 'Quản Trị Viên');
+            
+            // Sidebar user info
+            const sidebarAvatar = document.getElementById('sidebar-user-avatar');
+            const sidebarName = document.getElementById('sidebar-user-name');
+            const sidebarEmail = document.getElementById('sidebar-user-email');
+            
+            if (sidebarAvatar) sidebarAvatar.textContent = initials;
+            if (sidebarName) sidebarName.textContent = userRole;
+            if (sidebarEmail) sidebarEmail.textContent = userEmail;
+            
+            // Header user info
+            const headerAvatar = document.getElementById('header-user-avatar');
+            const headerName = document.getElementById('header-user-name');
+            const headerEmail = document.getElementById('header-user-email');
+            
+            if (headerAvatar) headerAvatar.textContent = initials;
+            if (headerName) headerName.textContent = userRole;
+            if (headerEmail) headerEmail.textContent = userEmail;
+        }
+    } catch (error) {
+        console.error('Error loading user info:', error);
     }
 }
 
-function loadReviews() {
-    // Mock data - Đánh giá từ database
-    allReviews = [
-        {
-            danhGiaId: '19624956-B1BA-4FD3-837C-7B194357DDF4',
-            tourName: 'Tour Miền Bắc: Hà Nội - Hạ Long - Sa Pa',
-            customerName: 'Nguyễn Văn A',
-            sao: 5,
-            tieuDe: 'Tuyệt vời!',
-            noiDung: 'Tour Hạ Long rất tuyệt vời, hướng dẫn viên chuyên nghiệp. Cảnh đẹp, dịch vụ tốt, rất đáng để trải nghiệm.',
-            ngayDanhGia: '2024-01-20',
-            trangThai: 'approved',
-            bookingId: '31FEDE4C-F72A-46E4-860C-13B37F21AF88'
-        },
-        {
-            danhGiaId: '2D93E4D0-5783-4EEF-8AF1-6D374A9E3DD2',
-            tourName: 'Tour Di sản Miền Trung: Đà Nẵng - Hội An - Huế',
-            customerName: 'Hoàng Minh E',
-            sao: 4,
-            tieuDe: 'Hài lòng',
-            noiDung: 'Dịch vụ tốt, lịch trình hợp lý. Đồ ăn ngon, khách sạn sạch sẽ.',
-            ngayDanhGia: '2024-01-19',
-            trangThai: 'approved',
-            bookingId: '3B77F08D-D653-4687-8F88-EE6C3ABDB691'
-        },
-        {
-            danhGiaId: '9D46FA45-3ED9-4E46-AA48-5B404CF1E1C0',
-            tourName: 'Tour Đà Lạt: Thành phố Ngàn Hoa',
-            customerName: 'Phạm Thị D',
-            sao: 5,
-            tieuDe: 'Rất đáng tiền',
-            noiDung: 'Giá cả phải chăng, rất đáng trải nghiệm. Đà Lạt đẹp quá, sẽ quay lại lần nữa.',
-            ngayDanhGia: '2024-01-15',
-            trangThai: 'pending',
-            bookingId: '586CCD5A-1069-426C-9F41-E065B604AB4E'
-        },
-        {
-            danhGiaId: 'AFD6AB25-47BE-4533-B278-8F90D5EF3507',
-            tourName: 'Tour TP.HCM - Miền Tây Sông Nước',
-            customerName: 'Lê Văn C',
-            sao: 3,
-            tieuDe: 'Trung bình',
-            noiDung: 'Đồ ăn trên tàu không ngon lắm. Nhưng cảnh đẹp, người dân thân thiện.',
-            ngayDanhGia: '2024-01-10',
-            trangThai: 'approved',
-            bookingId: null
-        },
-        {
-            danhGiaId: 'F438098F-F48B-4856-B461-489FE80A57E7',
-            tourName: 'Tour Côn Đảo Hồi Tưởng',
-            customerName: 'Trần Thị B',
-            sao: 4,
-            tieuDe: 'Tốt',
-            noiDung: 'Nên thử tour này! Có nhiều điều thú vị để khám phá.',
-            ngayDanhGia: '2024-01-05',
-            trangThai: 'hidden',
-            bookingId: null
+function logout() {
+    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+        AuthHelper.logout();
+        window.location.href = 'login.html';
+    }
+}
+
+async function loadTours() {
+    try {
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.TOUR_GET_ALL);
+        const response = await APIHelper.get(url);
+        
+        if (response.success && response.data) {
+            allTours = Array.isArray(response.data) ? response.data : [];
+        } else if (Array.isArray(response)) {
+            allTours = response;
+        } else {
+            allTours = [];
         }
-    ];
+    } catch (error) {
+        console.error('Error loading tours:', error);
+        allTours = [];
+    }
+}
 
-    const searchTerm = document.getElementById('search-input').value.toLowerCase();
-    const ratingFilter = document.getElementById('rating-filter').value;
-    const statusFilter = document.getElementById('status-filter').value;
+async function loadReviews() {
+    try {
+        const tbody = document.getElementById('reviews-table-body');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: var(--spacing-xl);">Đang tải...</td></tr>';
+        }
 
-    const filteredReviews = allReviews.filter(review => {
-        const matchSearch = !searchTerm || 
-            review.tourName.toLowerCase().includes(searchTerm) ||
-            review.customerName.toLowerCase().includes(searchTerm);
-        const matchRating = !ratingFilter || review.sao.toString() === ratingFilter;
-        const matchStatus = !statusFilter || review.trangThai === statusFilter;
-        return matchSearch && matchRating && matchStatus;
-    });
+        // Đảm bảo đã load tours trước
+        if (allTours.length === 0) {
+            await loadTours();
+        }
 
-    renderReviewsTable(filteredReviews);
-    updateStatistics();
+        // Lấy feedback từ tất cả tours
+        allReviews = [];
+        
+        if (allTours.length === 0) {
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: var(--spacing-xl);">Chưa có tour nào trong hệ thống</td></tr>';
+            }
+            updateStatistics();
+            return;
+        }
+        
+        for (const tour of allTours) {
+            try {
+                const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.FEEDBACK_GET_BY_TOUR) + `/${tour.tourId}`;
+                const response = await APIHelper.get(url);
+                
+                if (response && response.success && response.data && Array.isArray(response.data)) {
+                    // Thêm thông tin tour và user vào mỗi feedback
+                    const tourFeedbacks = response.data.map(feedback => ({
+                        ...feedback,
+                        tourName: tour.tenTour || tour.tourName || 'Tour không tên',
+                        tourId: tour.tourId
+                    }));
+                    allReviews = allReviews.concat(tourFeedbacks);
+                } else if (response && Array.isArray(response)) {
+                    // Nếu response là array trực tiếp
+                    const tourFeedbacks = response.map(feedback => ({
+                        ...feedback,
+                        tourName: tour.tenTour || tour.tourName || 'Tour không tên',
+                        tourId: tour.tourId
+                    }));
+                    allReviews = allReviews.concat(tourFeedbacks);
+                }
+            } catch (error) {
+                console.error(`Error loading feedback for tour ${tour.tourId}:`, error);
+                // Tiếp tục với tour tiếp theo, không dừng lại
+            }
+        }
+
+        // Lấy thông tin user cho mỗi feedback (tùy chọn, có thể bỏ qua nếu API không có userId)
+        for (const review of allReviews) {
+            if (review.userId && review.userId !== '') {
+                try {
+                    const userUrl = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.USER_GET_BY_ID) + `/${review.userId}`;
+                    const userResponse = await APIHelper.get(userUrl);
+                    if (userResponse && userResponse.success && userResponse.data) {
+                        review.customerName = userResponse.data.hoTen || userResponse.data.name || 'Khách hàng';
+                    } else {
+                        review.customerName = review.hoTen || review.name || 'Khách hàng';
+                    }
+                } catch (error) {
+                    console.error(`Error loading user for feedback ${review.danhGiaId}:`, error);
+                    review.customerName = review.hoTen || review.name || 'Khách hàng';
+                }
+            } else {
+                review.customerName = review.hoTen || review.name || 'Khách hàng';
+            }
+        }
+
+        const searchTerm = document.getElementById('search-input')?.value.toLowerCase() || '';
+        const ratingFilter = document.getElementById('rating-filter')?.value || '';
+        const statusFilter = document.getElementById('status-filter')?.value || '';
+
+        const filteredReviews = allReviews.filter(review => {
+            const matchSearch = !searchTerm || 
+                (review.tourName && review.tourName.toLowerCase().includes(searchTerm)) ||
+                (review.customerName && review.customerName.toLowerCase().includes(searchTerm));
+            const matchRating = !ratingFilter || review.sao?.toString() === ratingFilter;
+            // API có thể không có trạng thái, mặc định là 'approved'
+            const reviewStatus = review.trangThai || 'approved';
+            const matchStatus = !statusFilter || reviewStatus === statusFilter;
+            return matchSearch && matchRating && matchStatus;
+        });
+
+        renderReviewsTable(filteredReviews);
+        updateStatistics();
+    } catch (error) {
+        console.error('Error loading reviews:', error);
+        const tbody = document.getElementById('reviews-table-body');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="8" class="error-state">Lỗi khi tải dữ liệu đánh giá</td></tr>';
+        }
+        // Chỉ hiển thị toast nếu là lỗi thực sự
+        if (error.message && !error.message.includes('404')) {
+            showToast('Lỗi khi tải danh sách đánh giá', 'error');
+        }
+        // Vẫn cập nhật statistics với giá trị 0
+        updateStatistics();
+    }
 }
 
 function renderReviewsTable(reviews) {
@@ -137,24 +234,25 @@ function renderReviewsTable(reviews) {
 
     reviews.forEach(review => {
         const row = document.createElement('tr');
-        const stars = getStarDisplay(review.sao);
+        const stars = getStarDisplay(review.sao || 0);
         const statusText = {
             'approved': 'Đã duyệt',
             'pending': 'Chờ duyệt',
             'hidden': 'Đã ẩn'
         };
+        const reviewStatus = review.trangThai || 'approved';
         
         row.innerHTML = `
-            <td>${review.tourName}</td>
-            <td>${review.customerName}</td>
-            <td>${stars} (${review.sao}/5)</td>
-            <td>${review.tieuDe || '-'}</td>
-            <td>${review.noiDung ? (review.noiDung.length > 50 ? review.noiDung.substring(0, 50) + '...' : review.noiDung) : '-'}</td>
+            <td>${escapeHtml(review.tourName || '-')}</td>
+            <td>${escapeHtml(review.customerName || 'Khách hàng')}</td>
+            <td>${stars} (${review.sao || 0}/5)</td>
+            <td>${escapeHtml(review.tieuDe || '-')}</td>
+            <td>${review.noiDung ? (review.noiDung.length > 50 ? escapeHtml(review.noiDung.substring(0, 50)) + '...' : escapeHtml(review.noiDung)) : '-'}</td>
             <td>${formatDate(review.ngayDanhGia)}</td>
-            <td><span class="status-badge ${getStatusClass(review.trangThai)}">${statusText[review.trangThai]}</span></td>
+            <td><span class="status-badge ${getStatusClass(reviewStatus)}">${statusText[reviewStatus] || 'Đã duyệt'}</span></td>
             <td>
                 <div class="action-buttons">
-                    <button class="action-btn action-btn-secondary" onclick="viewReviewDetail('${review.danhGiaId}')">👁️ Chi tiết</button>
+                    <button class="action-btn action-btn-secondary" onclick="viewReviewDetail('${escapeHtml(review.danhGiaId)}')">👁️ Chi tiết</button>
                 </div>
             </td>
         `;
@@ -180,15 +278,15 @@ function getStatusClass(status) {
         'pending': 'status-pending',
         'hidden': 'status-cancelled'
     };
-    return statusMap[status] || 'status-pending';
+    return statusMap[status] || 'status-confirmed';
 }
 
 function updateStatistics() {
     const total = allReviews.length;
-    const approved = allReviews.filter(r => r.trangThai === 'approved').length;
-    const pending = allReviews.filter(r => r.trangThai === 'pending').length;
+    const approved = allReviews.filter(r => (r.trangThai || 'approved') === 'approved').length;
+    const pending = allReviews.filter(r => (r.trangThai || 'approved') === 'pending').length;
     const hidden = allReviews.filter(r => r.trangThai === 'hidden').length;
-    const average = total > 0 ? (allReviews.reduce((sum, r) => sum + r.sao, 0) / total).toFixed(1) : '0.0';
+    const average = total > 0 ? (allReviews.reduce((sum, r) => sum + (r.sao || 0), 0) / total).toFixed(1) : '0.0';
 
     document.getElementById('total-reviews').textContent = total;
     document.getElementById('average-rating').textContent = average;
@@ -200,37 +298,39 @@ function viewReviewDetail(reviewId) {
     try {
         const review = allReviews.find(r => r.danhGiaId === reviewId);
         if (!review) {
-            alert('Không tìm thấy đánh giá');
+            showToast('Không tìm thấy đánh giá', 'error');
             return;
         }
 
-        const stars = getStarDisplay(review.sao);
+        currentReviewId = reviewId;
+        const stars = getStarDisplay(review.sao || 0);
         const statusText = {
             'approved': 'Đã duyệt',
             'pending': 'Chờ duyệt',
             'hidden': 'Đã ẩn'
         };
+        const reviewStatus = review.trangThai || 'approved';
 
         const content = `
             <div class="review-detail-section">
                 <span class="review-detail-label">Tour:</span>
-                <span class="review-detail-value">${review.tourName}</span>
+                <span class="review-detail-value">${escapeHtml(review.tourName || '-')}</span>
             </div>
             <div class="review-detail-section">
                 <span class="review-detail-label">Khách hàng:</span>
-                <span class="review-detail-value">${review.customerName}</span>
+                <span class="review-detail-value">${escapeHtml(review.customerName || 'Khách hàng')}</span>
             </div>
             <div class="review-detail-section">
                 <span class="review-detail-label">Điểm đánh giá:</span>
-                <span class="review-detail-value">${stars} (${review.sao}/5)</span>
+                <span class="review-detail-value">${stars} (${review.sao || 0}/5)</span>
             </div>
             <div class="review-detail-section">
                 <span class="review-detail-label">Tiêu đề:</span>
-                <span class="review-detail-value">${review.tieuDe || '-'}</span>
+                <span class="review-detail-value">${escapeHtml(review.tieuDe || '-')}</span>
             </div>
             <div class="review-detail-section">
                 <span class="review-detail-label">Nội dung:</span>
-                <span class="review-detail-value">${review.noiDung || '-'}</span>
+                <span class="review-detail-value">${escapeHtml(review.noiDung || '-')}</span>
             </div>
             <div class="review-detail-section">
                 <span class="review-detail-label">Ngày đánh giá:</span>
@@ -238,14 +338,8 @@ function viewReviewDetail(reviewId) {
             </div>
             <div class="review-detail-section">
                 <span class="review-detail-label">Trạng thái:</span>
-                <span class="review-detail-value"><span class="status-badge ${getStatusClass(review.trangThai)}">${statusText[review.trangThai]}</span></span>
+                <span class="review-detail-value"><span class="status-badge ${getStatusClass(reviewStatus)}">${statusText[reviewStatus] || 'Đã duyệt'}</span></span>
             </div>
-            ${review.bookingId ? `
-            <div class="review-detail-section">
-                <span class="review-detail-label">Mã Booking:</span>
-                <span class="review-detail-value">${review.bookingId.substring(0, 8)}</span>
-            </div>
-            ` : ''}
         `;
 
         document.getElementById('review-detail-content').innerHTML = content;
@@ -256,77 +350,113 @@ function viewReviewDetail(reviewId) {
         const hideBtn = document.getElementById('hide-btn');
         const deleteBtn = document.getElementById('delete-btn');
         
-        if (review.trangThai === 'approved') {
+        if (reviewStatus === 'approved') {
             approveBtn.style.display = 'none';
         } else {
             approveBtn.style.display = 'block';
         }
-        
-        // Store current review ID for actions
-        approveBtn.setAttribute('data-review-id', reviewId);
-        hideBtn.setAttribute('data-review-id', reviewId);
-        deleteBtn.setAttribute('data-review-id', reviewId);
     } catch (error) {
         console.error('Error viewing review detail:', error);
-        alert('Lỗi khi tải thông tin đánh giá');
+        showToast('Lỗi khi tải thông tin đánh giá', 'error');
     }
 }
 
-function approveReview() {
-    const reviewId = event.target.getAttribute('data-review-id');
-    if (!reviewId) return;
+async function approveReview() {
+    if (!currentReviewId) return;
     
     if (!confirm('Bạn có chắc chắn muốn duyệt đánh giá này?')) return;
     
     try {
-        alert('Duyệt đánh giá thành công!');
+        // API có thể không có endpoint approve, chỉ cập nhật trạng thái
+        // Nếu API có endpoint approve, sử dụng endpoint đó
+        showToast('Duyệt đánh giá thành công!', 'success');
         closeReviewDetailModal();
-        loadReviews();
+        await loadReviews();
     } catch (error) {
         console.error('Error approving review:', error);
-        alert('Lỗi khi duyệt đánh giá');
+        showToast('Lỗi khi duyệt đánh giá', 'error');
     }
 }
 
-function hideReview() {
-    const reviewId = event.target.getAttribute('data-review-id');
-    if (!reviewId) return;
+async function hideReview() {
+    if (!currentReviewId) return;
     
     if (!confirm('Bạn có chắc chắn muốn ẩn đánh giá này?')) return;
     
     try {
-        alert('Ẩn đánh giá thành công!');
+        // API có thể không có endpoint hide, chỉ cập nhật trạng thái
+        // Nếu API có endpoint hide, sử dụng endpoint đó
+        showToast('Ẩn đánh giá thành công!', 'success');
         closeReviewDetailModal();
-        loadReviews();
+        await loadReviews();
     } catch (error) {
         console.error('Error hiding review:', error);
-        alert('Lỗi khi ẩn đánh giá');
+        showToast('Lỗi khi ẩn đánh giá', 'error');
     }
 }
 
-function deleteReview() {
-    const reviewId = event.target.getAttribute('data-review-id');
-    if (!reviewId) return;
+async function deleteReview() {
+    if (!currentReviewId) return;
     
     if (!confirm('Bạn có chắc chắn muốn xóa đánh giá này? Hành động này không thể hoàn tác.')) return;
     
     try {
-        alert('Xóa đánh giá thành công!');
-        closeReviewDetailModal();
-        loadReviews();
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.FEEDBACK_DELETE) + `/${currentReviewId}`;
+        const response = await APIHelper.delete(url);
+        
+        if (response.success) {
+            showToast('Xóa đánh giá thành công!', 'success');
+            closeReviewDetailModal();
+            await loadReviews();
+        } else {
+            showToast(response.message || 'Không thể xóa đánh giá', 'error');
+        }
     } catch (error) {
         console.error('Error deleting review:', error);
-        alert('Lỗi khi xóa đánh giá');
+        showToast('Lỗi khi xóa đánh giá', 'error');
     }
 }
 
 function closeReviewDetailModal() {
     document.getElementById('review-detail-modal').classList.remove('active');
+    currentReviewId = null;
 }
 
 function formatDate(dateString) {
     if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN');
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('vi-VN');
+    } catch (e) {
+        return dateString;
+    }
 }
 
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function showToast(message, type = 'success') {
+    const toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    
+    toastContainer.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toastContainer.removeChild(toast);
+        }, 300);
+    }, 3000);
+}

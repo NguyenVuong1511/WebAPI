@@ -1,9 +1,19 @@
-// Admin Bookings Management JavaScript
+// Admin Bookings Management JavaScript - Kết nối API
 let allBookings = [];
 let currentBookingId = null;
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Kiểm tra quyền admin
+    if (!AuthHelper.requireAuth('Admin')) {
+        return;
+    }
+
+    console.log('Admin Bookings loaded');
+    
+    // Load user info
     loadUserInfo();
+    
+    // Load bookings from API
     loadBookings();
     
     const searchInput = document.getElementById('search-input');
@@ -36,21 +46,75 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function loadUserInfo() {
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
-    if (user.name) {
-        const nameParts = user.name.split(' ');
-        const initials = nameParts.length >= 2 
-            ? nameParts[0][0] + nameParts[nameParts.length - 1][0]
-            : user.name[0];
-        document.getElementById('user-avatar').textContent = initials.toUpperCase();
-        document.getElementById('user-name').textContent = user.name;
-        document.getElementById('user-role').textContent = user.role || 'Quản Trị Viên';
+    const user = AuthHelper.getUser();
+    if (user) {
+        const initials = FormatHelper.getInitials(user.hoTen || 'NV');
+        const userName = user.hoTen || 'Quản Trị Viên';
+        const userEmail = user.email || 'admin@travelviet.com';
+        const userRole = user.role === 'Admin' ? 'Quản Trị Viên' : user.role || 'Quản Trị Viên';
+        
+        // Sidebar user info
+        const sidebarAvatar = document.getElementById('sidebar-user-avatar');
+        const sidebarName = document.getElementById('sidebar-user-name');
+        const sidebarEmail = document.getElementById('sidebar-user-email');
+        
+        if (sidebarAvatar) sidebarAvatar.textContent = initials;
+        if (sidebarName) sidebarName.textContent = userRole;
+        if (sidebarEmail) sidebarEmail.textContent = userEmail;
+        
+        // Header user info
+        const headerAvatar = document.getElementById('header-user-avatar');
+        const headerName = document.getElementById('header-user-name');
+        const headerEmail = document.getElementById('header-user-email');
+        
+        if (headerAvatar) headerAvatar.textContent = initials;
+        if (headerName) headerName.textContent = userRole;
+        if (headerEmail) headerEmail.textContent = userEmail;
     }
 }
 
-function loadBookings() {
-    // Mock data - Bookings từ database
-    allBookings = [
+function logout() {
+    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+        AuthHelper.logout();
+        window.location.href = 'login.html';
+    }
+}
+
+async function loadBookings() {
+    try {
+        const tbody = document.getElementById('bookings-table-body');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="8" class="loading-state">Đang tải...</td></tr>';
+        }
+        
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.BOOKING_ADMIN_ALL);
+        const response = await APIHelper.get(url);
+
+        if (response.success && response.data) {
+            allBookings = response.data;
+            applyFilters();
+        } else {
+            console.error('Failed to load bookings:', response.message);
+            allBookings = [];
+            const tbody = document.getElementById('bookings-table-body');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">' + (response.message || 'Không tìm thấy booking nào') + '</td></tr>';
+            }
+        }
+    } catch (error) {
+        console.error('Error loading bookings:', error);
+        allBookings = [];
+        const tbody = document.getElementById('bookings-table-body');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="8" class="error-state">Lỗi khi tải dữ liệu booking</td></tr>';
+        }
+    }
+}
+
+function applyFilters() {
+    // Mock data - Bookings từ database (fallback nếu API không có dữ liệu)
+    if (allBookings.length === 0) {
+        allBookings = [
         {
             bookingId: '31FEDE4C-F72A-46E4-860C-13B37F21AF88',
             tourName: 'Tour Miền Bắc: Hà Nội - Hạ Long - Sa Pa',
@@ -179,20 +243,21 @@ function loadBookings() {
             ]
         }
     ];
-
-    const searchTerm = document.getElementById('search-input').value.toLowerCase();
-    const statusFilter = document.getElementById('status-filter').value;
-    const dateFrom = document.getElementById('date-from').value;
-    const dateTo = document.getElementById('date-to').value;
+    }
+    
+    const searchTerm = document.getElementById('search-input')?.value.toLowerCase() || '';
+    const statusFilter = document.getElementById('status-filter')?.value || '';
+    const dateFrom = document.getElementById('date-from')?.value || '';
+    const dateTo = document.getElementById('date-to')?.value || '';
 
     const filteredBookings = allBookings.filter(booking => {
         const matchSearch = !searchTerm || 
-            booking.bookingId.toLowerCase().includes(searchTerm) ||
-            booking.customerName.toLowerCase().includes(searchTerm) ||
-            booking.tourName.toLowerCase().includes(searchTerm);
-        const matchStatus = !statusFilter || booking.trangThai === statusFilter;
-        const matchDate = (!dateFrom || booking.ngayKhoiHanh >= dateFrom) &&
-                        (!dateTo || booking.ngayKhoiHanh <= dateTo);
+            (booking.bookingId && booking.bookingId.toLowerCase().includes(searchTerm)) ||
+            (booking.nguoiDat && booking.nguoiDat.toLowerCase().includes(searchTerm)) ||
+            (booking.tenTour && booking.tenTour.toLowerCase().includes(searchTerm));
+        const matchStatus = !statusFilter || booking.trangThaiThanhToan === statusFilter;
+        const matchDate = (!dateFrom || !booking.ngayDat || booking.ngayDat >= dateFrom) &&
+                        (!dateTo || !booking.ngayDat || booking.ngayDat <= dateTo);
         return matchSearch && matchStatus && matchDate;
     });
 
@@ -206,29 +271,29 @@ function renderBookingsTable(bookings) {
     tbody.innerHTML = '';
 
     if (bookings.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: var(--spacing-xl);">Không tìm thấy booking nào</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Không tìm thấy booking nào</td></tr>';
         return;
     }
 
     bookings.forEach(booking => {
         const row = document.createElement('tr');
-        const soNguoi = `${booking.soNguoiLon} người lớn${booking.soTreEm > 0 ? `, ${booking.soTreEm} trẻ em` : ''}`;
+        const soNguoi = `${booking.soNguoiLon || 0} người lớn${(booking.soTreEm || 0) > 0 ? `, ${booking.soTreEm} trẻ em` : ''}`;
+        const bookingId = booking.bookingId || '';
+        const trangThai = booking.trangThaiThanhToan || booking.trangThai || 'Chờ xác nhận';
         
         row.innerHTML = `
-            <td>${booking.bookingId.substring(0, 8)}</td>
-            <td>${booking.tourName}</td>
-            <td>${booking.customerName}</td>
-            <td>${formatDate(booking.ngayKhoiHanh)}</td>
+            <td>${bookingId.substring(0, 8)}</td>
+            <td>${escapeHtml(booking.tenTour || '-')}</td>
+            <td>${escapeHtml(booking.nguoiDat || '-')}</td>
+            <td>${formatDate(booking.ngayDat)}</td>
             <td>${soNguoi}</td>
-            <td>${formatCurrency(booking.tongTien)}</td>
-            <td><span class="status-badge ${getStatusClass(booking.trangThai)}">${booking.trangThai}</span></td>
+            <td style="text-align: right;">${FormatHelper.currency(booking.tongTien || 0)}</td>
+            <td><span class="status-badge ${getStatusClass(trangThai)}">${escapeHtml(trangThai)}</span></td>
             <td>
                 <div class="action-buttons">
-                    <button class="action-btn action-btn-secondary" onclick="viewBookingDetail('${booking.bookingId}')">👁️ Chi tiết</button>
-                    ${booking.trangThai === 'Chờ xác nhận' ? 
-                        `<button class="action-btn cta-button cta-primary" style="padding: var(--spacing-xs) var(--spacing-sm); font-size: var(--font-size-xs);" onclick="confirmBooking('${booking.bookingId}')">✓ Xác nhận</button>` : ''}
-                    ${booking.trangThai !== 'Đã hủy' ? 
-                        `<button class="action-btn action-btn-danger" onclick="cancelBooking('${booking.bookingId}')">✕ Hủy</button>` : ''}
+                    <button class="action-btn action-btn-secondary" onclick="viewBookingDetail('${escapeHtml(bookingId)}')">Chi tiết</button>
+                    ${trangThai === 'Chờ xác nhận' ? 
+                        `<button class="action-btn action-btn-primary" onclick="confirmBooking('${escapeHtml(bookingId)}')">Xác nhận</button>` : ''}
                 </div>
             </td>
         `;
@@ -247,13 +312,24 @@ function getStatusClass(status) {
     return statusMap[status] || 'status-pending';
 }
 
-function viewBookingDetail(bookingId) {
+async function viewBookingDetail(bookingId) {
     try {
         currentBookingId = bookingId;
-        const booking = allBookings.find(b => b.bookingId === bookingId);
-        if (!booking) {
-            alert('Không tìm thấy booking');
-            return;
+        
+        // Load booking detail from API
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.BOOKING_DETAIL) + `/${bookingId}`;
+        const response = await APIHelper.get(url);
+        
+        let booking;
+        if (response.success && response.data) {
+            booking = response.data;
+        } else {
+            // Fallback to local data
+            booking = allBookings.find(b => b.bookingId === bookingId);
+            if (!booking) {
+                showToast('Không tìm thấy booking', 'error');
+                return;
+            }
         }
 
         showBookingTab('thong-tin');
@@ -261,14 +337,15 @@ function viewBookingDetail(bookingId) {
         
         // Show/hide confirm button based on status
         const confirmBtn = document.getElementById('confirm-booking-btn');
-        if (booking.trangThai === 'Chờ xác nhận') {
+        const trangThai = booking.trangThaiThanhToan || booking.trangThai || '';
+        if (trangThai === 'Chờ xác nhận') {
             confirmBtn.style.display = 'block';
         } else {
             confirmBtn.style.display = 'none';
         }
     } catch (error) {
         console.error('Error viewing booking detail:', error);
-        alert('Lỗi khi tải thông tin booking');
+        showToast('Lỗi khi tải thông tin booking', 'error');
     }
 }
 
@@ -290,24 +367,41 @@ function showBookingTab(tabName) {
     if (!content) return;
     
     if (tabName === 'thong-tin') {
-        const soNguoi = `${booking.soNguoiLon} người lớn${booking.soTreEm > 0 ? `, ${booking.soTreEm} trẻ em` : ''}`;
+        const soNguoi = `${booking.soNguoiLon || 0} người lớn${(booking.soTreEm || 0) > 0 ? `, ${booking.soTreEm} trẻ em` : ''}`;
+        const tenTour = booking.tenTour || booking.tourName || '-';
+        const nguoiDat = booking.nguoiDat || booking.customerName || '-';
+        const trangThai = booking.trangThaiThanhToan || booking.trangThai || 'Chờ xác nhận';
+        const danhSachHanhKhach = booking.danhSachHanhKhach || [];
+        
+        let hanhKhachHTML = '';
+        if (danhSachHanhKhach.length > 0) {
+            hanhKhachHTML = '<div class="booking-info-item" style="grid-column: 1 / -1;"><span class="booking-info-label">Danh sách hành khách:</span><ul style="margin-top: var(--spacing-sm); padding-left: var(--spacing-lg);">';
+            danhSachHanhKhach.forEach(hk => {
+                hanhKhachHTML += `<li>${escapeHtml(hk.hoTen || '')} - ${escapeHtml(hk.loaiKhach || '')}${hk.cmnd ? ` (CMND: ${escapeHtml(hk.cmnd)})` : ''}</li>`;
+            });
+            hanhKhachHTML += '</ul></div>';
+        }
+        
         content.innerHTML = `
             <div class="booking-info-grid">
                 <div class="booking-info-item">
                     <span class="booking-info-label">Mã Booking:</span>
-                    <span class="booking-info-value">${booking.bookingId}</span>
+                    <span class="booking-info-value">${escapeHtml(booking.bookingId || '-')}</span>
                 </div>
                 <div class="booking-info-item">
-                    <span class="booking-info-label">Tour:</span>
-                    <span class="booking-info-value">${booking.tourName}</span>
+                    <span class="booking-info-label">${escapeHtml(tenTour)}</span>
                 </div>
                 <div class="booking-info-item">
                     <span class="booking-info-label">Khách hàng:</span>
-                    <span class="booking-info-value">${booking.customerName}</span>
+                    <span class="booking-info-value">${escapeHtml(nguoiDat)}</span>
                 </div>
                 <div class="booking-info-item">
-                    <span class="booking-info-label">Ngày khởi hành:</span>
-                    <span class="booking-info-value">${formatDate(booking.ngayKhoiHanh)}</span>
+                    <span class="booking-info-label">Email:</span>
+                    <span class="booking-info-value">${escapeHtml(booking.email || '-')}</span>
+                </div>
+                <div class="booking-info-item">
+                    <span class="booking-info-label">Ngày đặt:</span>
+                    <span class="booking-info-value">${formatDate(booking.ngayDat)}</span>
                 </div>
                 <div class="booking-info-item">
                     <span class="booking-info-label">Số người:</span>
@@ -315,41 +409,46 @@ function showBookingTab(tabName) {
                 </div>
                 <div class="booking-info-item">
                     <span class="booking-info-label">Tổng tiền:</span>
-                    <span class="booking-info-value">${formatCurrency(booking.tongTien)}</span>
+                    <span class="booking-info-value">${formatCurrency(booking.tongTien || 0)}</span>
                 </div>
                 <div class="booking-info-item">
                     <span class="booking-info-label">Trạng thái:</span>
-                    <span class="booking-info-value"><span class="status-badge ${getStatusClass(booking.trangThai)}">${booking.trangThai}</span></span>
+                    <span class="booking-info-value"><span class="status-badge ${getStatusClass(trangThai)}">${escapeHtml(trangThai)}</span></span>
                 </div>
+                ${hanhKhachHTML}
             </div>
         `;
     } else if (tabName === 'hoa-don') {
         const hoaDon = booking.hoaDon || {};
+        const tongTien = booking.tongTien || hoaDon.tongTien || 0;
+        const tienDaThanhToan = hoaDon.tienDaThanhToan || 0;
+        const trangThaiTT = booking.trangThaiThanhToan || hoaDon.trangThaiThanhToan || 'Chờ thanh toán';
+        
         content.innerHTML = `
             <div class="booking-info-grid">
                 <div class="booking-info-item">
                     <span class="booking-info-label">Mã Hóa đơn:</span>
-                    <span class="booking-info-value">${hoaDon.hoaDonId || '-'}</span>
+                    <span class="booking-info-value">${escapeHtml(hoaDon.hoaDonId || booking.bookingId || '-')}</span>
                 </div>
                 <div class="booking-info-item">
                     <span class="booking-info-label">Tổng tiền:</span>
-                    <span class="booking-info-value">${formatCurrency(hoaDon.tongTien || 0)}</span>
+                    <span class="booking-info-value">${formatCurrency(tongTien)}</span>
                 </div>
                 <div class="booking-info-item">
                     <span class="booking-info-label">Tiền đã thanh toán:</span>
-                    <span class="booking-info-value">${formatCurrency(hoaDon.tienDaThanhToan || 0)}</span>
+                    <span class="booking-info-value">${formatCurrency(tienDaThanhToan)}</span>
                 </div>
                 <div class="booking-info-item">
                     <span class="booking-info-label">Tiền còn lại:</span>
-                    <span class="booking-info-value">${formatCurrency((hoaDon.tongTien || 0) - (hoaDon.tienDaThanhToan || 0))}</span>
+                    <span class="booking-info-value">${formatCurrency(tongTien - tienDaThanhToan)}</span>
                 </div>
                 <div class="booking-info-item">
                     <span class="booking-info-label">Trạng thái thanh toán:</span>
-                    <span class="booking-info-value"><span class="status-badge ${getStatusClass(hoaDon.trangThaiThanhToan || '')}">${hoaDon.trangThaiThanhToan || '-'}</span></span>
+                    <span class="booking-info-value"><span class="status-badge ${getStatusClass(trangThaiTT)}">${escapeHtml(trangThaiTT)}</span></span>
                 </div>
                 <div class="booking-info-item">
                     <span class="booking-info-label">Ngày lập:</span>
-                    <span class="booking-info-value">${hoaDon.ngayLap ? formatDate(hoaDon.ngayLap) : '-'}</span>
+                    <span class="booking-info-value">${hoaDon.ngayLap ? formatDate(hoaDon.ngayLap) : formatDate(booking.ngayDat)}</span>
                 </div>
             </div>
         `;
@@ -373,10 +472,10 @@ function showBookingTab(tabName) {
             thanhToan.forEach(tt => {
                 tableHTML += `
                     <tr>
-                        <td>${formatDate(tt.ngayThanhToan)}</td>
-                        <td>${formatCurrency(tt.soTien)}</td>
-                        <td>${tt.phuongThuc}</td>
-                        <td><span class="status-badge ${getStatusClass(tt.trangThai)}">${tt.trangThai}</span></td>
+                        <td>${formatDate(tt.ngayThanhToan || tt.ngayDat)}</td>
+                        <td style="text-align: right;">${formatCurrency(tt.soTien || tt.soTienThanhToan || 0)}</td>
+                        <td>${escapeHtml(tt.phuongThuc || tt.phuongThucThanhToan || '-')}</td>
+                        <td><span class="status-badge ${getStatusClass(tt.trangThai || 'Thành công')}">${escapeHtml(tt.trangThai || 'Thành công')}</span></td>
                     </tr>
                 `;
             });
@@ -427,17 +526,24 @@ function showBookingTab(tabName) {
     content.classList.add('active');
 }
 
-function confirmBooking(bookingId) {
+async function confirmBooking(bookingId) {
     if (!bookingId) bookingId = currentBookingId;
     if (!confirm('Bạn có chắc chắn muốn xác nhận booking này?')) return;
 
     try {
-        alert('Xác nhận booking thành công!');
-        closeBookingDetailModal();
-        loadBookings();
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.BOOKING_ADMIN_APPROVE) + `/${bookingId}`;
+        const response = await APIHelper.post(url, {});
+
+        if (response.success) {
+            showToast('Xác nhận booking thành công!', 'success');
+            closeBookingDetailModal();
+            await loadBookings();
+        } else {
+            showToast(response.message || 'Không thể xác nhận booking', 'error');
+        }
     } catch (error) {
         console.error('Error confirming booking:', error);
-        alert('Lỗi khi xác nhận booking');
+        showToast('Lỗi khi xác nhận booking', 'error');
     }
 }
 
@@ -501,15 +607,38 @@ function closeRefundModal() {
 }
 
 function formatCurrency(amount) {
-    return new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND'
-    }).format(amount);
+    return FormatHelper.currency(amount);
 }
 
 function formatDate(dateString) {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN');
+    return FormatHelper.date(dateString);
+}
+
+function showToast(message, type = 'success') {
+    const existingToasts = document.querySelectorAll('.toast');
+    existingToasts.forEach(toast => toast.remove());
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 

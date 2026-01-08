@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Thêm Tour - Admin Dashboard">
+    <title>Thêm Tour - Admin</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <link rel="stylesheet" href="css/admin-tours.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <img src="img/Logo.png" alt="Logo">
+                <div class="admin-logo-text">
+                    <h2>Travel Viet</h2>
+                    <p>Quản lý hệ thống</p>
+                </div>
+            </div>
+            <nav>
+                <ul class="admin-menu">
+                    <li class="admin-menu-item">
+                        <a href="admin-dashboard.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📊</span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-tours.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">✈️</span>
+                            <span>Quản lý Tour</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-bookings.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📋</span>
+                            <span>Quản lý Booking</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-users.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">👥</span>
+                            <span>Khách hàng</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-reports.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📈</span>
+                            <span>Báo cáo</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="admin-feedback.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">⭐</span>
+                            <span>Đánh giá</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
+                        <a href="index.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">🏠</span>
+                            <span>Về trang chủ</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <div class="admin-header">
+                <h1>Thêm Tour</h1>
+                <div class="admin-user">
+                    <div class="admin-user-avatar" id="user-avatar">NV</div>
+                    <div>
+                        <div class="admin-user-name" id="user-name">Nguyễn Văn A</div>
+                        <div class="admin-user-role" id="user-role">Quản Trị Viên</div>
+                    </div>
+                    <button onclick="logout()" class="cta-button cta-secondary" style="margin-left: 15px;">Đăng xuất</button>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <div class="form-container">
+                    <form id="tour-form" class="modal-form">
+                        
+                        <!-- Basic Information Section -->
+                        <div class="form-section">
+                            <h3>Thông tin cơ bản</h3>
+                            <div class="tour-form-grid">
+                                <div class="form-group">
+                                    <label class="form-label required" for="tour-ten">Tên Tour</label>
+                                    <input type="text" id="tour-ten" class="form-input" required maxlength="300" placeholder="Tên đầy đủ của tour">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label required" for="tour-loai">Loại Tour</label>
+                                    <select id="tour-loai" class="form-select" required>
+                                        <option value="">Chọn loại tour</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="tour-form-grid">
+                                <div class="form-group">
+                                    <label class="form-label required" for="tour-diem-xuatphat">Điểm xuất phát</label>
+                                    <select id="tour-diem-xuatphat" class="form-select" required>
+                                        <option value="">Chọn điểm xuất phát</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="tour-thoigian-khoihanh">Thời gian khởi hành</label>
+                                    <input type="text" id="tour-thoigian-khoihanh" class="form-input" placeholder="VD: Hàng ngày, Thứ 2-4-6">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description Section -->
+                        <div class="form-section">
+                            <h3>Mô tả</h3>
+                            <div class="form-group">
+                                <label class="form-label" for="tour-mota-ngan">Mô tả ngắn</label>
+                                <textarea id="tour-mota-ngan" class="form-textarea" rows="2" maxlength="500" placeholder="Mô tả ngắn gọn về tour"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="tour-mota-chitiet">Mô tả chi tiết</label>
+                                <textarea id="tour-mota-chitiet" class="form-textarea" rows="4" placeholder="Mô tả chi tiết về tour, lịch trình, dịch vụ..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Pricing Section -->
+                        <div class="form-section">
+                            <h3>Giá</h3>
+                            <div class="tour-form-grid">
+                                <div class="form-group">
+                                    <label class="form-label required" for="tour-gia-nguoilon">Giá người lớn (VNĐ)</label>
+                                    <input type="number" id="tour-gia-nguoilon" class="form-input" required min="0" step="1000" placeholder="Giá cho người lớn">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="tour-gia-treEm">Giá trẻ em (VNĐ)</label>
+                                    <input type="number" id="tour-gia-treEm" class="form-input" min="0" step="1000" value="0" placeholder="Giá cho trẻ em (nếu có)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status Section -->
+                        <div class="form-section">
+                            <h3>Trạng thái</h3>
+                            <div class="form-group">
+                                <label class="form-label" for="tour-trangthai">Trạng thái</label>
+                                <select id="tour-trangthai" class="form-select">
+                                    <option value="Hoạt động">Hoạt động</option>
+                                    <option value="Không hoạt động">Không hoạt động</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <a href="admin-tours.html" class="cta-button cta-secondary">Quay lại</a>
+                            <button type="submit" class="cta-button cta-primary">Lưu Tour</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toast-container"></div>
+
+    <script src="js/api-config.js"></script>
+    <script src="js/auth-helper.js"></script>
+    <!-- Toastify JS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="js/admin-add-tour.js"></script>
+</body>
+</html>

@@ -57,6 +57,10 @@ const API_CONFIG = {
         
         // DiaDiem
         DIADIEM_GET_ALL: '/diadiem/get-all',
+        DIADIEM_GET_BY_ID: '/diadiem/get-by-id',
+        DIADIEM_CREATE: '/diadiem/create',
+        DIADIEM_UPDATE: '/diadiem/update',
+        DIADIEM_DELETE: '/diadiem/delete',
         
         // Booking
         BOOKING_CREATE: '/booking/create',

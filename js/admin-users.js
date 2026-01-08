@@ -1,9 +1,16 @@
-// Admin Users Management JavaScript
+// Admin Users Management JavaScript - Kết nối API
 let currentPage = 1;
 const pageSize = 10;
 let allUsers = [];
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Kiểm tra quyền admin
+    if (!AuthHelper.requireAuth('Admin')) {
+        return;
+    }
+
+    console.log('Admin Users loaded');
+    
     loadUserInfo();
     loadUsers();
     
@@ -37,106 +44,95 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function loadUserInfo() {
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
-    if (user.name) {
-        const nameParts = user.name.split(' ');
-        const initials = nameParts.length >= 2 
-            ? nameParts[0][0] + nameParts[nameParts.length - 1][0]
-            : user.name[0];
-        document.getElementById('user-avatar').textContent = initials.toUpperCase();
-        document.getElementById('user-name').textContent = user.name;
-        document.getElementById('user-role').textContent = user.role || 'Quản Trị Viên';
+    try {
+        const user = AuthHelper.getUser();
+        if (user) {
+            // Get initials
+            let initials = 'NV';
+            if (user.hoTen) {
+                const nameParts = user.hoTen.split(' ');
+                if (nameParts.length >= 2) {
+                    initials = (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
+                } else if (nameParts.length === 1) {
+                    initials = nameParts[0][0].toUpperCase();
+                }
+            } else if (user.name) {
+                const nameParts = user.name.split(' ');
+                if (nameParts.length >= 2) {
+                    initials = (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
+                } else if (nameParts.length === 1) {
+                    initials = nameParts[0][0].toUpperCase();
+                }
+            }
+            
+            const userName = user.hoTen || user.name || 'Quản Trị Viên';
+            const userEmail = user.email || 'admin@travelviet.com';
+            const userRole = (user.role === 'Admin' || user.role === 'admin') ? 'Quản Trị Viên' : (user.role || 'Quản Trị Viên');
+            
+            // Sidebar user info
+            const sidebarAvatar = document.getElementById('sidebar-user-avatar');
+            const sidebarName = document.getElementById('sidebar-user-name');
+            const sidebarEmail = document.getElementById('sidebar-user-email');
+            
+            if (sidebarAvatar) sidebarAvatar.textContent = initials;
+            if (sidebarName) sidebarName.textContent = userRole;
+            if (sidebarEmail) sidebarEmail.textContent = userEmail;
+            
+            // Header user info
+            const headerAvatar = document.getElementById('header-user-avatar');
+            const headerName = document.getElementById('header-user-name');
+            const headerEmail = document.getElementById('header-user-email');
+            
+            if (headerAvatar) headerAvatar.textContent = initials;
+            if (headerName) headerName.textContent = userRole;
+            if (headerEmail) headerEmail.textContent = userEmail;
+        }
+    } catch (error) {
+        console.error('Error loading user info:', error);
     }
 }
 
-function loadUsers() {
-    // Mock data
-    allUsers = [
-        {
-            nguoiDungId: '40C2C104-795B-40C0-9C71-71C08968033B',
-            hoTen: 'Nguyễn Văn A',
-            email: 'admin@dulich.com',
-            soDienThoai: '0901234567',
-            vaiTro: 'Quản Trị Viên',
-            trangThai: true,
-            ngayTao: '2024-01-01',
-            khachHang: {
-                diaChi: '123 Đường Nguyễn Trãi, Q.1, TP.HCM',
-                gioiTinh: 'Nam',
-                ngaySinh: '1990-05-15',
-                cmnd_HoChieu: '123456789'
-            }
-        },
-        {
-            nguoiDungId: 'A59145AE-C991-44C0-8197-CF21904ED683',
-            hoTen: 'Trần Thị B',
-            email: 'manager@dulich.com',
-            soDienThoai: '0918765432',
-            vaiTro: 'Quản Lý',
-            trangThai: true,
-            ngayTao: '2024-01-02',
-            khachHang: {
-                diaChi: '456 Đường Lê Lợi, Q. Bình Thạnh, TP.HCM',
-                gioiTinh: 'Nữ',
-                ngaySinh: '1985-11-20',
-                cmnd_HoChieu: '987654321'
-            }
-        },
-        {
-            nguoiDungId: 'B25E5E1B-9DC3-44DB-86AF-18C29A5E93C6',
-            hoTen: 'Lê Văn C',
-            email: 'khachhang1@email.com',
-            soDienThoai: '0987654321',
-            vaiTro: 'Khách Hàng',
-            trangThai: true,
-            ngayTao: '2024-01-03',
-            khachHang: {
-                diaChi: '789 Đường Hai Bà Trưng, Hà Nội',
-                gioiTinh: 'Nam',
-                ngaySinh: '2000-01-01',
-                cmnd_HoChieu: '112233445'
-            }
-        },
-        {
-            nguoiDungId: 'BE5A83D4-4A14-46EF-85B1-822DDA9D74E4',
-            hoTen: 'Phạm Thị D',
-            email: 'khachhang2@email.com',
-            soDienThoai: '0976543210',
-            vaiTro: 'Khách Hàng',
-            trangThai: true,
-            ngayTao: '2024-01-04',
-            khachHang: {
-                diaChi: '999 Đường Cầu Giấy, Hà Nội',
-                gioiTinh: 'Nam',
-                ngaySinh: '1975-03-25',
-                cmnd_HoChieu: '223344556'
-            }
-        },
-        {
-            nguoiDungId: 'C9EA54FC-9F78-4802-9B3C-5145646DA9C2',
-            hoTen: 'Hoàng Minh E',
-            email: 'khachhang3@email.com',
-            soDienThoai: '0965432109',
-            vaiTro: 'Khách Hàng',
-            trangThai: true,
-            ngayTao: '2024-01-05',
-            khachHang: {
-                diaChi: '101 Đường Trần Phú, Đà Nẵng',
-                gioiTinh: 'Nữ',
-                ngaySinh: '1998-07-30',
-                cmnd_HoChieu: '334455667'
-            }
+function logout() {
+    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+        AuthHelper.logout();
+        window.location.href = 'login.html';
+    }
+}
+
+async function loadUsers() {
+    try {
+        const tbody = document.getElementById('users-table-body');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: var(--spacing-xl);">Đang tải...</td></tr>';
         }
-    ];
 
-    let filteredUsers = applyFilters(allUsers);
-    const totalPages = Math.ceil(filteredUsers.length / pageSize);
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.USER_GET_ALL);
+        const response = await APIHelper.get(url);
+        
+        if (response && response.data) {
+            allUsers = Array.isArray(response.data) ? response.data : [];
+        } else if (Array.isArray(response)) {
+            allUsers = response;
+        } else {
+            allUsers = [];
+        }
 
-    renderUsersTable(paginatedUsers);
-    updatePaginationInfo(filteredUsers.length);
+        let filteredUsers = applyFilters(allUsers);
+        const totalPages = Math.ceil(filteredUsers.length / pageSize);
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+
+        renderUsersTable(paginatedUsers);
+        updatePaginationInfo(filteredUsers.length);
+    } catch (error) {
+        console.error('Error loading users:', error);
+        const tbody = document.getElementById('users-table-body');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: var(--spacing-xl); color: red;">Lỗi khi tải dữ liệu người dùng</td></tr>';
+        }
+        showToast('Lỗi khi tải danh sách người dùng', 'error');
+    }
 }
 
 function applyFilters(users) {
@@ -145,12 +141,18 @@ function applyFilters(users) {
     const statusFilter = document.getElementById('status-filter').value;
 
     return users.filter(user => {
+        const hoTen = (user.hoTen || user.HoTen || '').toLowerCase();
+        const email = (user.email || user.Email || '').toLowerCase();
+        const soDienThoai = (user.soDienThoai || user.SoDienThoai || '').toString();
+        const vaiTro = user.vaiTro || user.VaiTro || '';
+        const trangThai = user.trangThai !== undefined ? user.trangThai : (user.TrangThai !== undefined ? user.TrangThai : true);
+        
         const matchSearch = !searchTerm || 
-            user.hoTen.toLowerCase().includes(searchTerm) ||
-            user.email.toLowerCase().includes(searchTerm) ||
-            (user.soDienThoai && user.soDienThoai.includes(searchTerm));
-        const matchRole = !roleFilter || user.vaiTro === roleFilter;
-        const matchStatus = !statusFilter || user.trangThai.toString() === statusFilter;
+            hoTen.includes(searchTerm) ||
+            email.includes(searchTerm) ||
+            soDienThoai.includes(searchTerm);
+        const matchRole = !roleFilter || vaiTro === roleFilter;
+        const matchStatus = !statusFilter || trangThai.toString() === statusFilter;
         return matchSearch && matchRole && matchStatus;
     });
 }
@@ -167,20 +169,33 @@ function renderUsersTable(users) {
     }
 
     users.forEach(user => {
+        const nguoiDungId = user.nguoiDungId || user.NguoiDungId;
+        const hoTen = user.hoTen || user.HoTen || '-';
+        const email = user.email || user.Email || '-';
+        const soDienThoai = user.soDienThoai || user.SoDienThoai || '-';
+        const vaiTro = user.vaiTro || user.VaiTro || '-';
+        const trangThai = user.trangThai !== undefined ? user.trangThai : (user.TrangThai !== undefined ? user.TrangThai : true);
+        const ngayTao = user.ngayTao || user.NgayTao;
+        const khachHang = user.khachHang || user.KhachHang;
+        
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${user.hoTen}</td>
-            <td>${user.email}</td>
-            <td>${user.soDienThoai || '-'}</td>
-            <td><span class="status-badge ${getRoleClass(user.vaiTro)}">${user.vaiTro}</span></td>
-            <td><span class="status-badge ${user.trangThai ? 'status-confirmed' : 'status-cancelled'}">${user.trangThai ? 'Hoạt động' : 'Không hoạt động'}</span></td>
-            <td>${formatDate(user.ngayTao)}</td>
+            <td>${hoTen}</td>
+            <td>${email}</td>
+            <td>${soDienThoai}</td>
+            <td><span class="status-badge ${getRoleClass(vaiTro)}">${vaiTro}</span></td>
+            <td><span class="status-badge ${trangThai ? 'status-confirmed' : 'status-cancelled'}">${trangThai ? 'Hoạt động' : 'Không hoạt động'}</span></td>
+            <td>${formatDate(ngayTao)}</td>
             <td>
                 <div class="action-buttons">
-                    <button class="action-btn action-btn-secondary" onclick="editUser('${user.nguoiDungId}')">✏️ Sửa</button>
-                    ${user.vaiTro === 'Khách Hàng' && user.khachHang ? 
-                        `<button class="action-btn action-btn-secondary" onclick="viewCustomerDetail('${user.nguoiDungId}')">👁️ Chi tiết</button>` : ''}
-                    <button class="action-btn action-btn-danger" onclick="deleteUser('${user.nguoiDungId}')">🗑️ Xóa</button>
+                    <button class="action-btn action-btn-secondary" onclick="editUser('${nguoiDungId}')">✏️ Sửa</button>
+                    <button class="action-btn action-btn-secondary" onclick="showChangePasswordModal('${nguoiDungId}')">🔑 Đổi MK</button>
+                    <button class="action-btn ${trangThai ? 'action-btn-warning' : 'action-btn-success'}" onclick="lockUnlockUser('${nguoiDungId}', ${!trangThai})">
+                        ${trangThai ? '🔒 Khóa' : '🔓 Mở khóa'}
+                    </button>
+                    ${vaiTro === 'Khách Hàng' && khachHang ? 
+                        `<button class="action-btn action-btn-secondary" onclick="viewCustomerDetail('${nguoiDungId}')">👁️ Chi tiết</button>` : ''}
+                    <button class="action-btn action-btn-danger" onclick="deleteUser('${nguoiDungId}')">🗑️ Xóa</button>
                 </div>
             </td>
         `;
@@ -207,80 +222,156 @@ function showAddUserModal() {
     document.getElementById('user-modal').classList.add('active');
 }
 
-function editUser(userId) {
-    const user = allUsers.find(u => u.nguoiDungId === userId);
-    if (!user) return;
-
-    document.getElementById('modal-title').textContent = 'Sửa thông tin người dùng';
-    document.getElementById('user-id').value = user.nguoiDungId;
-    document.getElementById('user-ho-ten').value = user.hoTen;
-    document.getElementById('user-email').value = user.email;
-    document.getElementById('user-phone').value = user.soDienThoai || '';
-    document.getElementById('user-role').value = user.vaiTro;
-    document.getElementById('user-status').value = user.trangThai.toString();
-    document.getElementById('password-section').style.display = 'none';
-    document.getElementById('user-password').required = false;
-    document.getElementById('user-modal').classList.add('active');
-}
-
-function saveUser(event) {
-    event.preventDefault();
-    const userId = document.getElementById('user-id').value;
-    alert(userId ? 'Cập nhật người dùng thành công!' : 'Thêm người dùng thành công!');
-    closeUserModal();
-    loadUsers();
-}
-
-function deleteUser(userId) {
-    if (!confirm('Bạn có chắc chắn muốn xóa người dùng này?')) return;
-    alert('Xóa người dùng thành công!');
-    loadUsers();
-}
-
-function viewCustomerDetail(userId) {
+async function editUser(userId) {
     try {
-        const user = allUsers.find(u => u.nguoiDungId === userId);
-        if (!user) {
-            console.error('Không tìm thấy người dùng với ID:', userId);
-            alert('Không tìm thấy thông tin người dùng');
-            return;
-        }
+        // Load user detail from API
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.USER_GET_BY_ID) + `/${userId}`;
+        const response = await APIHelper.get(url);
         
-        if (!user.khachHang) {
-            alert('Người dùng này chưa có thông tin khách hàng');
+        const user = response?.data || response || allUsers.find(u => u.nguoiDungId === userId);
+        if (!user) {
+            showToast('Không tìm thấy người dùng', 'error');
             return;
         }
 
+        document.getElementById('modal-title').textContent = 'Sửa thông tin người dùng';
+        document.getElementById('user-id').value = user.nguoiDungId || user.NguoiDungId;
+        document.getElementById('user-ho-ten').value = user.hoTen || user.HoTen || '';
+        document.getElementById('user-email').value = user.email || user.Email || '';
+        document.getElementById('user-phone').value = user.soDienThoai || user.SoDienThoai || '';
+        document.getElementById('user-role').value = user.vaiTro || user.VaiTro || 'Khách Hàng';
+        document.getElementById('user-status').value = (user.trangThai !== undefined ? user.trangThai : user.TrangThai !== undefined ? user.TrangThai : true).toString();
+        document.getElementById('password-section').style.display = 'none';
+        document.getElementById('user-password').required = false;
+        document.getElementById('user-modal').classList.add('active');
+    } catch (error) {
+        console.error('Error loading user detail:', error);
+        showToast('Lỗi khi tải thông tin người dùng', 'error');
+    }
+}
+
+async function saveUser(event) {
+    event.preventDefault();
+    try {
+        const userId = document.getElementById('user-id').value;
+        const hoTen = document.getElementById('user-ho-ten').value;
+        const email = document.getElementById('user-email').value;
+        const soDienThoai = document.getElementById('user-phone').value;
+        const vaiTro = document.getElementById('user-role').value;
+        const trangThai = document.getElementById('user-status').value === 'true';
+        const matKhau = document.getElementById('user-password').value;
+
+        const data = {
+            hoTen: hoTen,
+            email: email,
+            soDienThoai: soDienThoai || null,
+            vaiTro: vaiTro,
+            trangThai: trangThai
+        };
+
+        if (userId) {
+            // Update user
+            data.nguoiDungId = userId;
+            if (matKhau) {
+                data.matKhau = matKhau;
+            }
+            const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.USER_UPDATE);
+            await APIHelper.put(url, data);
+            showToast('Cập nhật người dùng thành công!', 'success');
+        } else {
+            // Create user
+            if (!matKhau) {
+                showToast('Vui lòng nhập mật khẩu', 'error');
+                return;
+            }
+            data.matKhau = matKhau;
+            const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.USER_CREATE);
+            await APIHelper.post(url, data);
+            showToast('Thêm người dùng thành công!', 'success');
+        }
+
+        closeUserModal();
+        loadUsers();
+    } catch (error) {
+        console.error('Error saving user:', error);
+        showToast('Lỗi khi lưu thông tin người dùng', 'error');
+    }
+}
+
+async function deleteUser(userId) {
+    if (!confirm('Bạn có chắc chắn muốn xóa người dùng này?')) return;
+    
+    try {
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.USER_DELETE) + `/${userId}`;
+        await APIHelper.delete(url);
+        showToast('Xóa người dùng thành công!', 'success');
+        loadUsers();
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        showToast('Lỗi khi xóa người dùng', 'error');
+    }
+}
+
+async function viewCustomerDetail(userId) {
+    try {
+        // Load user detail from API
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.USER_GET_BY_ID) + `/${userId}`;
+        const response = await APIHelper.get(url);
+        
+        const user = response?.data || response || allUsers.find(u => u.nguoiDungId === userId);
+        if (!user) {
+            showToast('Không tìm thấy thông tin người dùng', 'error');
+            return;
+        }
+
+        const khachHang = user.khachHang || user.KhachHang || {};
+        
         const content = `
             <div class="user-info-section">
                 <div class="user-info-item">
                     <span class="user-info-label">Họ tên:</span>
-                    <span class="user-info-value">${user.hoTen}</span>
+                    <span class="user-info-value">${user.hoTen || user.HoTen || '-'}</span>
                 </div>
                 <div class="user-info-item">
                     <span class="user-info-label">Email:</span>
-                    <span class="user-info-value">${user.email}</span>
+                    <span class="user-info-value">${user.email || user.Email || '-'}</span>
                 </div>
                 <div class="user-info-item">
                     <span class="user-info-label">Số điện thoại:</span>
-                    <span class="user-info-value">${user.soDienThoai || '-'}</span>
+                    <span class="user-info-value">${user.soDienThoai || user.SoDienThoai || '-'}</span>
                 </div>
+                <div class="user-info-item">
+                    <span class="user-info-label">Vai trò:</span>
+                    <span class="user-info-value">${user.vaiTro || user.VaiTro || '-'}</span>
+                </div>
+                <div class="user-info-item">
+                    <span class="user-info-label">Trạng thái:</span>
+                    <span class="user-info-value">${(user.trangThai !== undefined ? user.trangThai : user.TrangThai) ? 'Hoạt động' : 'Không hoạt động'}</span>
+                </div>
+                ${khachHang.diaChi || khachHang.DiaChi ? `
                 <div class="user-info-item">
                     <span class="user-info-label">Địa chỉ:</span>
-                    <span class="user-info-value">${user.khachHang.diaChi || '-'}</span>
+                    <span class="user-info-value">${khachHang.diaChi || khachHang.DiaChi || '-'}</span>
                 </div>
+                ` : ''}
+                ${khachHang.gioiTinh || khachHang.GioiTinh ? `
                 <div class="user-info-item">
                     <span class="user-info-label">Giới tính:</span>
-                    <span class="user-info-value">${user.khachHang.gioiTinh || '-'}</span>
+                    <span class="user-info-value">${khachHang.gioiTinh || khachHang.GioiTinh || '-'}</span>
                 </div>
+                ` : ''}
+                ${khachHang.ngaySinh || khachHang.NgaySinh ? `
                 <div class="user-info-item">
                     <span class="user-info-label">Ngày sinh:</span>
-                    <span class="user-info-value">${user.khachHang.ngaySinh ? formatDate(user.khachHang.ngaySinh) : '-'}</span>
+                    <span class="user-info-value">${formatDate(khachHang.ngaySinh || khachHang.NgaySinh)}</span>
                 </div>
+                ` : ''}
+                ${khachHang.cmnd_HoChieu || khachHang.Cmnd_HoChieu ? `
                 <div class="user-info-item">
                     <span class="user-info-label">CMND/Hộ chiếu:</span>
-                    <span class="user-info-value">${user.khachHang.cmnd_HoChieu || '-'}</span>
+                    <span class="user-info-value">${khachHang.cmnd_HoChieu || khachHang.Cmnd_HoChieu || '-'}</span>
                 </div>
+                ` : ''}
             </div>
         `;
 
@@ -301,7 +392,7 @@ function viewCustomerDetail(userId) {
         modal.classList.add('active');
     } catch (error) {
         console.error('Lỗi khi mở modal chi tiết khách hàng:', error);
-        alert('Có lỗi xảy ra khi mở thông tin khách hàng');
+        showToast('Có lỗi xảy ra khi mở thông tin khách hàng', 'error');
     }
 }
 
@@ -311,6 +402,76 @@ function closeUserModal() {
 
 function closeCustomerDetailModal() {
     document.getElementById('customer-detail-modal').classList.remove('active');
+}
+
+function showChangePasswordModal(userId) {
+    document.getElementById('change-password-user-id').value = userId;
+    document.getElementById('change-password-form').reset();
+    document.getElementById('change-password-modal').classList.add('active');
+}
+
+function closeChangePasswordModal() {
+    document.getElementById('change-password-modal').classList.remove('active');
+    document.getElementById('change-password-form').reset();
+}
+
+async function changePassword(event) {
+    event.preventDefault();
+    
+    const userId = document.getElementById('change-password-user-id').value;
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+
+    if (!newPassword || newPassword.length < 6) {
+        showToast('Mật khẩu phải có ít nhất 6 ký tự', 'error');
+        return;
+    }
+
+    if (newPassword !== confirmPassword) {
+        showToast('Mật khẩu xác nhận không khớp', 'error');
+        return;
+    }
+
+    try {
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.USER_UPDATE_PASSWORD);
+        const response = await APIHelper.put(url, {
+            nguoiDungId: userId,
+            matKhau: newPassword
+        });
+
+        if (response && response.success) {
+            showToast('Đổi mật khẩu thành công!', 'success');
+            closeChangePasswordModal();
+        } else {
+            showToast(response?.message || 'Không thể đổi mật khẩu', 'error');
+        }
+    } catch (error) {
+        console.error('Error changing password:', error);
+        showToast('Lỗi khi đổi mật khẩu', 'error');
+    }
+}
+
+async function lockUnlockUser(userId, unlock) {
+    const action = unlock ? 'mở khóa' : 'khóa';
+    if (!confirm(`Bạn có chắc chắn muốn ${action} tài khoản này?`)) return;
+
+    try {
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.USER_LOCK_UNLOCK);
+        const response = await APIHelper.put(url, {
+            nguoiDungId: userId,
+            trangThai: unlock
+        });
+
+        if (response && response.success) {
+            showToast(`${unlock ? 'Mở khóa' : 'Khóa'} tài khoản thành công!`, 'success');
+            await loadUsers();
+        } else {
+            showToast(response?.message || `Không thể ${action} tài khoản`, 'error');
+        }
+    } catch (error) {
+        console.error('Error locking/unlocking user:', error);
+        showToast(`Lỗi khi ${action} tài khoản`, 'error');
+    }
 }
 
 function previousPage() {
@@ -340,5 +501,16 @@ function formatDate(dateString) {
     if (!dateString) return '-';
     const date = new Date(dateString);
     return date.toLocaleDateString('vi-VN');
+}
+
+function showToast(message, type = 'info') {
+    Toastify({
+        text: message,
+        duration: 3000,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6',
+        stopOnFocus: true
+    }).showToast();
 }
 

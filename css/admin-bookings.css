@@ -29,6 +29,35 @@
     color: #991b1b;
 }
 
+/* Status Badge (used in tables) */
+.status-badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 50px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+}
+
+.status-confirmed {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-paid {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.status-cancelled {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
 /* Booking Detail Tabs */
 .booking-tabs {
     display: flex;
@@ -193,6 +222,83 @@
     overflow-x: auto;
 }
 
+/* Loading, Empty, Error States */
+.loading-state, .empty-state, .error-state {
+    text-align: center;
+    padding: var(--spacing-2xl) !important;
+    color: var(--text-secondary);
+}
+
+.empty-state::before {
+    content: "📭 ";
+    font-size: var(--font-size-2xl);
+    display: block;
+    margin-bottom: var(--spacing-md);
+}
+
+.error-state::before {
+    content: "⚠️ ";
+    font-size: var(--font-size-2xl);
+    display: block;
+    margin-bottom: var(--spacing-md);
+}
+
+/* Bookings Table */
+.bookings-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.bookings-table th,
+.bookings-table td {
+    padding: var(--spacing-md);
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.bookings-table th {
+    background-color: var(--bg-light);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.bookings-table td {
+    color: var(--text-secondary);
+}
+
+/* CTA Buttons */
+.cta-button {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius);
+    border: none;
+    cursor: pointer;
+    font-weight: var(--font-weight-medium);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    font-size: var(--font-size-base);
+    color: var(--bg-white);
+}
+
+.cta-primary {
+    background-color: var(--primary-color);
+    color: var(--bg-white);
+}
+
+.cta-primary:hover {
+    background-color: var(--primary-dark);
+}
+
+.cta-secondary {
+    background-color: var(--secondary-color);
+    color: var(--bg-white);
+}
+
+.cta-secondary:hover {
+    background-color: #047857;
+}
+
 /* Action Buttons */
 .action-buttons {
     display: flex;
@@ -220,13 +326,28 @@
     transform: translateY(-1px);
 }
 
+.action-btn-primary {
+    background: var(--secondary-color);
+    color: var(--bg-white);
+    border: 1px solid var(--secondary-color);
+}
+
+.action-btn-primary:hover {
+    background: #047857;
+    border-color: #047857;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
 .action-btn-danger {
     background: #ef4444;
     color: white;
+    border: 1px solid #ef4444;
 }
 
 .action-btn-danger:hover {
     background: #dc2626;
+    border-color: #dc2626;
     transform: translateY(-1px);
 }
 

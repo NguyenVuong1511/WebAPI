@@ -399,3 +399,148 @@ END
 GO
 
 SELECT * FROM NguoiDung WHERE Email = 'admin@gmail.com';
+
+USE QuanLyDuLich;
+GO
+
+-----------------------------------------------------
+-- 1) Lấy tất cả địa điểm
+-----------------------------------------------------
+CREATE OR ALTER PROCEDURE sp_DiaDiem_GetAll
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        DiaDiemId,
+        TenDiaDiem,
+        MoTa
+    FROM DiaDiem
+    ORDER BY TenDiaDiem ASC;
+END
+GO
+
+-----------------------------------------------------
+-- 2) Lấy địa điểm theo Id
+-----------------------------------------------------
+CREATE OR ALTER PROCEDURE sp_DiaDiem_GetById
+    @DiaDiemId UNIQUEIDENTIFIER
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        DiaDiemId,
+        TenDiaDiem,
+        MoTa
+    FROM DiaDiem
+    WHERE DiaDiemId = @DiaDiemId;
+END
+GO
+
+-----------------------------------------------------
+-- 3) Thêm địa điểm
+-- Service truyền vào: @DiaDiemId, @TenDiaDiem, @MoTa
+-----------------------------------------------------
+CREATE OR ALTER PROCEDURE sp_DiaDiem_Insert
+    @DiaDiemId UNIQUEIDENTIFIER,
+    @TenDiaDiem NVARCHAR(200),
+    @MoTa NVARCHAR(MAX) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Validate
+    IF (@TenDiaDiem IS NULL OR LTRIM(RTRIM(@TenDiaDiem)) = N'')
+    BEGIN
+        RAISERROR(N'Tên địa điểm không được để trống', 16, 1);
+        RETURN;
+    END
+
+    -- Chống trùng tên (so sánh theo trim + không phân biệt hoa thường)
+    IF EXISTS (
+        SELECT 1
+        FROM DiaDiem
+        WHERE UPPER(LTRIM(RTRIM(TenDiaDiem))) = UPPER(LTRIM(RTRIM(@TenDiaDiem)))
+    )
+    BEGIN
+        RAISERROR(N'Địa điểm đã tồn tại', 16, 1);
+        RETURN;
+    END
+
+    INSERT INTO DiaDiem (DiaDiemId, TenDiaDiem, MoTa)
+    VALUES (@DiaDiemId, LTRIM(RTRIM(@TenDiaDiem)), @MoTa);
+END
+GO
+
+-----------------------------------------------------
+-- 4) Cập nhật địa điểm
+-----------------------------------------------------
+CREATE OR ALTER PROCEDURE sp_DiaDiem_Update
+    @DiaDiemId UNIQUEIDENTIFIER,
+    @TenDiaDiem NVARCHAR(200),
+    @MoTa NVARCHAR(MAX) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Validate
+    IF (@TenDiaDiem IS NULL OR LTRIM(RTRIM(@TenDiaDiem)) = N'')
+    BEGIN
+        RAISERROR(N'Tên địa điểm không được để trống', 16, 1);
+        RETURN;
+    END
+
+    -- Check tồn tại
+    IF NOT EXISTS (SELECT 1 FROM DiaDiem WHERE DiaDiemId = @DiaDiemId)
+    BEGIN
+        RAISERROR(N'Không tìm thấy địa điểm', 16, 1);
+        RETURN;
+    END
+
+    -- Chống trùng tên với địa điểm khác
+    IF EXISTS (
+        SELECT 1
+        FROM DiaDiem
+        WHERE UPPER(LTRIM(RTRIM(TenDiaDiem))) = UPPER(LTRIM(RTRIM(@TenDiaDiem)))
+          AND DiaDiemId <> @DiaDiemId
+    )
+    BEGIN
+        RAISERROR(N'Tên địa điểm đã tồn tại', 16, 1);
+        RETURN;
+    END
+
+    UPDATE DiaDiem
+    SET TenDiaDiem = LTRIM(RTRIM(@TenDiaDiem)),
+        MoTa = @MoTa
+    WHERE DiaDiemId = @DiaDiemId;
+END
+GO
+
+-----------------------------------------------------
+-- 5) Xóa địa điểm
+-----------------------------------------------------
+CREATE OR ALTER PROCEDURE sp_DiaDiem_Delete
+    @DiaDiemId UNIQUEIDENTIFIER
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Check tồn tại
+    IF NOT EXISTS (SELECT 1 FROM DiaDiem WHERE DiaDiemId = @DiaDiemId)
+    BEGIN
+        RAISERROR(N'Không tìm thấy địa điểm', 16, 1);
+        RETURN;
+    END
+
+    -- Không cho xóa nếu đang được dùng làm điểm xuất phát của Tour
+    IF EXISTS (SELECT 1 FROM Tour WHERE DiemXuatPhatId = @DiaDiemId)
+    BEGIN
+        RAISERROR(N'Không thể xóa: Địa điểm đang được sử dụng trong Tour', 16, 1);
+        RETURN;
+    END
+
+    DELETE FROM DiaDiem
+    WHERE DiaDiemId = @DiaDiemId;
+END
+GO

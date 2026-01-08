@@ -1,18 +1,55 @@
-// Admin Dashboard JavaScript - Kết nối API
+// Admin Dashboard JavaScript
 document.addEventListener('DOMContentLoaded', function() {
     // Kiểm tra quyền admin
     if (!AuthHelper.requireAuth('Admin')) {
         return;
     }
 
-    console.log('Dashboard loaded');
+    console.log('Admin Dashboard loaded');
     
-    // Load dashboard statistics
+    // Load user info
+    loadUserInfo();
+    
+    // Load dashboard stats
     loadDashboardStats();
-    
-    // Load recent bookings
-    loadRecentBookings();
 });
+
+/**
+ * Load user info
+ */
+function loadUserInfo() {
+    const user = AuthHelper.getUser();
+    if (user) {
+        const initials = FormatHelper.getInitials(user.hoTen || 'NV');
+        const userName = user.hoTen || 'Quản Trị Viên';
+        const userEmail = user.email || 'admin@travelviet.com';
+        const userRole = user.role === 'Admin' ? 'Quản Trị Viên' : user.role || 'Quản Trị Viên';
+        
+        // Sidebar user info
+        const sidebarAvatar = document.getElementById('sidebar-user-avatar');
+        const sidebarName = document.getElementById('sidebar-user-name');
+        const sidebarEmail = document.getElementById('sidebar-user-email');
+        
+        if (sidebarAvatar) sidebarAvatar.textContent = initials;
+        if (sidebarName) sidebarName.textContent = userRole;
+        if (sidebarEmail) sidebarEmail.textContent = userEmail;
+        
+        // Header user info
+        const headerAvatar = document.getElementById('header-user-avatar');
+        const headerName = document.getElementById('header-user-name');
+        const headerEmail = document.getElementById('header-user-email');
+        
+        if (headerAvatar) headerAvatar.textContent = initials;
+        if (headerName) headerName.textContent = userRole;
+        if (headerEmail) headerEmail.textContent = userEmail;
+        
+        // Update welcome message
+        const welcomeUserName = document.getElementById('welcome-user-name');
+        if (welcomeUserName) {
+            welcomeUserName.textContent = userName;
+        }
+    }
+}
 
 /**
  * Logout function
@@ -20,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function logout() {
     if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
         AuthHelper.logout();
-        window.location.href = '/login.html';
+        window.location.href = 'login.html';
     }
 }
 
@@ -29,108 +66,90 @@ function logout() {
  */
 async function loadDashboardStats() {
     try {
-        // Gọi API thống kê
         const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.BOOKING_STATS);
         const response = await APIHelper.get(url);
 
         if (response.success && response.data) {
             const stats = response.data;
             
-            // Update UI với dữ liệu từ API
-            const totalToursEl = document.getElementById('total-tours');
-            const totalBookingsEl = document.getElementById('total-bookings');
-            const monthlyRevenueEl = document.getElementById('monthly-revenue');
-            const pendingBookingsEl = document.getElementById('pending-bookings');
-
-            // Chuẩn hóa tên field (camelCase hoặc PascalCase)
-            const tongDoanhThu = stats.tongDoanhThu || stats.TongDoanhThu || 0;
-            const bookingTrongThang = stats.bookingTrongThang || stats.BookingTrongThang || 0;
-            const tongKhachHang = stats.tongKhachHang || stats.TongKhachHang || 0;
-
-            if (totalToursEl) totalToursEl.textContent = tongKhachHang; // Tạm dùng total customers
-            if (totalBookingsEl) totalBookingsEl.textContent = bookingTrongThang;
-            if (monthlyRevenueEl) monthlyRevenueEl.textContent = FormatHelper.currency(tongDoanhThu);
-            if (pendingBookingsEl) pendingBookingsEl.textContent = '...'; // Load riêng
+            // Update stat cards
+            document.getElementById('stat-tong-doanh-thu').textContent = FormatHelper.currency(stats.tongDoanhThu || 0);
+            document.getElementById('stat-booking-thang').textContent = FormatHelper.number(stats.bookingTrongThang || 0);
+            document.getElementById('stat-tong-khach-hang').textContent = FormatHelper.number(stats.tongKhachHang || 0);
+            
+            // Update top tour
+            if (stats.topTours && stats.topTours.length > 0) {
+                const topTour = stats.topTours[0];
+                document.getElementById('stat-top-tour').textContent = truncateText(topTour.tenTour || '-', 20);
+                document.getElementById('stat-top-tour-count').textContent = `${FormatHelper.number(topTour.soLuotDat || 0)} lượt đặt`;
+            } else {
+                document.getElementById('stat-top-tour').textContent = '-';
+                document.getElementById('stat-top-tour-count').textContent = 'Chưa có dữ liệu';
+            }
+            
+            // Render top tours table
+            renderTopToursTable(stats.topTours || []);
         } else {
-            console.error('Failed to load stats:', response.message);
+            console.error('Failed to load dashboard stats:', response.message);
+            showErrorState();
         }
     } catch (error) {
         console.error('Error loading dashboard stats:', error);
-        // Không hiển thị alert để không làm phiền user
+        showErrorState();
     }
 }
 
 /**
- * Load recent bookings from API
+ * Render top tours table
  */
-async function loadRecentBookings() {
-    try {
-        // Gọi API lấy tất cả bookings
-        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.BOOKING_ADMIN_ALL);
-        const response = await APIHelper.get(url);
-
-        if (response.success && response.data) {
-            // Lấy 5 booking gần nhất
-            const bookings = response.data.slice(0, 5).map(b => ({
-                bookingId: (b.bookingId || b.BookingId || '').toString().substring(0, 8),
-                tourName: b.tenTour || b.TenTour || 'N/A',
-                customerName: b.nguoiDat || b.NguoiDat || 'N/A',
-                email: b.email || b.Email || '',
-                ngayDat: b.ngayDat || b.NgayDat,
-                soNguoi: `${b.soNguoiLon || b.SoNguoiLon || 0} người lớn${(b.soTreEm || b.SoTreEm) ? ', ' + (b.soTreEm || b.SoTreEm) + ' trẻ em' : ''}`,
-                tongTien: b.tongTien || b.TongTien || 0,
-                trangThai: b.trangThaiThanhToan || b.TrangThaiThanhToan || 'Chờ xác nhận'
-            }));
-
-            renderRecentBookings(bookings);
-        } else {
-            console.error('Failed to load bookings:', response.message);
-            renderRecentBookings([]);
-        }
-    } catch (error) {
-        console.error('Error loading recent bookings:', error);
-        renderRecentBookings([]);
-    }
-}
-
-/**
- * Render recent bookings table
- */
-function renderRecentBookings(bookings) {
-    const tbody = document.getElementById('recent-bookings-list');
+function renderTopToursTable(topTours) {
+    const tbody = document.getElementById('top-tours-table-body');
     if (!tbody) return;
 
     tbody.innerHTML = '';
 
-    bookings.forEach(booking => {
+    if (topTours.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Chưa có dữ liệu tour</td></tr>';
+        return;
+    }
+
+    topTours.forEach(tour => {
         const row = document.createElement('tr');
-        
-        const statusClass = getStatusClass(booking.trangThai);
-        
         row.innerHTML = `
-            <td>${booking.bookingId}</td>
-            <td>${booking.tourName}</td>
-            <td>${booking.customerName}</td>
-            <td>${FormatHelper.date(booking.ngayDat)}</td>
-            <td>${booking.soNguoi}</td>
-            <td>${FormatHelper.currency(booking.tongTien)}</td>
-            <td><span class="status-badge ${statusClass}">${booking.trangThai}</span></td>
+            <td>${escapeHtml(tour.tenTour || '-')}</td>
+            <td style="text-align: right;">${FormatHelper.currency(tour.giaTien || 0)}</td>
+            <td style="text-align: center;">${FormatHelper.number(tour.soLuotDat || 0)}</td>
+            <td style="text-align: right;">${FormatHelper.currency(tour.doanhThuTour || 0)}</td>
         `;
-        
         tbody.appendChild(row);
     });
 }
 
 /**
- * Get status badge class based on status text
+ * Show error state
  */
-function getStatusClass(status) {
-    const statusMap = {
-        'Đã xác nhận': 'status-confirmed',
-        'Chờ xác nhận': 'status-pending',
-        'Chờ thanh toán': 'status-pending',
-        'Đã thanh toán': 'status-paid',
-        'Đã hủy': 'status-cancelled'
-    };
-    return statusMap[status] || 'status-pending';
+function showErrorState() {
+    const tbody = document.getElementById('top-tours-table-body');
+    if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="4" class="error-state">Lỗi khi tải dữ liệu</td></tr>';
+    }
+}
+
+/**
+ * Helper functions
+ */
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function truncateText(text, maxLength) {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substr(0, maxLength) + '...';
 }

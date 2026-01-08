@@ -22,6 +22,16 @@
                     <p>Quản lý hệ thống</p>
                 </div>
             </div>
+            
+            <!-- User Info Section in Sidebar -->
+            <div class="sidebar-user-section">
+                <div class="sidebar-user-avatar" id="sidebar-user-avatar">NV</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name" id="sidebar-user-name">Quản Trị Viên</div>
+                    <div class="sidebar-user-email" id="sidebar-user-email">admin@travelviet.com</div>
+                </div>
+            </div>
+            
             <nav>
                 <ul class="admin-menu">
                     <li class="admin-menu-item">
@@ -49,6 +59,12 @@
                         </a>
                     </li>
                     <li class="admin-menu-item">
+                        <a href="admin-destinations.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📍</span>
+                            <span>Địa điểm</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
                         <a href="admin-reports.html" class="admin-menu-link">
                             <span class="admin-menu-icon">📈</span>
                             <span>Báo cáo</span>
@@ -60,27 +76,30 @@
                             <span>Đánh giá</span>
                         </a>
                     </li>
-                    <li class="admin-menu-item">
-                        <a href="index.html" class="admin-menu-link">
-                            <span class="admin-menu-icon">🏠</span>
-                            <span>Về trang chủ</span>
-                        </a>
-                    </li>
                 </ul>
             </nav>
         </aside>
 
         <main class="admin-main">
-            <div class="admin-header">
-                <h1>Quản lý Booking & Hóa đơn</h1>
-                <div class="admin-user">
-                    <div class="admin-user-avatar" id="user-avatar">NV</div>
-                    <div>
-                        <div class="admin-user-name" id="user-name">Nguyễn Văn A</div>
-                        <div class="admin-user-role" id="user-role">Quản Trị Viên</div>
-                    </div>
+            <!-- Top Header -->
+            <header class="admin-top-header">
+                <div class="header-left">
+                    <h1 class="page-title">Quản lý Booking</h1>
                 </div>
-            </div>
+                <div class="header-right">
+                    <div class="header-user-card">
+                        <div class="header-user-avatar" id="header-user-avatar">NV</div>
+                        <div class="header-user-info">
+                            <div class="header-user-name" id="header-user-name">Quản Trị Viên</div>
+                            <div class="header-user-email" id="header-user-email">admin@travelviet.com</div>
+                        </div>
+                    </div>
+                    <button class="logout-button" onclick="logout()">
+                        <span class="logout-icon">🚪</span>
+                        <span>Đăng xuất</span>
+                    </button>
+                </div>
+            </header>
 
             <div class="dashboard-section">
                 <div class="filter-section">
@@ -170,6 +189,13 @@
         </div>
     </div>
 
+    <!-- Toast container -->
+    <div id="toast-container"></div>
+
+    <script src="js/api-config.js"></script>
+    <script src="js/auth-helper.js"></script>
+    <!-- Toastify JS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="js/admin-bookings.js"></script>
 </body>
 </html>

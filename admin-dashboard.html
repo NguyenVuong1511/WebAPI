@@ -3,23 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Dashboard quản lý du lịch và đặt tour">
-    <title>Dashboard - Quản Lý Du Lịch</title>
+    <meta name="description" content="Dashboard - Admin">
+    <title>Dashboard - Admin</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/admin-dashboard.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
 <body>
     <div class="admin-layout">
-        <!-- Sidebar -->
         <aside class="admin-sidebar">
             <div class="admin-logo">
                 <img src="img/Logo.png" alt="Logo">
                 <div class="admin-logo-text">
                     <h2>Travel Viet</h2>
                     <p>Quản lý hệ thống</p>
+                </div>
+            </div>
+            
+            <!-- User Info Section in Sidebar -->
+            <div class="sidebar-user-section">
+                <div class="sidebar-user-avatar" id="sidebar-user-avatar">NV</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name" id="sidebar-user-name">Quản Trị Viên</div>
+                    <div class="sidebar-user-email" id="sidebar-user-email">admin@travelviet.com</div>
                 </div>
             </div>
             
@@ -50,6 +60,12 @@
                         </a>
                     </li>
                     <li class="admin-menu-item">
+                        <a href="admin-destinations.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">📍</span>
+                            <span>Địa điểm</span>
+                        </a>
+                    </li>
+                    <li class="admin-menu-item">
                         <a href="admin-reports.html" class="admin-menu-link">
                             <span class="admin-menu-icon">📈</span>
                             <span>Báo cáo</span>
@@ -61,139 +77,109 @@
                             <span>Đánh giá</span>
                         </a>
                     </li>
-                    <li class="admin-menu-item">
-                        <a href="index.html" class="admin-menu-link">
-                            <span class="admin-menu-icon">🏠</span>
-                            <span>Về trang chủ</span>
-                        </a>
-                    </li>
                 </ul>
             </nav>
         </aside>
 
-        <!-- Main Content -->
         <main class="admin-main">
-            <div class="admin-header">
-                <h1>Dashboard</h1>
-                <div class="admin-user">
-                    <div class="admin-user-avatar">NV</div>
-                    <div>
-                        <div style="font-weight: 600;">Nguyễn Văn A</div>
-                        <div style="font-size: 0.875rem; color: var(--text-secondary);">Quản Trị Viên</div>
+            <!-- Top Header -->
+            <header class="admin-top-header">
+                <div class="header-left">
+                    <div class="header-title-section">
+                        <div class="header-subtitle">Quản trị hệ thống</div>
+                        <h1 class="page-title">Dashboard</h1>
                     </div>
-                    <button onclick="logout()" style="margin-left: 15px; padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Đăng xuất</button>
+                </div>
+                <div class="header-right">
+                    <div class="header-user-card">
+                        <div class="header-user-avatar" id="header-user-avatar">NV</div>
+                        <div class="header-user-info">
+                            <div class="header-user-name" id="header-user-name">Quản Trị Viên</div>
+                            <div class="header-user-email" id="header-user-email">admin@travelviet.com</div>
+                        </div>
+                    </div>
+                    <button class="logout-button" onclick="logout()">
+                        <span class="logout-icon">🚪</span>
+                        <span>Đăng xuất</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h2 class="welcome-title">Chào mừng, <span id="welcome-user-name">Quản Trị Viên</span>!</h2>
+                <p class="welcome-subtitle">Tổng quan hệ thống quản lý du lịch</p>
+            </div>
+
+            <!-- Stats Grid - Tách riêng -->
+            <div class="stats-container">
+                <div class="stats-grid">
+                    <div class="stat-card primary">
+                        <div class="stat-header">
+                            <span class="stat-title">Tổng doanh thu</span>
+                            <span class="stat-icon">💰</span>
+                        </div>
+                        <div class="stat-value" id="stat-tong-doanh-thu">0 đ</div>
+                        <div class="stat-change">Tháng này</div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-header">
+                            <span class="stat-title">Booking trong tháng</span>
+                            <span class="stat-icon">📋</span>
+                        </div>
+                        <div class="stat-value" id="stat-booking-thang">0</div>
+                        <div class="stat-change">Đơn đặt tour</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-header">
+                            <span class="stat-title">Tổng khách hàng</span>
+                            <span class="stat-icon">👥</span>
+                        </div>
+                        <div class="stat-value" id="stat-tong-khach-hang">0</div>
+                        <div class="stat-change">Người dùng</div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-header">
+                            <span class="stat-title">Tour phổ biến</span>
+                            <span class="stat-icon">⭐</span>
+                        </div>
+                        <div class="stat-value" id="stat-top-tour">-</div>
+                        <div class="stat-change" id="stat-top-tour-count">0 lượt đặt</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Statistics Cards -->
-            <div class="stats-grid">
-                <div class="stat-card primary">
-                    <div class="stat-header">
-                        <span class="stat-title">Tổng số Tour</span>
-                        <span class="stat-icon">✈️</span>
-                    </div>
-                    <div class="stat-value" id="total-tours">5</div>
-                    <div class="stat-change">+2 tour mới tháng này</div>
-                </div>
-
-                <div class="stat-card success">
-                    <div class="stat-header">
-                        <span class="stat-title">Tổng Booking</span>
-                        <span class="stat-icon">📋</span>
-                    </div>
-                    <div class="stat-value" id="total-bookings">5</div>
-                    <div class="stat-change">+3 booking hôm nay</div>
-                </div>
-
-                <div class="stat-card warning">
-                    <div class="stat-header">
-                        <span class="stat-title">Doanh thu tháng</span>
-                        <span class="stat-icon">💰</span>
-                    </div>
-                    <div class="stat-value" id="monthly-revenue">324.000.000₫</div>
-                    <div class="stat-change">+15% so với tháng trước</div>
-                </div>
-
-                <div class="stat-card danger">
-                    <div class="stat-header">
-                        <span class="stat-title">Booking chờ xử lý</span>
-                        <span class="stat-icon">⏳</span>
-                    </div>
-                    <div class="stat-value" id="pending-bookings">1</div>
-                    <div class="stat-change negative">Cần xử lý ngay</div>
-                </div>
-            </div>
-
-            <!-- Recent Bookings -->
+            <!-- Top Tours Section -->
             <div class="dashboard-section">
-                <h2 class="section-title">Booking gần đây</h2>
-                <div class="recent-bookings">
+                <h2 class="section-title">Top Tours phổ biến</h2>
+                <div class="table-container">
                     <table class="bookings-table">
                         <thead>
                             <tr>
-                                <th>Mã Booking</th>
-                                <th>Tour</th>
-                                <th>Khách hàng</th>
-                                <th>Ngày khởi hành</th>
-                                <th>Số người</th>
-                                <th>Tổng tiền</th>
-                                <th>Trạng thái</th>
+                                <th>Tên Tour</th>
+                                <th>Giá</th>
+                                <th>Số lượt đặt</th>
+                                <th>Doanh thu</th>
                             </tr>
                         </thead>
-                        <tbody id="recent-bookings-list">
-                            <!-- Sẽ được load từ API -->
+                        <tbody id="top-tours-table-body">
                             <tr>
-                                <td>31FEDE4C</td>
-                                <td>Tour Miền Bắc</td>
-                                <td>Lê Văn C</td>
-                                <td>15/01/2025</td>
-                                <td>2 người lớn</td>
-                                <td>17.000.000₫</td>
-                                <td><span class="status-badge status-confirmed">Đã xác nhận</span></td>
-                            </tr>
-                            <tr>
-                                <td>3B77F08D</td>
-                                <td>Tour Di sản Miền Trung</td>
-                                <td>Hoàng Minh E</td>
-                                <td>20/02/2025</td>
-                                <td>1 người lớn, 1 trẻ em</td>
-                                <td>6.000.000₫</td>
-                                <td><span class="status-badge status-paid">Đã thanh toán</span></td>
-                            </tr>
-                            <tr>
-                                <td>586CCD5A</td>
-                                <td>Tour Đà Lạt</td>
-                                <td>Phạm Thị D</td>
-                                <td>10/03/2025</td>
-                                <td>3 người lớn</td>
-                                <td>9.600.000₫</td>
-                                <td><span class="status-badge status-pending">Chờ thanh toán</span></td>
+                                <td colspan="4" class="loading-state">Đang tải...</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-
-            <!-- Quick Actions -->
-            <div class="dashboard-section">
-                <h2 class="section-title">Thao tác nhanh</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-md);">
-                    <a href="admin-tours.html?action=create" class="cta-button cta-primary" style="text-align: center; padding: var(--spacing-lg);">
-                        ➕ Tạo Tour mới
-                    </a>
-                    <a href="admin-bookings.html" class="cta-button cta-secondary" style="text-align: center; padding: var(--spacing-lg);">
-                        📋 Xem Booking
-                    </a>
-                    <a href="admin-reports.html" class="cta-button cta-secondary" style="text-align: center; padding: var(--spacing-lg);">
-                        📈 Xem Báo cáo
-                    </a>
-                </div>
-            </div>
         </main>
     </div>
 
+    <!-- Toast container -->
+    <div id="toast-container"></div>
+
     <script src="js/api-config.js"></script>
     <script src="js/auth-helper.js"></script>
+    <!-- Toastify JS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="js/admin-dashboard.js"></script>
 </body>
 </html>
