@@ -76,7 +76,20 @@ const API_CONFIG = {
         // Feedback
         FEEDBACK_GET_BY_TOUR: '/feedback/tour',
         FEEDBACK_CREATE: '/feedback',
-        FEEDBACK_DELETE: '/feedback'
+        FEEDBACK_DELETE: '/feedback',
+        
+        // Contact
+        CONTACT_CREATE: '/contact',
+        CONTACT_GET_ALL: '/contact',
+        CONTACT_MARK_READ: '/contact/mark-read',
+        CONTACT_DELETE: '/contact',
+        
+        // TinTuc (News)
+        TINTUC_GET_ALL: '/tintuc/get-all',
+        TINTUC_GET_BY_ID: '/tintuc/get-by-id',
+        TINTUC_CREATE: '/tintuc/create',
+        TINTUC_UPDATE: '/tintuc/update',
+        TINTUC_DELETE: '/tintuc/delete'
     },
     
     // Get base URL for specific service
@@ -95,7 +108,9 @@ const API_CONFIG = {
             'booking': this.BOOKING_SERVICE_URL,
             'bookingthongke': this.BOOKING_SERVICE_URL,
             'diadiem': this.GENERAL_SERVICE_URL,
-            'feedback': this.GENERAL_SERVICE_URL
+            'feedback': this.GENERAL_SERVICE_URL,
+            'contact': this.GENERAL_SERVICE_URL,
+            'tintuc': this.GENERAL_SERVICE_URL
         };
         
         return serviceUrls[serviceName] || this.GENERAL_SERVICE_URL;

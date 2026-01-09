@@ -512,3 +512,47 @@
     background: #dc2626;
 }
 
+/* Passenger Table */
+.passenger-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--spacing-md);
+    background: var(--bg-white);
+}
+
+.passenger-table thead {
+    background-color: #f3f4f6;
+}
+
+.passenger-table th {
+    padding: var(--spacing-md);
+    text-align: left;
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    font-size: var(--font-size-sm);
+}
+
+.passenger-table td {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+}
+
+.passenger-table tbody tr:hover {
+    background-color: var(--bg-light);
+}
+
+/* Loading and Error States */
+.loading-state,
+.empty-state,
+.error-state {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--text-secondary);
+}
+
+.error-state {
+    color: #ef4444;
+}

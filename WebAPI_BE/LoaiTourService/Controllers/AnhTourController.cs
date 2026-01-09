@@ -17,7 +17,7 @@ namespace TourManageService.Controllers
         }
 
         [HttpGet("get-by-tour/{tourId}")]
-        
+        [AllowAnonymous]
         public async Task<IActionResult> GetByTourId(Guid tourId)
         {
             var result = await _anhTourService.GetByTourId(tourId);

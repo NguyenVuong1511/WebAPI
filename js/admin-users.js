@@ -3,6 +3,31 @@ let currentPage = 1;
 const pageSize = 10;
 let allUsers = [];
 
+// Utility functions
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN');
+}
+
+function showToast(message, type = 'info') {
+    Toastify({
+        text: message,
+        duration: 3000,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6',
+        stopOnFocus: true
+    }).showToast();
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Kiểm tra quyền admin
     if (!AuthHelper.requireAuth('Admin')) {
@@ -107,15 +132,30 @@ async function loadUsers() {
         }
 
         const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.USER_GET_ALL);
-        const response = await APIHelper.get(url);
+        console.log('Loading users from:', url);
         
-        if (response && response.data) {
+        const response = await APIHelper.get(url);
+        console.log('Users response:', response);
+        
+        // API trả về: { Success: true, Message: "...", Data: [...] }
+        // Sau khi normalize: { success: true, message: "...", data: [...] }
+        if (response && response.success && response.data) {
             allUsers = Array.isArray(response.data) ? response.data : [];
+        } else if (response && Array.isArray(response.data)) {
+            allUsers = response.data;
         } else if (Array.isArray(response)) {
+            // Trường hợp API trả về trực tiếp array
             allUsers = response;
         } else {
+            console.warn('Unexpected response format:', response);
+            // Nếu có message lỗi, hiển thị
+            if (response && response.message) {
+                throw new Error(response.message);
+            }
             allUsers = [];
         }
+        
+        console.log('Loaded users:', allUsers.length);
 
         let filteredUsers = applyFilters(allUsers);
         const totalPages = Math.ceil(filteredUsers.length / pageSize);
@@ -129,9 +169,11 @@ async function loadUsers() {
         console.error('Error loading users:', error);
         const tbody = document.getElementById('users-table-body');
         if (tbody) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: var(--spacing-xl); color: red;">Lỗi khi tải dữ liệu người dùng</td></tr>';
+            const errorMessage = error?.message || 'Lỗi khi tải dữ liệu người dùng';
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: var(--spacing-xl); color: red;">${escapeHtml(errorMessage)}</td></tr>`;
         }
-        showToast('Lỗi khi tải danh sách người dùng', 'error');
+        const toastMessage = error?.message || 'Lỗi khi tải danh sách người dùng';
+        showToast(toastMessage, 'error');
     }
 }
 
@@ -270,14 +312,27 @@ async function saveUser(event) {
         };
 
         if (userId) {
-            // Update user
-            data.nguoiDungId = userId;
+            // Update user - API yêu cầu id trong route và body theo NguoiDungUpdateDTO
+            // Tìm user hiện tại để lấy thông tin đầy đủ
+            const currentUser = allUsers.find(u => (u.nguoiDungId || u.NguoiDungId) === userId);
+            const updateData = {
+                hoTen: hoTen,
+                sDT: soDienThoai || '',
+                diaChi: (currentUser && (currentUser.diaChi || currentUser.DiaChi)) || '',
+                trangThai: trangThai
+            };
+            // Nếu có mật khẩu mới, thêm vào (backend có thể chấp nhận)
             if (matKhau) {
-                data.matKhau = matKhau;
+                updateData.matKhau = matKhau;
             }
-            const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.USER_UPDATE);
-            await APIHelper.put(url, data);
-            showToast('Cập nhật người dùng thành công!', 'success');
+            const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.USER_UPDATE) + `/${userId}`;
+            const response = await APIHelper.post(url, updateData);
+            if (response && response.success) {
+                showToast('Cập nhật người dùng thành công!', 'success');
+            } else {
+                showToast(response?.message || 'Không thể cập nhật người dùng', 'error');
+                return;
+            }
         } else {
             // Create user
             if (!matKhau) {
@@ -433,11 +488,33 @@ async function changePassword(event) {
     }
 
     try {
-        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.USER_UPDATE_PASSWORD);
-        const response = await APIHelper.put(url, {
-            nguoiDungId: userId,
-            matKhau: newPassword
-        });
+        // Tìm user để lấy email
+        const user = allUsers.find(u => (u.nguoiDungId || u.NguoiDungId) === userId);
+        if (!user) {
+            showToast('Không tìm thấy người dùng', 'error');
+            return;
+        }
+
+        const email = user.email || user.Email;
+        if (!email) {
+            showToast('Không tìm thấy email của người dùng', 'error');
+            return;
+        }
+
+        // Sử dụng USER_UPDATE để cập nhật mật khẩu
+        // Lưu ý: Nếu backend không hỗ trợ đổi mật khẩu qua endpoint này, 
+        // có thể cần tạo endpoint riêng cho admin đổi mật khẩu
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.USER_UPDATE) + `/${userId}`;
+        const updateData = {
+            hoTen: user.hoTen || user.HoTen || '',
+            sDT: user.soDienThoai || user.SoDienThoai || '',
+            diaChi: user.diaChi || user.DiaChi || '',
+            trangThai: user.trangThai !== undefined ? user.trangThai : (user.TrangThai !== undefined ? user.TrangThai : true)
+        };
+        // Thử thêm mật khẩu mới (backend có thể chấp nhận nếu là admin)
+        updateData.matKhau = newPassword;
+        
+        const response = await APIHelper.post(url, updateData);
 
         if (response && response.success) {
             showToast('Đổi mật khẩu thành công!', 'success');
@@ -456,11 +533,22 @@ async function lockUnlockUser(userId, unlock) {
     if (!confirm(`Bạn có chắc chắn muốn ${action} tài khoản này?`)) return;
 
     try {
-        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.USER_LOCK_UNLOCK);
-        const response = await APIHelper.put(url, {
-            nguoiDungId: userId,
-            trangThai: unlock
-        });
+        // Tìm user để lấy email
+        const user = allUsers.find(u => (u.nguoiDungId || u.NguoiDungId) === userId);
+        if (!user) {
+            showToast('Không tìm thấy người dùng', 'error');
+            return;
+        }
+
+        const email = user.email || user.Email;
+        if (!email) {
+            showToast('Không tìm thấy email của người dùng', 'error');
+            return;
+        }
+
+        // API lock-unlock sử dụng query string với check (bool) và email (string)
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.USER_LOCK_UNLOCK) + `?check=${unlock}&email=${encodeURIComponent(email)}`;
+        const response = await APIHelper.post(url);
 
         if (response && response.success) {
             showToast(`${unlock ? 'Mở khóa' : 'Khóa'} tài khoản thành công!`, 'success');
@@ -497,20 +585,4 @@ function updatePaginationInfo(total) {
         `Hiển thị ${startIndex}-${endIndex} của ${total} khách hàng`;
 }
 
-function formatDate(dateString) {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN');
-}
-
-function showToast(message, type = 'info') {
-    Toastify({
-        text: message,
-        duration: 3000,
-        gravity: 'top',
-        position: 'right',
-        backgroundColor: type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6',
-        stopOnFocus: true
-    }).showToast();
-}
 

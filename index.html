@@ -34,9 +34,21 @@
                     </ul>
                     
                     <!-- Auth Buttons -->
-                    <div class="auth-buttons">
+                    <div class="auth-buttons" id="auth-buttons">
                         <a href="login.html" class="auth-btn auth-login">Đăng nhập</a>
                         <a href="register.html" class="auth-btn auth-register">Đăng ký</a>
+                    </div>
+                    
+                    <!-- User Menu (hidden by default) -->
+                    <div class="user-menu" id="user-menu" style="display: none;">
+                        <div class="user-avatar" id="user-avatar-menu">U</div>
+                        <div class="user-dropdown">
+                            <a href="customer-dashboard.html" class="user-dropdown-item">Dashboard</a>
+                            <a href="customer-bookings.html" class="user-dropdown-item">Đặt tour của tôi</a>
+                            <a href="customer-profile.html" class="user-dropdown-item">Thông tin cá nhân</a>
+                            <a href="customer-reviews.html" class="user-dropdown-item">Đánh giá</a>
+                            <a href="#" class="user-dropdown-item" onclick="logout()">Đăng xuất</a>
+                        </div>
                     </div>
                     
                     <!-- Hamburger Menu Button -->
@@ -239,274 +251,16 @@
                     </button>
                     
                     <div class="tours-carousel">
-                        <div class="tours-carousel-track">
-                            <article class="tour-card">
-                                <div class="tour-image">
-                                    <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800" alt="Tour Hạ Long" loading="lazy">
-                                    <span class="tour-badge">Phổ biến</span>
-                                </div>
-                                <div class="tour-content">
-                                    <div class="tour-meta">
-                                        <span class="tour-type">Tour Trong Nước</span>
-                                        <span class="tour-status">Sẵn sàng</span>
-                                    </div>
-                                    <h3 class="tour-title">Vịnh Hạ Long - Kỳ Quan Thiên Nhiên</h3>
-                                    <p class="tour-description">Khám phá vẻ đẹp hùng vĩ của vịnh Hạ Long với hàng nghìn đảo đá vôi độc đáo. Trải nghiệm du thuyền sang trọng và tham quan các hang động kỳ bí.</p>
-                                    <div class="tour-info">
-                                        <div class="tour-date">
-                                            <span class="tour-date-label">Khởi hành:</span>
-                                            <span class="tour-date-value">15/01/2025</span>
-                                        </div>
-                                        <div class="tour-destinations">
-                                            <span class="tour-destinations-label">Điểm đến:</span>
-                                            <span class="tour-destinations-value">Hạ Long, Cát Bà</span>
-                                        </div>
-                                    </div>
-                                    <div class="tour-footer">
-                                        <div class="tour-pricing">
-                                            <span class="tour-price">2.500.000₫</span>
-                                            <span class="tour-duration">3 ngày 2 đêm</span>
-                                        </div>
-                                        <a href="detail-tour.html" class="tour-btn">Xem chi tiết</a>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <article class="tour-card">
-                                <div class="tour-image">
-                                    <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800" alt="Tour Sapa" loading="lazy">
-                                    <span class="tour-badge">Mới</span>
-                                </div>
-                                <div class="tour-content">
-                                    <div class="tour-meta">
-                                        <span class="tour-type">Tour Trong Nước</span>
-                                        <span class="tour-status">Sẵn sàng</span>
-                                    </div>
-                                    <h3 class="tour-title">Sapa - Núi Rừng Tây Bắc</h3>
-                                    <p class="tour-description">Trải nghiệm văn hóa dân tộc và cảnh quan núi rừng tuyệt đẹp tại Sapa. Tham quan Fansipan, làng Cát Cát và thưởng thức ẩm thực địa phương.</p>
-                                    <div class="tour-info">
-                                        <div class="tour-date">
-                                            <span class="tour-date-label">Khởi hành:</span>
-                                            <span class="tour-date-value">20/01/2025</span>
-                                        </div>
-                                        <div class="tour-destinations">
-                                            <span class="tour-destinations-label">Điểm đến:</span>
-                                            <span class="tour-destinations-value">Sapa, Fansipan</span>
-                                        </div>
-                                    </div>
-                                    <div class="tour-footer">
-                                        <div class="tour-pricing">
-                                            <span class="tour-price">3.200.000₫</span>
-                                            <span class="tour-duration">4 ngày 3 đêm</span>
-                                        </div>
-                                        <a href="detail-tour.html" class="tour-btn">Xem chi tiết</a>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <article class="tour-card">
-                                <div class="tour-image">
-                                    <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800" alt="Tour Phú Quốc" loading="lazy">
-                                    <span class="tour-badge">Yêu thích</span>
-                                </div>
-                                <div class="tour-content">
-                                    <div class="tour-meta">
-                                        <span class="tour-type">Tour Trong Nước</span>
-                                        <span class="tour-status">Sẵn sàng</span>
-                                    </div>
-                                    <h3 class="tour-title">Phú Quốc - Thiên Đường Biển Đảo</h3>
-                                    <p class="tour-description">Thư giãn tại những bãi biển tuyệt đẹp và khám phá văn hóa địa phương. Trải nghiệm lặn biển, tham quan nhà tù Phú Quốc và thưởng thức hải sản tươi ngon.</p>
-                                    <div class="tour-info">
-                                        <div class="tour-date">
-                                            <span class="tour-date-label">Khởi hành:</span>
-                                            <span class="tour-date-value">25/01/2025</span>
-                                        </div>
-                                        <div class="tour-destinations">
-                                            <span class="tour-destinations-label">Điểm đến:</span>
-                                            <span class="tour-destinations-value">Phú Quốc, Bãi Sao</span>
-                                        </div>
-                                    </div>
-                                    <div class="tour-footer">
-                                        <div class="tour-pricing">
-                                            <span class="tour-price">4.500.000₫</span>
-                                            <span class="tour-duration">5 ngày 4 đêm</span>
-                                        </div>
-                                        <a href="detail-tour.html" class="tour-btn">Xem chi tiết</a>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <article class="tour-card">
-                                <div class="tour-image">
-                                    <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800" alt="Tour Hội An" loading="lazy">
-                                    <span class="tour-badge">Đặc biệt</span>
-                                </div>
-                                <div class="tour-content">
-                                    <div class="tour-meta">
-                                        <span class="tour-type">Tour Trong Nước</span>
-                                        <span class="tour-status">Sẵn sàng</span>
-                                    </div>
-                                    <h3 class="tour-title">Hội An - Phố Cổ Di Sản</h3>
-                                    <p class="tour-description">Khám phá phố cổ Hội An với kiến trúc cổ kính và ẩm thực đặc sắc. Tham quan chùa Cầu, làng gốm Thanh Hà và thưởng thức cao lầu.</p>
-                                    <div class="tour-info">
-                                        <div class="tour-date">
-                                            <span class="tour-date-label">Khởi hành:</span>
-                                            <span class="tour-date-value">10/02/2025</span>
-                                        </div>
-                                        <div class="tour-destinations">
-                                            <span class="tour-destinations-label">Điểm đến:</span>
-                                            <span class="tour-destinations-value">Hội An, Đà Nẵng</span>
-                                        </div>
-                                    </div>
-                                    <div class="tour-footer">
-                                        <div class="tour-pricing">
-                                            <span class="tour-price">2.800.000₫</span>
-                                            <span class="tour-duration">3 ngày 2 đêm</span>
-                                        </div>
-                                        <a href="detail-tour.html" class="tour-btn">Xem chi tiết</a>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <article class="tour-card">
-                                <div class="tour-image">
-                                    <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800" alt="Tour Đà Lạt" loading="lazy">
-                                    <span class="tour-badge">Phổ biến</span>
-                                </div>
-                                <div class="tour-content">
-                                    <div class="tour-meta">
-                                        <span class="tour-type">Tour Trong Nước</span>
-                                        <span class="tour-status">Sẵn sàng</span>
-                                    </div>
-                                    <h3 class="tour-title">Đà Lạt - Thành Phố Ngàn Hoa</h3>
-                                    <p class="tour-description">Khám phá thành phố mộng mơ với khí hậu mát mẻ quanh năm. Tham quan thác Datanla, hồ Xuân Hương và thưởng thức cà phê đặc sản.</p>
-                                    <div class="tour-info">
-                                        <div class="tour-date">
-                                            <span class="tour-date-label">Khởi hành:</span>
-                                            <span class="tour-date-value">05/02/2025</span>
-                                        </div>
-                                        <div class="tour-destinations">
-                                            <span class="tour-destinations-label">Điểm đến:</span>
-                                            <span class="tour-destinations-value">Đà Lạt, Lâm Đồng</span>
-                                        </div>
-                                    </div>
-                                    <div class="tour-footer">
-                                        <div class="tour-pricing">
-                                            <span class="tour-price">2.200.000₫</span>
-                                            <span class="tour-duration">3 ngày 2 đêm</span>
-                                        </div>
-                                        <a href="detail-tour.html" class="tour-btn">Xem chi tiết</a>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <article class="tour-card">
-                                <div class="tour-image">
-                                    <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800" alt="Tour Nha Trang" loading="lazy">
-                                    <span class="tour-badge">Yêu thích</span>
-                                </div>
-                                <div class="tour-content">
-                                    <div class="tour-meta">
-                                        <span class="tour-type">Tour Trong Nước</span>
-                                        <span class="tour-status">Sẵn sàng</span>
-                                    </div>
-                                    <h3 class="tour-title">Nha Trang - Biển Xanh Cát Trắng</h3>
-                                    <p class="tour-description">Tận hưởng kỳ nghỉ biển tuyệt vời với các hoạt động thể thao dưới nước. Tham quan Vinpearl, tháp Bà Ponagar và thưởng thức hải sản tươi sống.</p>
-                                    <div class="tour-info">
-                                        <div class="tour-date">
-                                            <span class="tour-date-label">Khởi hành:</span>
-                                            <span class="tour-date-value">12/02/2025</span>
-                                        </div>
-                                        <div class="tour-destinations">
-                                            <span class="tour-destinations-label">Điểm đến:</span>
-                                            <span class="tour-destinations-value">Nha Trang, Khánh Hòa</span>
-                                        </div>
-                                    </div>
-                                    <div class="tour-footer">
-                                        <div class="tour-pricing">
-                                            <span class="tour-price">3.500.000₫</span>
-                                            <span class="tour-duration">4 ngày 3 đêm</span>
-                                        </div>
-                                        <a href="detail-tour.html" class="tour-btn">Xem chi tiết</a>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <article class="tour-card">
-                                <div class="tour-image">
-                                    <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800" alt="Tour Huế" loading="lazy">
-                                    <span class="tour-badge">Mới</span>
-                                </div>
-                                <div class="tour-content">
-                                    <div class="tour-meta">
-                                        <span class="tour-type">Tour Trong Nước</span>
-                                        <span class="tour-status">Sẵn sàng</span>
-                                    </div>
-                                    <h3 class="tour-title">Huế - Cố Đô Lịch Sử</h3>
-                                    <p class="tour-description">Khám phá di sản văn hóa thế giới với Đại Nội, lăng tẩm các vua và sông Hương thơ mộng. Trải nghiệm ẩm thực cung đình độc đáo.</p>
-                                    <div class="tour-info">
-                                        <div class="tour-date">
-                                            <span class="tour-date-label">Khởi hành:</span>
-                                            <span class="tour-date-value">18/02/2025</span>
-                                        </div>
-                                        <div class="tour-destinations">
-                                            <span class="tour-destinations-label">Điểm đến:</span>
-                                            <span class="tour-destinations-value">Huế, Thừa Thiên</span>
-                                        </div>
-                                    </div>
-                                    <div class="tour-footer">
-                                        <div class="tour-pricing">
-                                            <span class="tour-price">2.600.000₫</span>
-                                            <span class="tour-duration">3 ngày 2 đêm</span>
-                                        </div>
-                                        <a href="detail-tour.html" class="tour-btn">Xem chi tiết</a>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <article class="tour-card">
-                                <div class="tour-image">
-                                    <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800" alt="Tour Mũi Né" loading="lazy">
-                                    <span class="tour-badge">Đặc biệt</span>
-                                </div>
-                                <div class="tour-content">
-                                    <div class="tour-meta">
-                                        <span class="tour-type">Tour Trong Nước</span>
-                                        <span class="tour-status">Sẵn sàng</span>
-                                    </div>
-                                    <h3 class="tour-title">Mũi Né - Sa Mạc Việt Nam</h3>
-                                    <p class="tour-description">Trải nghiệm độc đáo với đồi cát bay, tham quan làng chài và thưởng thức hải sản tươi ngon. Hoạt động lướt ván và chèo thuyền kayak.</p>
-                                    <div class="tour-info">
-                                        <div class="tour-date">
-                                            <span class="tour-date-label">Khởi hành:</span>
-                                            <span class="tour-date-value">22/02/2025</span>
-                                        </div>
-                                        <div class="tour-destinations">
-                                            <span class="tour-destinations-label">Điểm đến:</span>
-                                            <span class="tour-destinations-value">Mũi Né, Phan Thiết</span>
-                                        </div>
-                                    </div>
-                                    <div class="tour-footer">
-                                        <div class="tour-pricing">
-                                            <span class="tour-price">2.300.000₫</span>
-                                            <span class="tour-duration">3 ngày 2 đêm</span>
-                                        </div>
-                                        <a href="detail-tour.html" class="tour-btn">Xem chi tiết</a>
-                                    </div>
-                                </div>
-                            </article>
+                        <div class="tours-carousel-track" id="featured-tours-track">
+                            <!-- Tour cards will be loaded here -->
                         </div>
                     </div>
                     
-                    <button class="carousel-btn carousel-btn-next" aria-label="Tour tiếp theo">
+                    <button class="carousel-btn carousel-btn-next" aria-label="Tour sau">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M9 18l6-6-6-6"/>
                         </svg>
                     </button>
-                    
-                    <div class="carousel-dots">
-                        <!-- Dots will be generated by JavaScript -->
-                    </div>
                 </div>
             </div>
         </section>
@@ -795,7 +549,10 @@
         </div>
     </footer>
 
+    <script src="js/api-config.js"></script>
+    <script src="js/auth-helper.js"></script>
     <script src="js/script.js"></script>
+    <script src="js/index.js"></script>
 </body>
 </html>
 

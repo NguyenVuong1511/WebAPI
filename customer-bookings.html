@@ -11,6 +11,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
 <body>
     <div class="admin-layout">
@@ -22,6 +24,16 @@
                     <p>Khách hàng</p>
                 </div>
             </div>
+            
+            <!-- User Info Section in Sidebar -->
+            <div class="sidebar-user-section">
+                <div class="sidebar-user-avatar" id="sidebar-user-avatar">KH</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name" id="sidebar-user-name">Khách Hàng</div>
+                    <div class="sidebar-user-email" id="sidebar-user-email">customer@travelviet.com</div>
+                </div>
+            </div>
+            
             <nav>
                 <ul class="admin-menu">
                     <li class="admin-menu-item">
@@ -37,9 +49,9 @@
                         </a>
                     </li>
                     <li class="admin-menu-item">
-                        <a href="customer-invoices.html" class="admin-menu-link">
-                            <span class="admin-menu-icon">🧾</span>
-                            <span>Hóa đơn</span>
+                        <a href="customer-profile.html" class="admin-menu-link">
+                            <span class="admin-menu-icon">👤</span>
+                            <span>Thông tin cá nhân</span>
                         </a>
                     </li>
                     <li class="admin-menu-item">
@@ -59,16 +71,28 @@
         </aside>
 
         <main class="admin-main">
-            <div class="admin-header">
-                <h1>Đặt tour của tôi</h1>
-                <div class="admin-user">
-                    <div class="admin-user-avatar" id="user-avatar">KH</div>
-                    <div>
-                        <div class="admin-user-name" id="user-name">Khách hàng</div>
-                        <div class="admin-user-role" id="user-role">Khách Hàng</div>
+            <!-- Top Header -->
+            <header class="admin-top-header">
+                <div class="header-left">
+                    <div class="header-title-section">
+                        <div class="header-subtitle">Khách hàng</div>
+                        <h1 class="page-title">Đặt tour của tôi</h1>
                     </div>
                 </div>
-            </div>
+                <div class="header-right">
+                    <div class="header-user-card">
+                        <div class="header-user-avatar" id="header-user-avatar">KH</div>
+                        <div class="header-user-info">
+                            <div class="header-user-name" id="header-user-name">Khách Hàng</div>
+                            <div class="header-user-email" id="header-user-email">customer@travelviet.com</div>
+                        </div>
+                    </div>
+                    <button class="logout-button" onclick="logout()">
+                        <span class="logout-icon">🚪</span>
+                        <span>Đăng xuất</span>
+                    </button>
+                </div>
+            </header>
 
             <div class="dashboard-section">
                 <div class="filter-section">
@@ -93,34 +117,37 @@
                             <tr>
                                 <th>Mã Booking</th>
                                 <th>Tên Tour</th>
-                                <th>Ngày khởi hành</th>
+                                <th>Ngày đặt</th>
                                 <th>Số người</th>
                                 <th>Tổng tiền</th>
                                 <th>Trạng thái</th>
                                 <th>Thao tác</th>
                             </tr>
                         </thead>
-                        <tbody id="bookings-table-body"></tbody>
+                        <tbody id="bookings-table-body">
+                            <tr>
+                                <td colspan="7" class="loading-state">Đang tải...</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
         </main>
     </div>
 
+    <!-- Booking Detail Modal -->
     <div id="booking-detail-modal" class="modal-overlay">
         <div class="modal-content modal-content-large">
             <h2 class="modal-title" id="booking-detail-title">Chi tiết Booking</h2>
             <div class="tab-container">
                 <button class="tab-button active" onclick="showTab('thong-tin')">Thông tin</button>
-                <button class="tab-button" onclick="showTab('hoa-don')">Hóa đơn</button>
-                <button class="tab-button" onclick="showTab('thanh-toan')">Thanh toán</button>
+                <button class="tab-button" onclick="showTab('hanh-khach')">Hành khách</button>
             </div>
             <div id="booking-detail-content" class="tab-content active">
                 <!-- Nội dung tab sẽ được load ở đây -->
             </div>
             <div class="modal-actions">
                 <button class="cta-button cta-secondary" onclick="closeBookingDetailModal()">Đóng</button>
-                <button id="payment-btn" class="cta-button cta-primary" onclick="makePayment()" style="display: none;">💳 Thanh toán</button>
                 <button id="cancel-btn" class="cta-button cta-danger" onclick="showCancelBookingModal()" style="display: none;">✕ Hủy tour</button>
             </div>
         </div>
@@ -150,7 +177,10 @@
         </div>
     </div>
 
+    <script src="js/api-config.js"></script>
+    <script src="js/auth-helper.js"></script>
     <script src="js/customer-bookings.js"></script>
+    <!-- Toastify JS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </body>
 </html>
-

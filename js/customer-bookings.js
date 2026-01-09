@@ -1,15 +1,47 @@
-// Customer Bookings Management JavaScript
+// Customer Bookings Management JavaScript - Kết nối API
 let allBookings = [];
 let currentBookingId = null;
 
+// Utility functions
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN');
+}
+
+function formatCurrency(amount) {
+    if (!amount && amount !== 0) return '0 ₫';
+    return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+    }).format(amount);
+}
+
+function showToast(message, type = 'success') {
+    Toastify({
+        text: message,
+        duration: 3000,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6',
+        stopOnFocus: true
+    }).showToast();
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Kiểm tra đăng nhập
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
-    if (!user.email || user.role !== 'Khách Hàng') {
-        alert('Vui lòng đăng nhập để truy cập trang này!');
-        window.location.href = 'login.html';
+    if (!AuthHelper.requireAuth('Khách Hàng')) {
         return;
     }
+
+    console.log('Customer Bookings loaded');
     
     loadUserInfo();
     loadBookings();
@@ -42,121 +74,135 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Đóng modal hủy tour khi click bên ngoài
-    const cancelModal = document.getElementById('cancel-booking-modal');
-    if (cancelModal) {
-        cancelModal.addEventListener('click', function(e) {
-            if (e.target === cancelModal) {
-                closeCancelBookingModal();
-            }
-        });
+    // Check URL params for booking detail
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookingId = urlParams.get('bookingId');
+    if (bookingId) {
+        setTimeout(() => {
+            viewBookingDetail(bookingId);
+        }, 500);
     }
 });
 
 function loadUserInfo() {
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
-    if (user.name) {
-        const nameParts = user.name.split(' ');
-        const initials = nameParts.length >= 2 
-            ? nameParts[0][0] + nameParts[nameParts.length - 1][0]
-            : user.name[0];
-        document.getElementById('user-avatar').textContent = initials.toUpperCase();
-        document.getElementById('user-name').textContent = user.name;
-        document.getElementById('user-role').textContent = user.role || 'Khách Hàng';
+    try {
+        const user = AuthHelper.getUser();
+        if (user) {
+            // Get initials
+            let initials = 'KH';
+            if (user.hoTen) {
+                const nameParts = user.hoTen.split(' ');
+                if (nameParts.length >= 2) {
+                    initials = (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
+                } else if (nameParts.length === 1) {
+                    initials = nameParts[0][0].toUpperCase();
+                }
+            } else if (user.name) {
+                const nameParts = user.name.split(' ');
+                if (nameParts.length >= 2) {
+                    initials = (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
+                } else if (nameParts.length === 1) {
+                    initials = nameParts[0][0].toUpperCase();
+                }
+            }
+            
+            const userName = user.hoTen || user.name || 'Khách Hàng';
+            const userEmail = user.email || 'customer@travelviet.com';
+            
+            // Sidebar user info
+            const sidebarAvatar = document.getElementById('sidebar-user-avatar');
+            const sidebarName = document.getElementById('sidebar-user-name');
+            const sidebarEmail = document.getElementById('sidebar-user-email');
+            
+            if (sidebarAvatar) sidebarAvatar.textContent = initials;
+            if (sidebarName) sidebarName.textContent = 'Khách Hàng';
+            if (sidebarEmail) sidebarEmail.textContent = userEmail;
+            
+            // Header user info
+            const headerAvatar = document.getElementById('header-user-avatar');
+            const headerName = document.getElementById('header-user-name');
+            const headerEmail = document.getElementById('header-user-email');
+            
+            if (headerAvatar) headerAvatar.textContent = initials;
+            if (headerName) headerName.textContent = 'Khách Hàng';
+            if (headerEmail) headerEmail.textContent = userEmail;
+        }
+    } catch (error) {
+        console.error('Error loading user info:', error);
     }
 }
 
-function loadBookings() {
-    // Mock data - Chỉ hiển thị booking của khách hàng hiện tại
-    const currentUser = JSON.parse(sessionStorage.getItem('user') || '{}');
-    const currentUserId = currentUser.email || 'khachhang1@email.com'; // Giả sử lấy từ session
-    
-    // Mock data - Bookings của khách hàng
-    allBookings = [
-        {
-            bookingId: '31FEDE4C-F72A-46E4-860C-13B37F21AF88',
-            tourName: 'Tour Miền Bắc: Hà Nội - Hạ Long - Sa Pa',
-            ngayKhoiHanh: '2025-01-15',
-            ngayDat: '2024-12-20',
-            soNguoiLon: 2,
-            soTreEm: 0,
-            tongTien: 17000000,
-            trangThai: 'Đã xác nhận',
-            hoaDon: {
-                hoaDonId: '057C779C-55BF-47C7-B03E-5E4A8A3D1F7D',
-                tongTien: 17000000,
-                tienDaThanhToan: 17000000,
-                trangThaiThanhToan: 'Đã thanh toán đủ',
-                ngayLap: '2024-12-20'
-            },
-            thanhToan: [
-                {
-                    thanhToanId: '151B2519-5799-4255-99A1-543A25015ABB',
-                    soTien: 17000000,
-                    phuongThuc: 'Chuyển khoản',
-                    trangThai: 'Thành công',
-                    ngayThanhToan: '2024-12-20'
-                }
-            ]
-        },
-        {
-            bookingId: '3B77F08D-D653-4687-8F88-EE6C3ABDB691',
-            tourName: 'Tour Di sản Miền Trung: Đà Nẵng - Hội An - Huế',
-            ngayKhoiHanh: '2025-02-20',
-            ngayDat: '2024-12-15',
-            soNguoiLon: 1,
-            soTreEm: 1,
-            tongTien: 6000000,
-            trangThai: 'Đã thanh toán',
-            hoaDon: {
-                hoaDonId: '39D5AE02-C1A4-4E2C-9E60-EF4DD01C26A1',
-                tongTien: 6000000,
-                tienDaThanhToan: 6000000,
-                trangThaiThanhToan: 'Đã thanh toán đủ',
-                ngayLap: '2024-12-25'
-            },
-            thanhToan: [
-                {
-                    thanhToanId: '157652AC-C764-444A-821F-EF0F6FA75A5A',
-                    soTien: 6000000,
-                    phuongThuc: 'Tiền mặt',
-                    trangThai: 'Thành công',
-                    ngayThanhToan: '2024-12-25'
-                }
-            ]
-        },
-        {
-            bookingId: '586CCD5A-1069-426C-9F41-E065B604AB4E',
-            tourName: 'Tour Đà Lạt: Thành phố Ngàn Hoa',
-            ngayKhoiHanh: '2025-03-10',
-            ngayDat: '2024-12-10',
-            soNguoiLon: 3,
-            soTreEm: 0,
-            tongTien: 9600000,
-            trangThai: 'Chờ thanh toán',
-            hoaDon: {
-                hoaDonId: '8CB7DF63-2734-49B5-B9DE-16D4590566CA',
-                tongTien: 9600000,
-                tienDaThanhToan: 0,
-                trangThaiThanhToan: 'Chờ thanh toán',
-                ngayLap: '2024-12-28'
-            },
-            thanhToan: []
+function logout() {
+    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+        AuthHelper.logout();
+        window.location.href = 'login.html';
+    }
+}
+
+async function loadBookings() {
+    try {
+        const tbody = document.getElementById('bookings-table-body');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="7" class="loading-state">Đang tải...</td></tr>';
         }
-    ];
 
-    const searchTerm = document.getElementById('search-input').value.toLowerCase();
-    const statusFilter = document.getElementById('status-filter').value;
+        const user = AuthHelper.getUser();
+        if (!user || !user.nguoiDungId) {
+            showToast('Không tìm thấy thông tin người dùng', 'error');
+            return;
+        }
 
-    const filteredBookings = allBookings.filter(booking => {
-        const matchSearch = !searchTerm || 
-            booking.bookingId.toLowerCase().includes(searchTerm) ||
-            booking.tourName.toLowerCase().includes(searchTerm);
-        const matchStatus = !statusFilter || booking.trangThai === statusFilter;
-        return matchSearch && matchStatus;
-    });
+        const userId = user.nguoiDungId;
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.BOOKING_MY_HISTORY) + `/${userId}`;
+        console.log('Loading bookings from:', url);
+        
+        const response = await APIHelper.get(url);
+        console.log('Bookings response:', response);
+        
+        if (response && response.success && response.data) {
+            allBookings = Array.isArray(response.data) ? response.data : [];
+        } else if (Array.isArray(response)) {
+            allBookings = response;
+        } else if (response && Array.isArray(response.data)) {
+            allBookings = response.data;
+        } else {
+            console.warn('Unexpected response format:', response);
+            allBookings = [];
+        }
+        
+        console.log('Loaded bookings:', allBookings.length);
+        
+        // Filter bookings
+        const searchTerm = document.getElementById('search-input')?.value.toLowerCase().trim() || '';
+        const statusFilter = document.getElementById('status-filter')?.value || '';
+        
+        let filteredBookings = allBookings;
+        
+        if (searchTerm) {
+            filteredBookings = filteredBookings.filter(booking => {
+                const tenTour = (booking.tenTour || booking.TenTour || '').toLowerCase();
+                const bookingId = (booking.bookingId || booking.BookingId || '').toString().toLowerCase();
+                return tenTour.includes(searchTerm) || bookingId.includes(searchTerm);
+            });
+        }
+        
+        if (statusFilter) {
+            filteredBookings = filteredBookings.filter(booking => {
+                const trangThai = booking.trangThaiThanhToan || booking.TrangThaiThanhToan || '';
+                return trangThai === statusFilter;
+            });
+        }
 
-    renderBookingsTable(filteredBookings);
+        renderBookingsTable(filteredBookings);
+    } catch (error) {
+        console.error('Error loading bookings:', error);
+        const tbody = document.getElementById('bookings-table-body');
+        if (tbody) {
+            const errorMessage = error?.message || 'Lỗi khi tải dữ liệu booking';
+            tbody.innerHTML = `<tr><td colspan="7" class="error-state">${escapeHtml(errorMessage)}</td></tr>`;
+        }
+        showToast('Lỗi khi tải danh sách booking', 'error');
+    }
 }
 
 function renderBookingsTable(bookings) {
@@ -166,29 +212,35 @@ function renderBookingsTable(bookings) {
     tbody.innerHTML = '';
 
     if (bookings.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: var(--spacing-xl);">Không tìm thấy booking nào</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Không tìm thấy booking nào</td></tr>';
         return;
     }
 
     bookings.forEach(booking => {
+        const bookingId = booking.bookingId || booking.BookingId || '';
+        const tenTour = booking.tenTour || booking.TenTour || '-';
+        const ngayDat = booking.ngayDat || booking.NgayDat;
+        const soNguoiLon = booking.soNguoiLon || booking.SoNguoiLon || 0;
+        const soTreEm = booking.soTreEm || booking.SoTreEm || 0;
+        const tongTien = booking.tongTien || booking.TongTien || 0;
+        const trangThai = booking.trangThaiThanhToan || booking.TrangThaiThanhToan || 'Chờ xác nhận';
+        
         const row = document.createElement('tr');
-        const soNguoi = `${booking.soNguoiLon} người lớn${booking.soTreEm > 0 ? `, ${booking.soTreEm} trẻ em` : ''}`;
+        const soNguoi = `${soNguoiLon} người lớn${soTreEm > 0 ? `, ${soTreEm} trẻ em` : ''}`;
         
         const canCancel = canCancelBooking(booking);
         row.innerHTML = `
-            <td>${booking.bookingId.substring(0, 8)}...</td>
-            <td>${booking.tourName}</td>
-            <td>${formatDate(booking.ngayKhoiHanh)}</td>
+            <td>${bookingId.substring(0, 8)}...</td>
+            <td>${escapeHtml(tenTour)}</td>
+            <td>${formatDate(ngayDat)}</td>
             <td>${soNguoi}</td>
-            <td>${formatCurrency(booking.tongTien)}</td>
-            <td><span class="status-badge ${getStatusClass(booking.trangThai)}">${booking.trangThai}</span></td>
+            <td>${formatCurrency(tongTien)}</td>
+            <td><span class="status-badge ${getStatusClass(trangThai)}">${escapeHtml(trangThai)}</span></td>
             <td>
                 <div class="action-buttons">
-                    <button class="action-btn action-btn-secondary" onclick="viewBookingDetail('${booking.bookingId}')">👁️ Chi tiết</button>
-                    ${booking.trangThai === 'Chờ thanh toán' ? 
-                        `<button class="action-btn action-btn-primary" onclick="makePayment('${booking.bookingId}')">💳 Thanh toán</button>` : ''}
+                    <button class="action-btn action-btn-secondary" onclick="viewBookingDetail('${bookingId}')">👁️ Chi tiết</button>
                     ${canCancel ? 
-                        `<button class="action-btn action-btn-danger" onclick="showCancelBookingModalFromTable('${booking.bookingId}')">✕ Hủy</button>` : ''}
+                        `<button class="action-btn action-btn-danger" onclick="showCancelBookingModalFromTable('${bookingId}')">✕ Hủy</button>` : ''}
                 </div>
             </td>
         `;
@@ -202,44 +254,60 @@ function getStatusClass(status) {
         'Chờ thanh toán': 'status-pending',
         'Đã thanh toán': 'status-paid',
         'Đã hủy': 'status-cancelled',
-        'Chờ xác nhận': 'status-pending',
-        'Chờ hủy': 'status-pending'
+        'Chờ xác nhận': 'status-pending'
     };
     return statusMap[status] || 'status-pending';
 }
 
-function viewBookingDetail(bookingId) {
+async function viewBookingDetail(bookingId) {
     currentBookingId = bookingId;
-    const booking = allBookings.find(b => b.bookingId === bookingId);
-    if (!booking) {
-        alert('Không tìm thấy booking');
-        return;
-    }
+    
+    try {
+        // Tìm booking từ danh sách đã load
+        let booking = allBookings.find(b => 
+            (b.bookingId || b.BookingId) === bookingId
+        );
+        
+        // Nếu không tìm thấy, thử load lại từ API
+        if (!booking) {
+            const user = AuthHelper.getUser();
+            if (user && user.nguoiDungId) {
+                const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.BOOKING_MY_HISTORY) + `/${user.nguoiDungId}`;
+                const response = await APIHelper.get(url);
+                
+                if (response && response.success && response.data) {
+                    const bookings = Array.isArray(response.data) ? response.data : [];
+                    booking = bookings.find(b => 
+                        (b.bookingId || b.BookingId) === bookingId
+                    );
+                }
+            }
+        }
+        
+        if (!booking) {
+            showToast('Không tìm thấy booking', 'error');
+            return;
+        }
 
-    document.getElementById('booking-detail-title').textContent = `Chi tiết Booking: ${booking.bookingId.substring(0, 8)}`;
-    
-    // Hiển thị nút thanh toán nếu cần
-    const paymentBtn = document.getElementById('payment-btn');
-    const cancelBtn = document.getElementById('cancel-btn');
-    
-    if (booking.trangThai === 'Chờ thanh toán') {
-        paymentBtn.style.display = 'block';
-    } else {
-        paymentBtn.style.display = 'none';
+        document.getElementById('booking-detail-title').textContent = `Chi tiết Booking: ${(bookingId || '').substring(0, 8)}`;
+        
+        // Hiển thị nút hủy tour nếu booking có thể hủy
+        const cancelBtn = document.getElementById('cancel-btn');
+        if (canCancelBooking(booking)) {
+            cancelBtn.style.display = 'block';
+        } else {
+            cancelBtn.style.display = 'none';
+        }
+        
+        showTab('thong-tin', booking);
+        document.getElementById('booking-detail-modal').classList.add('active');
+    } catch (error) {
+        console.error('Error loading booking detail:', error);
+        showToast('Lỗi khi tải chi tiết booking', 'error');
     }
-    
-    // Hiển thị nút hủy tour nếu booking có thể hủy
-    if (canCancelBooking(booking)) {
-        cancelBtn.style.display = 'block';
-    } else {
-        cancelBtn.style.display = 'none';
-    }
-    
-    showTab('thong-tin');
-    document.getElementById('booking-detail-modal').classList.add('active');
 }
 
-function showTab(tabName) {
+function showTab(tabName, booking = null) {
     // Update tab buttons
     const tabButtons = document.querySelectorAll('#booking-detail-modal .tab-button');
     tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -253,116 +321,91 @@ function showTab(tabName) {
     const content = document.getElementById('booking-detail-content');
     if (!content) return;
 
-    const booking = allBookings.find(b => b.bookingId === currentBookingId);
+    // If booking not provided, find from allBookings
+    if (!booking && currentBookingId) {
+        booking = allBookings.find(b => 
+            (b.bookingId || b.BookingId) === currentBookingId
+        );
+    }
+    
     if (!booking) return;
 
     if (tabName === 'thong-tin') {
+        const tenTour = booking.tenTour || booking.TenTour || '-';
+        const ngayDat = booking.ngayDat || booking.NgayDat;
+        const soNguoiLon = booking.soNguoiLon || booking.SoNguoiLon || 0;
+        const soTreEm = booking.soTreEm || booking.SoTreEm || 0;
+        const tongTien = booking.tongTien || booking.TongTien || 0;
+        const trangThai = booking.trangThaiThanhToan || booking.TrangThaiThanhToan || 'Chờ xác nhận';
+        const bookingId = booking.bookingId || booking.BookingId || '';
+        
         content.innerHTML = `
             <div class="booking-info-grid">
                 <div class="booking-info-item">
                     <span class="booking-info-label">Mã Booking:</span>
-                    <span class="booking-info-value">${booking.bookingId}</span>
+                    <span class="booking-info-value">${escapeHtml(bookingId)}</span>
                 </div>
                 <div class="booking-info-item">
                     <span class="booking-info-label">Tên Tour:</span>
-                    <span class="booking-info-value">${booking.tourName}</span>
-                </div>
-                <div class="booking-info-item">
-                    <span class="booking-info-label">Ngày khởi hành:</span>
-                    <span class="booking-info-value">${formatDate(booking.ngayKhoiHanh)}</span>
+                    <span class="booking-info-value">${escapeHtml(tenTour)}</span>
                 </div>
                 <div class="booking-info-item">
                     <span class="booking-info-label">Ngày đặt:</span>
-                    <span class="booking-info-value">${formatDate(booking.ngayDat)}</span>
+                    <span class="booking-info-value">${formatDate(ngayDat)}</span>
                 </div>
                 <div class="booking-info-item">
                     <span class="booking-info-label">Số người lớn:</span>
-                    <span class="booking-info-value">${booking.soNguoiLon}</span>
+                    <span class="booking-info-value">${soNguoiLon}</span>
                 </div>
                 <div class="booking-info-item">
                     <span class="booking-info-label">Số trẻ em:</span>
-                    <span class="booking-info-value">${booking.soTreEm}</span>
+                    <span class="booking-info-value">${soTreEm}</span>
                 </div>
                 <div class="booking-info-item">
                     <span class="booking-info-label">Tổng tiền:</span>
-                    <span class="booking-info-value">${formatCurrency(booking.tongTien)}</span>
+                    <span class="booking-info-value">${formatCurrency(tongTien)}</span>
                 </div>
                 <div class="booking-info-item">
                     <span class="booking-info-label">Trạng thái:</span>
                     <span class="booking-info-value">
-                        <span class="status-badge ${getStatusClass(booking.trangThai)}">${booking.trangThai}</span>
+                        <span class="status-badge ${getStatusClass(trangThai)}">${escapeHtml(trangThai)}</span>
                     </span>
                 </div>
             </div>
         `;
-    } else if (tabName === 'hoa-don') {
-        const hoaDon = booking.hoaDon || {};
-        const conNo = hoaDon.tongTien - hoaDon.tienDaThanhToan;
+    } else if (tabName === 'hanh-khach') {
+        const danhSachHanhKhach = booking.danhSachHanhKhach || booking.DanhSachHanhKhach || [];
         
-        content.innerHTML = `
-            <div class="invoice-info-grid">
-                <div class="booking-info-item">
-                    <span class="booking-info-label">Mã hóa đơn:</span>
-                    <span class="booking-info-value">${hoaDon.hoaDonId || '-'}</span>
-                </div>
-                <div class="booking-info-item">
-                    <span class="booking-info-label">Ngày lập:</span>
-                    <span class="booking-info-value">${formatDate(hoaDon.ngayLap)}</span>
-                </div>
-                <div class="booking-info-item">
-                    <span class="booking-info-label">Trạng thái thanh toán:</span>
-                    <span class="booking-info-value">${hoaDon.trangThaiThanhToan || '-'}</span>
-                </div>
-            </div>
-            <div class="invoice-summary">
-                <div class="invoice-summary-item">
-                    <span>Tổng tiền:</span>
-                    <span>${formatCurrency(hoaDon.tongTien || 0)}</span>
-                </div>
-                <div class="invoice-summary-item">
-                    <span>Đã thanh toán:</span>
-                    <span>${formatCurrency(hoaDon.tienDaThanhToan || 0)}</span>
-                </div>
-                <div class="invoice-summary-item">
-                    <span>Còn nợ:</span>
-                    <span>${formatCurrency(conNo)}</span>
-                </div>
-            </div>
-        `;
-    } else if (tabName === 'thanh-toan') {
-        const thanhToan = booking.thanhToan || [];
-        
-        if (thanhToan.length === 0) {
+        if (danhSachHanhKhach.length === 0) {
             content.innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-state-icon">💳</div>
-                    <div class="empty-state-text">Chưa có lịch sử thanh toán</div>
-                    <div class="empty-state-desc">Bạn chưa thực hiện thanh toán nào cho booking này</div>
+                    <div class="empty-state-icon">👥</div>
+                    <div class="empty-state-text">Chưa có thông tin hành khách</div>
                 </div>
             `;
         } else {
             let tableHTML = `
-                <table class="payment-history-table">
+                <table class="passenger-table">
                     <thead>
                         <tr>
-                            <th>Mã thanh toán</th>
-                            <th>Số tiền</th>
-                            <th>Phương thức</th>
-                            <th>Trạng thái</th>
-                            <th>Ngày thanh toán</th>
+                            <th>Họ tên</th>
+                            <th>Loại khách</th>
+                            <th>CMND/Hộ chiếu</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
             
-            thanhToan.forEach(payment => {
+            danhSachHanhKhach.forEach(khach => {
+                const hoTen = khach.hoTen || khach.HoTen || '-';
+                const loaiKhach = khach.loaiKhach || khach.LoaiKhach || 'Người lớn';
+                const cmnd = khach.cmnd || khach.CMND || '-';
+                
                 tableHTML += `
                     <tr>
-                        <td>${payment.thanhToanId.substring(0, 8)}...</td>
-                        <td>${formatCurrency(payment.soTien)}</td>
-                        <td>${payment.phuongThuc}</td>
-                        <td><span class="status-badge ${payment.trangThai === 'Thành công' ? 'status-paid' : 'status-pending'}">${payment.trangThai}</span></td>
-                        <td>${formatDate(payment.ngayThanhToan)}</td>
+                        <td>${escapeHtml(hoTen)}</td>
+                        <td>${escapeHtml(loaiKhach)}</td>
+                        <td>${escapeHtml(cmnd)}</td>
                     </tr>
                 `;
             });
@@ -381,82 +424,21 @@ function showTab(tabName) {
 
 function closeBookingDetailModal() {
     document.getElementById('booking-detail-modal').classList.remove('active');
-}
-
-function makePayment() {
-    if (!currentBookingId) return;
-    
-    const booking = allBookings.find(b => b.bookingId === currentBookingId);
-    if (!booking) {
-        alert('Không tìm thấy booking');
-        return;
+    // Clear URL params
+    if (window.location.search.includes('bookingId')) {
+        window.history.replaceState({}, document.title, window.location.pathname);
     }
-    
-    if (!confirm(`Bạn có muốn thanh toán booking này không?\nTổng tiền: ${formatCurrency(booking.tongTien)}`)) return;
-    
-    alert('Chức năng thanh toán sẽ được tích hợp sau!\nBạn sẽ được chuyển đến trang thanh toán.');
-    // TODO: Redirect to payment page
-    // window.location.href = `customer-payment.html?bookingId=${currentBookingId}`;
-}
-
-function formatCurrency(amount) {
-    return new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND'
-    }).format(amount);
-}
-
-function formatDate(dateString) {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN');
 }
 
 // Hàm kiểm tra xem booking có thể hủy không
 function canCancelBooking(booking) {
-    // Không thể hủy nếu đã hủy hoặc đã hoàn thành
-    if (booking.trangThai === 'Đã hủy' || booking.trangThai === 'Đã hoàn thành') {
+    const trangThai = booking.trangThaiThanhToan || booking.TrangThaiThanhToan || '';
+    // Không thể hủy nếu đã hủy hoặc đã thanh toán
+    if (trangThai === 'Đã hủy' || trangThai === 'Đã thanh toán') {
         return false;
     }
-    
-    // Kiểm tra thời gian: chỉ có thể hủy trước 7 ngày khởi hành
-    if (booking.ngayKhoiHanh) {
-        const ngayKhoiHanh = new Date(booking.ngayKhoiHanh);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        ngayKhoiHanh.setHours(0, 0, 0, 0);
-        
-        const daysUntilDeparture = Math.ceil((ngayKhoiHanh - today) / (1000 * 60 * 60 * 24));
-        
-        // Có thể hủy nếu còn ít nhất 7 ngày trước ngày khởi hành
-        return daysUntilDeparture >= 7;
-    }
-    
-    return false;
-}
-
-// Tính số ngày còn lại trước ngày khởi hành
-function getDaysUntilDeparture(ngayKhoiHanh) {
-    if (!ngayKhoiHanh) return 0;
-    const ngayKhoiHanhDate = new Date(ngayKhoiHanh);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    ngayKhoiHanhDate.setHours(0, 0, 0, 0);
-    
-    return Math.ceil((ngayKhoiHanhDate - today) / (1000 * 60 * 60 * 24));
-}
-
-// Tính phần trăm hoàn tiền dựa trên số ngày trước khởi hành
-function calculateRefundPercentage(daysUntilDeparture) {
-    if (daysUntilDeparture >= 30) {
-        return 100; // Hoàn 100% nếu hủy trước 30 ngày
-    } else if (daysUntilDeparture >= 14) {
-        return 80; // Hoàn 80% nếu hủy trước 14 ngày
-    } else if (daysUntilDeparture >= 7) {
-        return 50; // Hoàn 50% nếu hủy trước 7 ngày
-    } else {
-        return 0; // Không hoàn tiền nếu hủy dưới 7 ngày
-    }
+    // Có thể hủy nếu còn ở trạng thái chờ xác nhận hoặc chờ thanh toán
+    return trangThai === 'Chờ xác nhận' || trangThai === 'Chờ thanh toán';
 }
 
 // Hiển thị modal hủy tour từ bảng
@@ -469,21 +451,21 @@ function showCancelBookingModalFromTable(bookingId) {
 function showCancelBookingModal() {
     if (!currentBookingId) return;
     
-    const booking = allBookings.find(b => b.bookingId === currentBookingId);
+    const booking = allBookings.find(b => 
+        (b.bookingId || b.BookingId) === currentBookingId
+    );
     if (!booking) {
-        alert('Không tìm thấy booking');
+        showToast('Không tìm thấy booking', 'error');
         return;
     }
     
     // Kiểm tra điều kiện hủy
     if (!canCancelBooking(booking)) {
-        alert('Booking này không thể hủy. Vui lòng liên hệ nhân viên để được hỗ trợ.');
+        showToast('Booking này không thể hủy. Vui lòng liên hệ nhân viên để được hỗ trợ.', 'error');
         return;
     }
     
-    const daysUntilDeparture = getDaysUntilDeparture(booking.ngayKhoiHanh);
-    const refundPercentage = calculateRefundPercentage(daysUntilDeparture);
-    const refundAmount = (booking.tongTien * refundPercentage) / 100;
+    const tongTien = booking.tongTien || booking.TongTien || 0;
     
     // Hiển thị chính sách hủy
     const policyInfo = document.getElementById('cancel-policy-info');
@@ -496,10 +478,10 @@ function showCancelBookingModal() {
             <li>Hủy dưới 7 ngày: Không hoàn tiền</li>
         </ul>
         <div class="cancel-policy-warning">
-            ⚠️ Còn ${daysUntilDeparture} ngày trước ngày khởi hành (${formatDate(booking.ngayKhoiHanh)})
+            ⚠️ Yêu cầu hủy sẽ được gửi đến nhân viên để xử lý
         </div>
         <div class="cancel-policy-refund">
-            💰 Số tiền được hoàn lại: ${formatCurrency(refundAmount)} (${refundPercentage}% của ${formatCurrency(booking.tongTien)})
+            💰 Tổng tiền booking: ${formatCurrency(tongTien)}
         </div>
     `;
     
@@ -517,12 +499,14 @@ function closeCancelBookingModal() {
 }
 
 // Gửi yêu cầu hủy tour
-function submitCancelBooking() {
+async function submitCancelBooking() {
     if (!currentBookingId) return;
     
-    const booking = allBookings.find(b => b.bookingId === currentBookingId);
+    const booking = allBookings.find(b => 
+        (b.bookingId || b.BookingId) === currentBookingId
+    );
     if (!booking) {
-        alert('Không tìm thấy booking');
+        showToast('Không tìm thấy booking', 'error');
         return;
     }
     
@@ -535,53 +519,39 @@ function submitCancelBooking() {
     
     const cancelReason = document.getElementById('cancel-reason').value.trim();
     if (!cancelReason) {
-        alert('Vui lòng nhập lý do hủy tour');
+        showToast('Vui lòng nhập lý do hủy tour', 'error');
         return;
     }
     
-    const daysUntilDeparture = getDaysUntilDeparture(booking.ngayKhoiHanh);
-    const refundPercentage = calculateRefundPercentage(daysUntilDeparture);
-    const refundAmount = (booking.tongTien * refundPercentage) / 100;
-    
     // Xác nhận hủy
+    const tenTour = booking.tenTour || booking.TenTour || '';
     if (!confirm(`Bạn có chắc chắn muốn hủy tour này không?\n\n` +
-        `Tour: ${booking.tourName}\n` +
-        `Ngày khởi hành: ${formatDate(booking.ngayKhoiHanh)}\n` +
-        `Số tiền được hoàn lại: ${formatCurrency(refundAmount)} (${refundPercentage}%)\n\n` +
+        `Tour: ${tenTour}\n\n` +
         `Yêu cầu hủy sẽ được gửi đến nhân viên để xử lý.`)) {
         return;
     }
     
     try {
-        // TODO: Gửi API request để hủy booking
-        // const response = await fetch(`/api/bookings/${currentBookingId}/cancel`, {
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify({
-        //         reason: cancelReason,
-        //         refundAmount: refundAmount
-        //     })
-        // });
+        const user = AuthHelper.getUser();
+        if (!user || !user.nguoiDungId) {
+            showToast('Không tìm thấy thông tin người dùng', 'error');
+            return;
+        }
         
-        // Mock: Cập nhật trạng thái booking
-        booking.trangThai = 'Chờ hủy';
-        booking.cancelRequest = {
-            reason: cancelReason,
-            refundAmount: refundAmount,
-            refundPercentage: refundPercentage,
-            requestDate: new Date().toISOString().split('T')[0],
-            status: 'Chờ xử lý'
-        };
+        const userId = user.nguoiDungId;
+        const url = API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.BOOKING_CANCEL) + `/${currentBookingId}?userId=${userId}`;
+        const response = await APIHelper.post(url);
         
-        alert('Yêu cầu hủy tour đã được gửi thành công!\nNhân viên sẽ xử lý và liên hệ với bạn trong vòng 24 giờ.');
-        
-        // Đóng modal và reload
-        closeCancelBookingModal();
-        closeBookingDetailModal();
-        loadBookings();
+        if (response && response.success) {
+            showToast('Yêu cầu hủy tour đã được gửi thành công!', 'success');
+            closeCancelBookingModal();
+            closeBookingDetailModal();
+            await loadBookings();
+        } else {
+            showToast(response?.message || 'Không thể hủy booking', 'error');
+        }
     } catch (error) {
         console.error('Error canceling booking:', error);
-        alert('Lỗi khi gửi yêu cầu hủy tour. Vui lòng thử lại sau.');
+        showToast('Lỗi khi gửi yêu cầu hủy tour. Vui lòng thử lại sau.', 'error');
     }
 }
-

@@ -128,12 +128,48 @@ const APIHelper = {
         
         try {
             const response = await fetch(url, config);
-            const data = await response.json();
+            
+            // Kiểm tra status code
+            if (!response.ok) {
+                // Xử lý lỗi 401 (Unauthorized) - redirect về login
+                if (response.status === 401) {
+                    AuthHelper.logout();
+                    window.location.href = 'login.html';
+                    throw new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                }
+                
+                let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData?.message || errorData?.Message || errorMessage;
+                } catch (e) {
+                    // Nếu không parse được JSON, dùng status text
+                }
+                throw new Error(errorMessage);
+            }
+            
+            // Parse JSON response
+            let data;
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new Error('Response is not valid JSON');
+                }
+            }
             
             // Xử lý response từ backend (camelCase hoặc PascalCase)
             return this.normalizeResponse(data);
         } catch (error) {
             console.error('API Error:', error);
+            // Nếu là lỗi network hoặc CORS
+            if (error.message.includes('Failed to fetch') || error.message.includes('CORS')) {
+                throw new Error('Không thể kết nối đến server. Vui lòng kiểm tra API đã chạy chưa.');
+            }
             throw error;
         }
     },
